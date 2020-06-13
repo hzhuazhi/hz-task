@@ -97,6 +97,36 @@ public class BankModel extends BasePage implements Serializable {
     private Integer openType;
 
     /**
+     * 日收款金额
+     */
+    private String inDayMoney;
+
+    /**
+     * 日转账金额
+     */
+    private String outDayMoney;
+
+    /**
+     * 月收款金额
+     */
+    private String inMonthMoney;
+
+    /**
+     * 月转账金额
+     */
+    private String outMonthMoney;
+
+    /**
+     * 总收款金额
+     */
+    private String inTotalMoney;
+
+    /**
+     * 总转账金额
+     */
+    private String outTotalMoney;
+
+    /**
      * 日开关是否启用（等于1正常使用，其它是暂停）:：1正常使用，2暂停使用
      */
     private Integer daySwitch;
@@ -115,6 +145,11 @@ public class BankModel extends BasePage implements Serializable {
      * 备注
      */
     private String remark;
+
+    /**
+     *被限制的原因:task跑日月总限制，如果被限制，会填充被限制的原因
+     */
+    private String limitInfo;
 
     /**
      * 使用状态:1初始化有效正常使用，2无效暂停使用
@@ -355,5 +390,61 @@ public class BankModel extends BasePage implements Serializable {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public String getLimitInfo() {
+        return limitInfo;
+    }
+
+    public void setLimitInfo(String limitInfo) {
+        this.limitInfo = limitInfo;
+    }
+
+    public String getInDayMoney() {
+        return inDayMoney;
+    }
+
+    public void setInDayMoney(String inDayMoney) {
+        this.inDayMoney = inDayMoney;
+    }
+
+    public String getOutDayMoney() {
+        return outDayMoney;
+    }
+
+    public void setOutDayMoney(String outDayMoney) {
+        this.outDayMoney = outDayMoney;
+    }
+
+    public String getInMonthMoney() {
+        return inMonthMoney;
+    }
+
+    public void setInMonthMoney(String inMonthMoney) {
+        this.inMonthMoney = inMonthMoney;
+    }
+
+    public String getOutMonthMoney() {
+        return outMonthMoney;
+    }
+
+    public void setOutMonthMoney(String outMonthMoney) {
+        this.outMonthMoney = outMonthMoney;
+    }
+
+    public String getInTotalMoney() {
+        return inTotalMoney;
+    }
+
+    public void setInTotalMoney(String inTotalMoney) {
+        this.inTotalMoney = inTotalMoney;
+    }
+
+    public String getOutTotalMoney() {
+        return outTotalMoney;
+    }
+
+    public void setOutTotalMoney(String outTotalMoney) {
+        this.outTotalMoney = outTotalMoney;
     }
 }

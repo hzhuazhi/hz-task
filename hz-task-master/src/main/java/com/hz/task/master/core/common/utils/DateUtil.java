@@ -3100,6 +3100,10 @@ public class DateUtil {
 		String nowTime = "2020-06-13 00:01:29";
 		String sb = addDateByTime(nowTime, -10);
 		System.out.println("sb:" + sb);
+		int min = getMinMonthDate();
+		int max = getMaxMonthDate();
+		System.out.println(min);
+		System.out.println(max);
 	}
 
 	/**

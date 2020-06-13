@@ -134,6 +134,9 @@ public class AutowireRunner implements ApplicationRunner {
     @Autowired
     private TaskCatDataOfflineService taskCatDataOfflineService;
 
+    @Autowired
+    private TaskBankLimitService taskBankLimitService;
+
 
 
 
@@ -182,6 +185,7 @@ public class AutowireRunner implements ApplicationRunner {
         ComponentUtil.taskCatDataService = taskCatDataService;
         ComponentUtil.taskOrderService = taskOrderService;
         ComponentUtil.taskCatDataOfflineService = taskCatDataOfflineService;
+        ComponentUtil.taskBankLimitService = taskBankLimitService;
 
         runThread = new RunThread();
         runThread.start();

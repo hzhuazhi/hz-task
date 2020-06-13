@@ -3,6 +3,7 @@ package com.hz.task.master.core.service.impl;
 import com.hz.task.master.core.common.dao.BaseDao;
 import com.hz.task.master.core.common.service.impl.BaseServiceImpl;
 import com.hz.task.master.core.mapper.BankTransferMapper;
+import com.hz.task.master.core.model.bank.BankTransferModel;
 import com.hz.task.master.core.service.BankTransferService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,5 +28,10 @@ public class BankTransferServiceImpl<T> extends BaseServiceImpl<T> implements Ba
 
     public BaseDao<T> getDao() {
         return bankTransferMapper;
+    }
+
+    @Override
+    public String getBankTransferMoney(BankTransferModel model) {
+        return bankTransferMapper.getBankTransferMoney(model);
     }
 }

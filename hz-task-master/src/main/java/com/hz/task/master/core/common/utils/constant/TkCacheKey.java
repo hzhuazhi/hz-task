@@ -102,4 +102,10 @@ public interface TkCacheKey {
      */
     String LOCK_CAT_DATA_OFFLINE = "-16";
 
+    /**
+     * 锁：银行卡金额流水task的redis
+     * 锁住
+     */
+    String LOCK_BANK = "-17";
+
 }

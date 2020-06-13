@@ -48,6 +48,7 @@ public class ComponentUtil {
     public static TaskCatDataService taskCatDataService;
     public static TaskOrderService taskOrderService;
     public static TaskCatDataOfflineService taskCatDataOfflineService;
+    public static TaskBankLimitService taskBankLimitService;
 
 
 

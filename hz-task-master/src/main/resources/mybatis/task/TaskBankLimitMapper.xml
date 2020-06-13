@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hz.task.master.core.mapper.task.TaskBankLimitMapper">
+
+
+
+
+    <!-- 定义数据库基本列,只适用代替单表的*-->
+    <sql id="Base_Column_List">
+        a.id,a.mobile_card_id,a.bank_name,a.bank_card,a.subbranch_name,a.account_name,a.province,a.city,a.bank_type,
+        a.sms_num,a.last_num,a.sms_content,a.start_key,a.end_key,a.special_type,a.open_type,
+        a.in_day_money,a.out_day_money,a.in_month_money,a.out_month_money,a.in_total_money,a.out_total_money,
+        a.day_switch,a.month_switch,a.total_switch,a.remark,a.limit_info,a.use_status,
+        a.create_time,a.update_time,a.yn
+    </sql>
+
+    <!-- 查询条件 -->
+    <sql id="Example_Where_Clause">
+        where 1=1
+        <trim  suffixOverrides="," >
+            <if test="id != null and id != '' " >
+                and a.id = #{id}
+            </if>
+            <if test="mobileCardId != null and mobileCardId != '' " >
+                and a.mobile_card_id = #{mobileCardId}
+            </if>
+            <if test="bankName != null and bankName != '' " >
+                and a.bank_name = #{bankName}
+            </if>
+            <if test="bankType != null and bankType != '' " >
+                and a.bank_type = #{bankType}
+            </if>
+            <if test="smsNum != null and smsNum != '' " >
+                and a.sms_num = #{smsNum}
+            </if>
+            <if test="lastNum != null and lastNum != '' " >
+                and a.last_num = #{lastNum}
+            </if>
+            <if test="startKey != null and startKey != '' " >
+                and a.start_key = #{startKey}
+            </if>
+            <if test="endKey != null and endKey != '' " >
+                and a.end_key = #{endKey}
+            </if>
+            <if test="specialType != null and specialType != '' " >
+                and a.special_type = #{specialType}
+            </if>
+            <if test="openType != null and openType != '' " >
+                and a.open_type = #{openType}
+            </if>
+            <if test="daySwitch != null and daySwitch != '' " >
+                and a.day_switch = #{daySwitch}
+            </if>
+            <if test="monthSwitch != null and monthSwitch != '' " >
+                and a.month_switch = #{monthSwitch}
+            </if>
+            <if test="totalSwitch != null and totalSwitch != '' " >
+                and a.total_switch = #{totalSwitch}
+            </if>
+            <if test="useStatus != null and useStatus != '' " >
+                and a.use_status = #{useStatus}
+            </if>
+            <if test="mobileCardIdList != null and mobileCardIdList.size()>0">
+                and a.mobile_card_id in
+                <foreach item="item" index="index" collection="mobileCardIdList" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="openTypeList != null and openTypeList.size()>0">
+                and a.open_type in
+                <foreach item="item" index="index" collection="openTypeList" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            and a.yn = 0
+        </trim>
+    </sql>
+
+
+    <!-- 查询条件_id -->
+    <sql id="Example_Where_Clause_id">
+        where 1=1
+        <trim  suffixOverrides="," >
+            <if test="id != null and id != '' " >
+                and a.id = #{id}
+            </if>
+            and a.yn =  0
+        </trim>
+    </sql>
+
+    <!-- 排序条件 -->
+    <sql id="Example_Order_By">
+        order by a.create_time desc
+    </sql>
+
+    <!-- 获取银行卡的信息 -->
+    <select id="getBankDataList" parameterType="Object" resultType="com.hz.task.master.core.model.bank.BankModel">
+        select
+        <include refid="Base_Column_List" />
+        from tb_fn_bank a
+        <include refid="Example_Where_Clause"/>
+    </select>
+
+    <!-- 更新银行卡的三个开关 -->
+    <update id="updateBankSwitch" parameterType="Object">
+        UPDATE tb_fn_bank a
+        <trim prefix="set" suffixOverrides=",">
+            <if test="daySwitch != null and daySwitch != '' " >
+                a.day_switch = #{daySwitch},
+            </if>
+            <if test="monthSwitch != null and monthSwitch != '' " >
+                a.month_switch = #{monthSwitch},
+            </if>
+            <if test="totalSwitch != null and totalSwitch != '' " >
+                a.total_switch = #{totalSwitch},
+            </if>
+            a.limit_info = #{limitInfo},
+            a.update_time = NOW(),
+        </trim>
+        where 1=1
+        and a.id = #{id}
+    </update>
+
+</mapper>

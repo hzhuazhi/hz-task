@@ -34,4 +34,9 @@ public class DidRechargeServiceImpl <T> extends BaseServiceImpl<T> implements Di
     public String directSumMoney(DidRechargeModel model) {
         return didRechargeMapper.directSumMoney(model);
     }
+
+    @Override
+    public String getRechargeMoney(DidRechargeModel model) {
+        return didRechargeMapper.getRechargeMoney(model);
+    }
 }

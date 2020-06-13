@@ -9,6 +9,7 @@ import com.hz.task.master.core.common.utils.constant.ServerConstant;
 import com.hz.task.master.core.model.bank.BankCollectionDataModel;
 import com.hz.task.master.core.model.bank.BankCollectionModel;
 import com.hz.task.master.core.model.bank.BankModel;
+import com.hz.task.master.core.model.bank.BankTransferModel;
 import com.hz.task.master.core.model.cat.CatDataModel;
 import com.hz.task.master.core.model.cat.CatDataOfflineModel;
 import com.hz.task.master.core.model.did.*;
@@ -1495,6 +1496,97 @@ public class TaskMethod {
         return resBean;
     }
 
+    /**
+     * @Description: 组装查询银行卡信息的查询条件
+     * @return
+     * @author yoko
+     * @date 2020/6/13 19:25
+    */
+    public static BankModel assembleBankQuery(){
+        BankModel resBean = new BankModel();
+        resBean.setUseStatus(1);
+        return resBean;
+    }
+
+
+    /**
+     * @Description: 组装查询银行卡收款金额的查询条件
+     * @param bankId - 银行卡主键ID
+     * @param curday - 日期
+     * @param curdayStart - 开始日期
+     * @param curdayEnd - 结束日期
+     * @return com.hz.task.master.core.model.did.DidRechargeModel
+     * @author yoko
+     * @date 2020/6/13 20:55
+     */
+    public static DidRechargeModel assembleDidRechargeByBankIdQuery(long bankId, int curday, int curdayStart, int curdayEnd){
+        DidRechargeModel resBean = new DidRechargeModel();
+        resBean.setBankId(bankId);
+        if (curday > 0){
+            resBean.setCurday(curday);
+        }
+        if (curdayStart > 0){
+            resBean.setCurdayStart(curdayStart);
+        }
+        if (curdayEnd > 0){
+            resBean.setCurdayEnd(curdayEnd);
+        }
+        return resBean;
+    }
+
+    /**
+     * @Description: 组装查询银行卡转账金额的查询条件
+     * @param bankId - 银行卡主键ID
+     * @param curday - 日期
+     * @param curdayStart - 开始日期
+     * @param curdayEnd - 结束日期
+     * @return com.hz.task.master.core.model.bank.BankTransferModel
+     * @author yoko
+     * @date 2020/6/13 20:55
+     */
+    public static BankTransferModel assembleBankTransferByBankIdQuery(long bankId, int curday, int curdayStart, int curdayEnd){
+        BankTransferModel resBean = new BankTransferModel();
+        resBean.setBankId(bankId);
+        if (curday > 0){
+            resBean.setCurday(curday);
+        }
+        if (curdayStart > 0){
+            resBean.setCurdayStart(curdayStart);
+        }
+        if (curdayEnd > 0){
+            resBean.setCurdayEnd(curdayEnd);
+        }
+        return resBean;
+    }
+
+
+    /**
+     * @Description: 组装更新银行卡开关的方法
+     * @param bankId - 银行卡主键ID
+     * @param daySwitch - 日开关是否启用（等于1正常使用，其它是暂停）:：1正常使用，2暂停使用
+     * @param monthSwitch - 月开关是否启用：1正常使用，2暂停使用
+     * @param totalSwitch - 总开关是否启用：1正常使用，2暂停使用
+     * @param limitInfo - 限制缘由
+     * @return com.hz.task.master.core.model.bank.BankModel
+     * @author yoko
+     * @date 2020/6/13 21:15
+     */
+    public static BankModel assembleBankSwitchUpdate(long bankId, int daySwitch, int monthSwitch, int totalSwitch, String limitInfo){
+        BankModel resBean = new BankModel();
+        resBean.setId(bankId);
+        if (daySwitch > 0){
+            resBean.setDaySwitch(daySwitch);
+        }
+        if (monthSwitch > 0){
+            resBean.setMonthSwitch(monthSwitch);
+        }
+        if (totalSwitch > 0){
+            resBean.setTotalSwitch(totalSwitch);
+        }
+        resBean.setLimitInfo(limitInfo);
+        return resBean;
+    }
+
 
 
 
@@ -1546,6 +1638,9 @@ public class TaskMethod {
         for (Long id : idList){
             System.out.println("id:" + id);
         }
+//        List<String> tableNames=list.stream().map(User::getMessage).collect(Collectors.toList());
+//        Double sum = investorList.stream().mapToDouble(n -> CommonUtils.isNumeric(n.getInvestMoney()) ?
+//        int ageSum = userList.stream().collect(Collectors.summingInt(User::getAge));
 
     }
 

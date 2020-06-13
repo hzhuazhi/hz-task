@@ -242,4 +242,19 @@
     </update>
 
 
+    <!-- 根据查询条件获取银行卡的转账金额-->
+    <select id="getBankTransferMoney" parameterType="Object" resultType="java.lang.String">
+        select ifnull(sum(convert(a.money,decimal(19,2))), '0.00') as money from tb_fn_bank_transfer a
+        where 1=1
+        and a.bank_id = #{bankId}
+        <if test="curday != null and curday != '' " >
+            and a.curday = #{curday}
+        </if>
+        <if test="curdayStart != null and curdayStart != '' and curdayEnd != null and curdayEnd != '' " >
+            and a.curday >= #{curdayStart} and a.curday &lt;= #{curdayEnd}
+        </if>
+        and a.yn = 0
+    </select>
+
+
 </mapper>
