@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hz.task.master.core.mapper.task.TaskOrderMapper">
+
+
+
+
+    <!-- 定义数据库基本列,只适用代替单表的*-->
+    <sql id="Base_Column_List">
+        a.id,a.did,a.order_no,a.order_money,a.collection_account_id,a.collection_type,
+        a.qr_code,a.wx_nickname,a.wx_id,a.out_trade_no,a.notify_url,a.order_status,a.invalid_time,
+        a.curday,a.curhour,a.curminute,a.run_num,a.run_status,a.send_num,a.send_status,
+        a.create_time,a.update_time,a.yn,
+        b.ac_name,b.ac_num
+    </sql>
+
+    <!-- 查询条件 -->
+    <sql id="Example_Where_Clause">
+        where 1=1
+        <trim  suffixOverrides="," >
+            <if test="id != null and id != '' " >
+                and a.id = #{id}
+            </if>
+            <if test="orderStatus != null and orderStatus != '' " >
+                and a.order_status = #{orderStatus}
+            </if>
+            <if test="curday != null and curday != '' " >
+                and a.curday = #{curday}
+            </if>
+            <if test="curdayStart != null and curdayStart != '' and curdayEnd != null and curdayEnd != '' " >
+                and a.curday >= #{curdayStart} and a.curday &lt;= #{curdayEnd}
+            </if>
+            <if test="runNum != null and runNum != '' " >
+                and a.run_num &lt; #{runNum}
+            </if>
+            <if test="runStatus != null and runStatus != '' " >
+                and a.run_status &lt; #{runStatus}
+            </if>
+            <if test="sendNum != null and sendNum != '' " >
+                and a.send_num &lt; #{sendNum}
+            </if>
+            <if test="sendStatus != null and sendStatus != '' " >
+                and a.send_status &lt; #{sendStatus}
+            </if>
+            <if test="invalidTime != null and invalidTime != '' " >
+                and a.invalid_time &lt; = now()
+            </if>
+            and a.yn = 0
+        </trim>
+    </sql>
+
+
+    <!-- 查询条件_id -->
+    <sql id="Example_Where_Clause_id">
+        where 1=1
+        <trim  suffixOverrides="," >
+            <if test="id != null and id != '' " >
+                and a.id = #{id}
+            </if>
+            and a.yn =  0
+        </trim>
+    </sql>
+
+    <!-- 排序条件 -->
+    <sql id="Example_Order_By">
+        order by a.create_time desc
+    </sql>
+
+
+
+
+    <!-- 根据条件获取派单数据-未跑task的派单数据 -->
+    <select id="getOrderList" parameterType="Object" resultType="com.hz.task.master.core.model.order.OrderModel">
+        select
+        <include refid="Base_Column_List" />
+        from tb_fn_order a left join tb_fn_did_collection_account b on a.collection_account_id = b.id
+        <include refid="Example_Where_Clause"/>
+        limit #{limitNum}
+    </select>
+
+
+    <!-- 更新派单数据数据的状态-task的状态 -->
+    <update id="updateOrderStatus" parameterType="com.hz.task.master.core.model.order.OrderModel">
+        UPDATE tb_fn_order a
+        <trim prefix="set" suffixOverrides=",">
+            <if test="runNum != null and runNum != '' " >
+                a.run_num = a.run_num + #{runNum},
+            </if>
+            <if test="runStatus != null and runStatus != '' " >
+                a.run_status = #{runStatus},
+            </if>
+            <if test="sendNum != null and sendNum != '' " >
+                a.send_num = a.send_num + #{sendNum},
+            </if>
+            <if test="sendStatus != null and sendStatus != '' " >
+                a.send_status = #{sendStatus},
+            </if>
+            <if test="info != null and info != '' " >
+                a.remark = #{info},
+            </if>
+            a.update_time = NOW(),
+        </trim>
+        where 1=1
+        and a.id = #{id}
+    </update>
+
+
+    <!-- 获取要同步给下游的订单数据 -->
+    <select id="getOrderNotifyList" parameterType="Object" resultType="com.hz.task.master.core.model.order.OrderModel">
+        select
+        a.id,a.did,a.order_no,a.order_money,a.collection_account_id,a.collection_type,
+        a.qr_code,a.wx_nickname,a.wx_id,a.out_trade_no,a.notify_url,a.order_status,a.invalid_time,
+        a.curday,a.curhour,a.curminute,a.run_num,a.run_status,a.send_num,a.send_status,
+        a.create_time,a.update_time,a.yn
+        from tb_fn_order a
+        where 1=1
+        and a.order_status = 4
+        and a.run_status = 3
+        <if test="sendNum != null and sendNum != '' " >
+            and a.send_num &lt; #{sendNum}
+        </if>
+        <if test="sendStatus != null and sendStatus != '' " >
+            and a.send_status &lt; #{sendStatus}
+        </if>
+        limit #{limitNum}
+    </select>
+
+
+
+
+
+
+</mapper>
