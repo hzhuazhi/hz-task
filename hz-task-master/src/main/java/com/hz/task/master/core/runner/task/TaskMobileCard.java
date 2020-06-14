@@ -58,7 +58,7 @@ public class TaskMobileCard {
      * @author yoko
      * @date 2019/12/6 20:25
      */
-    @Scheduled(cron = "5 * * * * ?")
+    @Scheduled(fixedDelay = 5000) // 每5秒执行
     public void mobileCardData() throws Exception{
 //        log.info("----------------------------------TaskMobileCard.mobileCardData()----start");
         // 策略：获取检查手机短信类型规则

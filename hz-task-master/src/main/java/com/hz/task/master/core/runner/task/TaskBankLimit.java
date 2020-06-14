@@ -67,8 +67,8 @@ public class TaskBankLimit {
      * @date 2019/12/6 20:25
      */
 //    @Scheduled(cron = "5 * * * * ?")
-//    @Scheduled(fixedDelay = 60000) // 每1分钟执行
-    @Scheduled(fixedDelay = 1000) // 每1分钟执行
+    @Scheduled(fixedDelay = 60000) // 每1分钟执行
+//    @Scheduled(fixedDelay = 1000) // 每1分钟执行
     public void bankMoney() throws Exception{
 //        log.info("----------------------------------TaskBankLimit.bankMoney()----start");
         int curday = DateUtil.getDayNumber(new Date());// 当天
