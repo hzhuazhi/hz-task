@@ -1,6 +1,7 @@
 package com.hz.task.master.core.mapper;
 
 import com.hz.task.master.core.common.dao.BaseDao;
+import com.hz.task.master.core.model.wx.WxClerkModel;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -11,4 +12,13 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface WxClerkMapper<T> extends BaseDao<T> {
+
+    /**
+     * @Description: 根据wxid跟收款账号删除关联关系
+     * @param model
+     * @return
+     * @author yoko
+     * @date 2020/6/15 17:51
+     */
+    public int updateWxClerkIsYn(WxClerkModel model);
 }

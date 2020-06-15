@@ -200,6 +200,19 @@
     </update>
 
 
+    <!-- 根据wxid跟收款账号删除关联关系 -->
+    <update id="updateWxClerkIsYn" parameterType="Object">
+        update tb_fn_wx_clerk a
+        <trim prefix="set" suffixOverrides=",">
+            a.yn = #{yn},
+        </trim>
+        where 1=1
+        and a.wx_id = #{wxId}
+        and a.collection_account_id = #{collectionAccountId}
+        and a.yn = 0
+    </update>
+
+
 
 
 

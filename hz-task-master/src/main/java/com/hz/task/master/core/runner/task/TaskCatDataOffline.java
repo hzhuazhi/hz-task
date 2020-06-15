@@ -8,6 +8,7 @@ import com.hz.task.master.core.model.cat.CatDataOfflineModel;
 import com.hz.task.master.core.model.did.DidCollectionAccountModel;
 import com.hz.task.master.core.model.order.OrderModel;
 import com.hz.task.master.core.model.task.base.StatusModel;
+import com.hz.task.master.core.model.wx.WxClerkModel;
 import com.hz.task.master.core.model.wx.WxModel;
 import com.hz.task.master.util.ComponentUtil;
 import com.hz.task.master.util.TaskMethod;
@@ -81,6 +82,11 @@ public class TaskCatDataOffline {
                         StatusModel statusModel = TaskMethod.assembleTaskUpdateStatusByCatDataOffline(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE, 2, "");
                         ComponentUtil.taskCatDataOfflineService.updateCatDataOfflineStatus(statusModel);
                     }else{
+
+                        // 修改微信旗下店员关系
+                        WxClerkModel wxClerkUpdate = TaskMethod.assembleWxClerkUpdate(data.getWxId(), data.getCollectionAccountId());
+                        ComponentUtil.wxClerkService.updateWxClerkIsYn(wxClerkUpdate);
+
                         // 根据小微ID跟微信昵称能匹配到收款账号
 
                         // 查询从现在到十分钟之前是否有派单数据
@@ -100,6 +106,7 @@ public class TaskCatDataOffline {
                                 ComponentUtil.taskCatDataOfflineService.updateCatDataOfflineStatus(statusModel);
                             }
                         }else{
+
                             // 有派单数据时
                             // 组装要更改订单状态的数据
                             OrderModel orderUpdate = TaskMethod.assembleUpdateOrderStatus(orderList);

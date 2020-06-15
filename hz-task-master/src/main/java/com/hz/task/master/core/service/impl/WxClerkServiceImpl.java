@@ -3,6 +3,7 @@ package com.hz.task.master.core.service.impl;
 import com.hz.task.master.core.common.dao.BaseDao;
 import com.hz.task.master.core.common.service.impl.BaseServiceImpl;
 import com.hz.task.master.core.mapper.WxClerkMapper;
+import com.hz.task.master.core.model.wx.WxClerkModel;
 import com.hz.task.master.core.service.WxClerkService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,5 +28,10 @@ public class WxClerkServiceImpl<T> extends BaseServiceImpl<T> implements WxClerk
 
     public BaseDao<T> getDao() {
         return wxClerkMapper;
+    }
+
+    @Override
+    public int updateWxClerkIsYn(WxClerkModel model) {
+        return wxClerkMapper.updateWxClerkIsYn(model);
     }
 }

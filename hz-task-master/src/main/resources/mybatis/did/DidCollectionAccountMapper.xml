@@ -371,6 +371,7 @@
     <update id="updateDidCollectionAccountCheckData" parameterType="com.hz.task.master.core.model.did.DidCollectionAccountModel">
         UPDATE tb_fn_did_collection_account a
         <trim prefix="set" suffixOverrides=",">
+            a.wx_id = 0,
             a.check_status = #{checkStatus},
             a.check_info = #{checkInfo},
             a.update_time = NOW(),

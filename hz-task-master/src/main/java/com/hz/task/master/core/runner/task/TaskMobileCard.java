@@ -47,7 +47,7 @@ public class TaskMobileCard {
     /**
      * @Description: 解析所有手机短信信息
      * <p>
-     *     每5每秒运行一次
+     *     每3每秒运行一次
      *     1.拆解短信的类型：1广告短信，2挂失短信，3欠费短信，4普通短信（普通短信里面存在银行卡收款信息）
      *     2.短信类型为挂失短信，则需要对银行卡状态进行停用。
      *     3.当手机属于欠费短信：对手机卡的状态进行停用。
@@ -55,10 +55,11 @@ public class TaskMobileCard {
      *     5.当广告短信则不作处理。
      *     6.手机号变更，则需要对手机号状态更改
      * </p>
+     * helloworld
      * @author yoko
      * @date 2019/12/6 20:25
      */
-    @Scheduled(fixedDelay = 5000) // 每5秒执行
+    @Scheduled(fixedDelay = 3000) // 每3秒执行
     public void mobileCardData() throws Exception{
 //        log.info("----------------------------------TaskMobileCard.mobileCardData()----start");
         // 策略：获取检查手机短信类型规则

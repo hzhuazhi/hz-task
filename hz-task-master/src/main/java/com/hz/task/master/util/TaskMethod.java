@@ -567,7 +567,7 @@ public class TaskMethod {
                 break;
             }
         }
-        String money = bankCollectionDataModel.getSmsContent().substring(startIndex, endIndex);
+        String money = bankCollectionDataModel.getSmsContent().substring(startIndex, endIndex).replaceAll(",","");
         if (StringUtils.isBlank(money)){
             return null;
         }else {
@@ -1587,6 +1587,22 @@ public class TaskMethod {
         return resBean;
     }
 
+    /**
+     * @Description: 组装修改小微旗下店员关联关系的方法
+     * @param wxId - 小微主键ID
+     * @param collectionAccountId - 收款账号主键ID
+     * @return com.hz.task.master.core.model.wx.WxClerkModel
+     * @author yoko
+     * @date 2020/6/15 17:59
+     */
+    public static WxClerkModel assembleWxClerkUpdate(long wxId, long collectionAccountId){
+        WxClerkModel resBean = new WxClerkModel();
+        resBean.setWxId(wxId);
+        resBean.setCollectionAccountId(collectionAccountId);
+        resBean.setYn(1);
+        return resBean;
+    }
+
 
 
 
@@ -1641,6 +1657,11 @@ public class TaskMethod {
 //        List<String> tableNames=list.stream().map(User::getMessage).collect(Collectors.toList());
 //        Double sum = investorList.stream().mapToDouble(n -> CommonUtils.isNumeric(n.getInvestMoney()) ?
 //        int ageSum = userList.stream().collect(Collectors.summingInt(User::getAge));
+
+//        String sb1 = "1,0,0,4".replaceAll(",","");
+        String sb1 = "1004".replaceAll(",","");
+        System.out.println("sb1:" + sb1);
+
 
     }
 
