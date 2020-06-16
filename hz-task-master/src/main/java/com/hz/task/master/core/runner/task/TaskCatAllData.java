@@ -6,6 +6,7 @@ import com.hz.task.master.core.common.utils.constant.CachedKeyUtils;
 import com.hz.task.master.core.common.utils.constant.ServerConstant;
 import com.hz.task.master.core.common.utils.constant.TkCacheKey;
 import com.hz.task.master.core.model.cat.CatAllDataModel;
+import com.hz.task.master.core.model.cat.CatDataBindingModel;
 import com.hz.task.master.core.model.cat.CatDataModel;
 import com.hz.task.master.core.model.cat.CatDataOfflineModel;
 import com.hz.task.master.core.model.did.DidCollectionAccountModel;
@@ -26,6 +27,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Description task：可爱猫回调原始数据
@@ -113,77 +115,103 @@ public class TaskCatAllData {
                                     }
                                 }else if(fromCatModel.getType().equals("100")){
                                     if (!StringUtils.isBlank(fromCatModel.getMsg())){
-                                        // 获取短信猫回传数据是否符合小微店员下线的通知数据
-                                        String wxName = TaskMethod.getWxNameByCatData(fromCatModel.getMsg());
-                                        if (!StringUtils.isBlank(wxName)){
-                                            // 根据可爱猫的robot_wxid查询小微的主键ID
-                                            WxModel wxQuery = TaskMethod.assembleWxModel(fromCatModel.getRobot_wxid());
-                                            WxModel wxModel = (WxModel) ComponentUtil.wxService.findByObject(wxQuery);
-                                            if (wxModel != null && wxModel.getId() > 0){
-                                                long did = 0;// 用户ID
-                                                long didCollectionAccountId = 0;// 收款账号ID
-                                                // 根据小微主键ID查询小微旗下的收款账号信息
-                                                WxClerkModel wxClerkQuery = TaskMethod.assembleWxClerkQuery(wxModel.getId());
-                                                List<WxClerkModel> wxClerkList = ComponentUtil.wxClerkService.findByCondition(wxClerkQuery);
-                                                if (wxClerkList != null && wxClerkList.size() > 0){
-                                                    for (WxClerkModel wxClerkModel : wxClerkList){
-                                                        // 循环根据收款账号ID加微信名称查询收款账号信息
-                                                        DidCollectionAccountModel didCollectionAccountQuery = TaskMethod.assembleDidCollectionAccountQuery(wxClerkModel.getCollectionAccountId(), wxName);
-                                                        DidCollectionAccountModel didCollectionAccountModel = (DidCollectionAccountModel)ComponentUtil.didCollectionAccountService.findByObject(didCollectionAccountQuery);
-                                                        if (didCollectionAccountModel != null && didCollectionAccountModel.getId() > 0){
-                                                            did = didCollectionAccountModel.getDid();
-                                                            didCollectionAccountId = didCollectionAccountModel.getId();
-                                                            break;
+                                        Map<String, String> map = TaskMethod.getWxNameByCatData(fromCatModel.getMsg());
+                                        if (map != null && map.size() > 0){
+                                            String wxName = map.get("wxName");
+                                            if (map.get("dataType").equals("1")){
+                                                // 小微下线
+
+                                                // 根据可爱猫的robot_wxid查询小微的主键ID
+                                                WxModel wxQuery = TaskMethod.assembleWxModel(fromCatModel.getRobot_wxid());
+                                                WxModel wxModel = (WxModel) ComponentUtil.wxService.findByObject(wxQuery);
+                                                if (wxModel != null && wxModel.getId() > 0){
+                                                    long did = 0;// 用户ID
+                                                    long didCollectionAccountId = 0;// 收款账号ID
+                                                    // 根据小微主键ID查询小微旗下的收款账号信息
+                                                    WxClerkModel wxClerkQuery = TaskMethod.assembleWxClerkQuery(wxModel.getId());
+                                                    List<WxClerkModel> wxClerkList = ComponentUtil.wxClerkService.findByCondition(wxClerkQuery);
+                                                    if (wxClerkList != null && wxClerkList.size() > 0){
+                                                        for (WxClerkModel wxClerkModel : wxClerkList){
+                                                            // 循环根据收款账号ID加微信名称查询收款账号信息
+                                                            DidCollectionAccountModel didCollectionAccountQuery = TaskMethod.assembleDidCollectionAccountQuery(wxClerkModel.getCollectionAccountId(), wxName);
+                                                            DidCollectionAccountModel didCollectionAccountModel = (DidCollectionAccountModel)ComponentUtil.didCollectionAccountService.findByObject(didCollectionAccountQuery);
+                                                            if (didCollectionAccountModel != null && didCollectionAccountModel.getId() > 0){
+                                                                did = didCollectionAccountModel.getDid();
+                                                                didCollectionAccountId = didCollectionAccountModel.getId();
+                                                                break;
+                                                            }
                                                         }
-                                                    }
-                                                    int matchingType = 0;// 数据匹配的类型：1根据小微ID跟微信昵称不能匹配到收款账号，2根据小微ID跟微信昵称能匹配到收款账号
-                                                    if (didCollectionAccountId > 0){
-                                                        matchingType = 2;
-                                                        // 并且立刻锁住这个收款账号，让其它派单的地方无法使用：无需去解锁
-                                                        String lockKey_did_collection_account = CachedKeyUtils.getCacheKey(CacheKey.LOCK_DID_COLLECTION_ACCOUNT_FOR, didCollectionAccountId);
-                                                        ComponentUtil.redisIdService.lock(lockKey_did_collection_account);
+                                                        int matchingType = 0;// 数据匹配的类型：1根据小微ID跟微信昵称不能匹配到收款账号，2根据小微ID跟微信昵称能匹配到收款账号
+                                                        if (didCollectionAccountId > 0){
+                                                            matchingType = 2;
+                                                            // 并且立刻锁住这个收款账号，让其它派单的地方无法使用：无需去解锁
+                                                            String lockKey_did_collection_account = CachedKeyUtils.getCacheKey(CacheKey.LOCK_DID_COLLECTION_ACCOUNT_FOR, didCollectionAccountId);
+                                                            ComponentUtil.redisIdService.lock(lockKey_did_collection_account);
 
-                                                        // 添加收款账号的下线纪录
-                                                        WxClerkDataModel wxClerkDataModel = TaskMethod.assembleWxClerkData(wxModel.getId(), did, didCollectionAccountId, 3);
-                                                        ComponentUtil.wxClerkDataService.add(wxClerkDataModel);
+                                                            // 添加收款账号的下线纪录
+                                                            WxClerkDataModel wxClerkDataModel = TaskMethod.assembleWxClerkData(wxModel.getId(), did, didCollectionAccountId, 3);
+                                                            ComponentUtil.wxClerkDataService.add(wxClerkDataModel);
 
-                                                    }else{
-                                                        matchingType = 1;
-                                                    }
-
+                                                        }else{
+                                                            matchingType = 1;
+                                                        }
 
 
-                                                    // 组装可爱猫回调店员下线：小微旗下店员下线通知；取消与小微绑定关系的信息；并且添加数据
-                                                    CatDataOfflineModel catDataOfflineModel = TaskMethod.assembleCatDataOffline(data.getId(), wxModel.getId(), wxModel.getToWxid(), wxName, didCollectionAccountId, matchingType);
-                                                    int catDataOfflineNum = ComponentUtil.catDataOfflineService.add(catDataOfflineModel);
-                                                    if (catDataOfflineNum > 0){
-                                                        // 更新此次task的状态：更新成成功
-                                                        StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE, "");
-                                                        ComponentUtil.taskCatAllDataService.updateCatAllDataStatus(statusModel);
+
+                                                        // 组装可爱猫回调店员下线：小微旗下店员下线通知；取消与小微绑定关系的信息；并且添加数据
+                                                        CatDataOfflineModel catDataOfflineModel = TaskMethod.assembleCatDataOffline(data.getId(), wxModel.getId(), wxModel.getToWxid(), wxName, didCollectionAccountId, matchingType);
+                                                        int catDataOfflineNum = ComponentUtil.catDataOfflineService.add(catDataOfflineModel);
+                                                        if (catDataOfflineNum > 0){
+                                                            // 更新此次task的状态：更新成成功
+                                                            StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE, "");
+                                                            ComponentUtil.taskCatAllDataService.updateCatAllDataStatus(statusModel);
+                                                        }else {
+                                                            // 更新此次task的状态：更新成失败-添加可爱猫回调店员下线响应行为0
+                                                            StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "添加可爱猫回调店员下线响应行为0");
+                                                            ComponentUtil.taskCatAllDataService.updateCatAllDataStatus(statusModel);
+                                                        }
+
                                                     }else {
-                                                        // 更新此次task的状态：更新成失败-添加可爱猫回调店员下线响应行为0
-                                                        StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "添加可爱猫回调店员下线响应行为0");
+                                                        // 此小微旗下没有店员
+                                                        // 更新此次task的状态：更新成失败-根据小微的wxId查询旗下店员数据为空
+                                                        StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "根据小微的wxId查询旗下店员数据为空");
                                                         ComponentUtil.taskCatAllDataService.updateCatAllDataStatus(statusModel);
                                                     }
+
 
                                                 }else {
-                                                    // 此小微旗下没有店员
-                                                    // 更新此次task的状态：更新成失败-根据小微的wxId查询旗下店员数据为空
-                                                    StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "根据小微的wxId查询旗下店员数据为空");
+                                                    // 更新此次task的状态：更新成失败-根据可爱猫的robot_wxid查询小微数据为空
+                                                    StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "可爱猫的robot_wxid查询小微数据为空");
                                                     ComponentUtil.taskCatAllDataService.updateCatAllDataStatus(statusModel);
                                                 }
 
 
-                                            }else {
-                                                // 更新此次task的状态：更新成失败-根据可爱猫的robot_wxid查询小微数据为空
-                                                StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "可爱猫的robot_wxid查询小微数据为空");
+                                                // 更新此次task的状态：更新成成功
+                                                StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE, "");
+                                                ComponentUtil.taskCatAllDataService.updateCatAllDataStatus(statusModel);
+
+
+                                            }else if(map.get("dataType").equals("2")){
+                                                // 小微绑定店员
+                                                // 组装可爱猫回调店员绑定小微的数据
+                                                CatDataBindingModel catDataBindingModel = TaskMethod.assembleCatDataBinding(data.getId(), fromCatModel.getRobot_wxid(), wxName);
+                                                int bindingNum = ComponentUtil.catDataBindingService.add(catDataBindingModel);
+                                                if (bindingNum > 0){
+                                                    // 更新此次task的状态：更新成成功
+                                                    StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE, "");
+                                                    ComponentUtil.taskCatAllDataService.updateCatAllDataStatus(statusModel);
+                                                }else {
+                                                    // 更新此次task的状态：更新成失败-添加可爱猫回调店员绑定小微数据响应行为0
+                                                    StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "添加可爱猫回调店员绑定小微数据响应行为0");
+                                                    ComponentUtil.taskCatAllDataService.updateCatAllDataStatus(statusModel);
+                                                }
+
+                                            }else{
+                                                // 更新此次task的状态：更新成成功
+                                                StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE, "type等于100，但是不属于小微下线以及绑定关系");
                                                 ComponentUtil.taskCatAllDataService.updateCatAllDataStatus(statusModel);
                                             }
 
-
-                                            // 更新此次task的状态：更新成成功
-                                            StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE, "");
-                                            ComponentUtil.taskCatAllDataService.updateCatAllDataStatus(statusModel);
                                         }else {
                                             // 更新此次task的状态：更新成失败-type等于100，但不是下线消息
                                             StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "type等于100，但不是下线消息");

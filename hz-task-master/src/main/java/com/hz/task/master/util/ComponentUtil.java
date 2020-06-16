@@ -38,6 +38,7 @@ public class ComponentUtil {
     public static CatAllDataService catAllDataService;
     public static CatDataService catDataService;
     public static CatDataOfflineService catDataOfflineService;
+    public static CatDataBindingService catDataBindingService;
 
 
     public static TaskMobileCardService taskMobileCardService;

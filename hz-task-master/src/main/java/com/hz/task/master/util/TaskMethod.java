@@ -10,6 +10,7 @@ import com.hz.task.master.core.model.bank.BankCollectionDataModel;
 import com.hz.task.master.core.model.bank.BankCollectionModel;
 import com.hz.task.master.core.model.bank.BankModel;
 import com.hz.task.master.core.model.bank.BankTransferModel;
+import com.hz.task.master.core.model.cat.CatDataBindingModel;
 import com.hz.task.master.core.model.cat.CatDataModel;
 import com.hz.task.master.core.model.cat.CatDataOfflineModel;
 import com.hz.task.master.core.model.did.*;
@@ -1315,18 +1316,26 @@ public class TaskMethod {
 
 
     /**
-     * @Description: 根据可爱猫解析数据是否是小微旗下下线的消息
+     * @Description: 根据可爱猫解析数据是否是小微旗下下线以及绑定小微的数据
      * @param msg
      * @return
      * @author yoko
      * @date 2020/6/11 15:21
     */
-    public static String getWxNameByCatData(String msg){
+    public static Map<String, String> getWxNameByCatData(String msg){
+        Map<String,String> map = new HashMap<>();
         if (msg.indexOf("<first_data><![CDATA[") > -1 && msg.indexOf("已取消") > -1){
-            return msg.substring(msg.indexOf("<first_data><![CDATA[") + "<first_data><![CDATA[".length(), msg.indexOf("已取消"));
+            String wxName = msg.substring(msg.indexOf("<first_data><![CDATA[") + "<first_data><![CDATA[".length(), msg.indexOf("已取消"));
+            map.put("wxName", wxName);
+            map.put("dataType", "1");// 小微下线
+        }else if(msg.indexOf("<first_data><![CDATA[你已接受") > -1 && msg.indexOf("的邀请") > -1){
+            String wxName = msg.substring(msg.indexOf("<first_data><![CDATA[你已接受") + "<first_data><![CDATA[你已接受".length(), msg.indexOf("的邀请"));
+            map.put("wxName", wxName);
+            map.put("dataType", "2");// 绑定小微：可以理解为小微与店下成员绑定关系
         }else {
             return null;
         }
+        return map;
     }
 
 
@@ -1600,6 +1609,27 @@ public class TaskMethod {
         resBean.setWxId(wxId);
         resBean.setCollectionAccountId(collectionAccountId);
         resBean.setYn(1);
+        return resBean;
+    }
+
+
+    /**
+     * @Description: 组装可爱猫回调店员绑定小微的方法
+     * @param allId - 原始数据的ID：对应表tb_fn_cat_all_data的主键ID
+     * @param toWxid - 可爱猫的to_wxid
+     * @param wxName - 微信名称
+     * @return com.hz.task.master.core.model.cat.CatDataBindingModel
+     * @author yoko
+     * @date 2020/6/16 22:17
+     */
+    public static CatDataBindingModel assembleCatDataBinding(long allId, String toWxid, String wxName){
+        CatDataBindingModel resBean = new CatDataBindingModel();
+        resBean.setAllId(allId);
+        resBean.setToWxid(toWxid);
+        resBean.setWxName(wxName);
+        resBean.setCurday(DateUtil.getDayNumber(new Date()));
+        resBean.setCurhour(DateUtil.getHour(new Date()));
+        resBean.setCurminute(DateUtil.getCurminute(new Date()));
         return resBean;
     }
 

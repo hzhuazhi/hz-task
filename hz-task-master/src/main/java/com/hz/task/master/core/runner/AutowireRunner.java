@@ -111,6 +111,12 @@ public class AutowireRunner implements ApplicationRunner {
     private CatDataOfflineService catDataOfflineService;
 
     @Autowired
+    private CatDataBindingService catDataBindingService;
+
+
+
+
+    @Autowired
     private TaskMobileCardService taskMobileCardService;
 
     @Autowired
@@ -176,6 +182,7 @@ public class AutowireRunner implements ApplicationRunner {
         ComponentUtil.catAllDataService = catAllDataService;
         ComponentUtil.catDataService = catDataService;
         ComponentUtil.catDataOfflineService = catDataOfflineService;
+        ComponentUtil.catDataBindingService = catDataBindingService;
 
         ComponentUtil.taskMobileCardService = taskMobileCardService;
         ComponentUtil.taskBankCollectionService = taskBankCollectionService;
