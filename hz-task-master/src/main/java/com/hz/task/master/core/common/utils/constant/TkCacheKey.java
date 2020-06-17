@@ -108,4 +108,10 @@ public interface TkCacheKey {
      */
     String LOCK_BANK = "-17";
 
+    /**
+     * 锁：可爱猫回调店员绑定小微的数据的流水
+     * 锁住
+     */
+    String LOCK_CAT_DATA_BINDING = "-18";
+
 }

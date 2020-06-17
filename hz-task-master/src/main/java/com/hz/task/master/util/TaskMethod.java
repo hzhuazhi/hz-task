@@ -1633,6 +1633,42 @@ public class TaskMethod {
         return resBean;
     }
 
+    /**
+     * @Description: 组装根据微信昵称查询收款账号的方法
+     * @param wxName - 微信昵称
+     * @return
+     * @author yoko
+     * @date 2020/6/17 10:38
+    */
+    public static DidCollectionAccountModel assembleDidCollectionAccountQueryByPayee(String wxName){
+        DidCollectionAccountModel resBean = new DidCollectionAccountModel();
+        resBean.setPayee(wxName);
+        return resBean;
+    }
+
+    /**
+     * @Description: 组装更新可爱猫回调店员绑定小微的信息
+     * @param id - 主键ID
+     * @param matchingType - 数据匹配的类型：1根据小微ID跟微信昵称不能匹配到收款账号，2根据小微ID跟微信昵称能匹配到收款账号
+     * @param wxId - 小微的主键ID
+     * @param collectionAccountId - 收款账号的主键ID
+     * @return
+     * @author yoko
+     * @date 2020/6/17 10:45
+    */
+    public static CatDataBindingModel assembleCatDataBindingUpdate(long id, int matchingType, long wxId, long collectionAccountId){
+        CatDataBindingModel resBean = new CatDataBindingModel();
+        resBean.setId(id);
+        resBean.setMatchingType(matchingType);
+        if (wxId != 0){
+            resBean.setWxId(wxId);
+        }
+        if (collectionAccountId != 0){
+            resBean.setCollectionAccountId(collectionAccountId);
+        }
+        return resBean;
+    }
+
 
 
 

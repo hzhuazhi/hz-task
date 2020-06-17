@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hz.task.master.core.mapper.task.TaskCatDataBindingMapper">
+
+
+
+
+    <!-- 定义数据库基本列,只适用代替单表的*-->
+    <sql id="Base_Column_List">
+        a.id,a.all_id,a.wx_id,a.to_wxid,a.wx_name,a.collection_account_id,
+        a.curday,a.curhour,a.curminute,a.work_type,a.matching_type,a.remark,a.run_num,a.run_status,
+        a.create_time,a.update_time,a.yn
+    </sql>
+
+    <!-- 查询条件 -->
+    <sql id="Example_Where_Clause">
+        where 1=1
+        <trim  suffixOverrides="," >
+            <if test="id != null and id != '' " >
+                and a.id = #{id}
+            </if>
+            <if test="curday != null and curday != '' " >
+                and a.curday = #{curday}
+            </if>
+            <if test="curdayStart != null and curdayStart != '' and curdayEnd != null and curdayEnd != '' " >
+                and a.curday >= #{curdayStart} and a.curday &lt;= #{curdayEnd}
+            </if>
+            <if test="workType != null and workType != '' " >
+                and a.work_type = #{workType}
+            </if>
+            and a.yn = 0
+        </trim>
+    </sql>
+
+
+    <!-- 查询条件_id -->
+    <sql id="Example_Where_Clause_id">
+        where 1=1
+        <trim  suffixOverrides="," >
+            <if test="id != null and id != '' " >
+                and a.id = #{id}
+            </if>
+            and a.yn =  0
+        </trim>
+    </sql>
+
+    <!-- 排序条件 -->
+    <sql id="Example_Order_By">
+        order by a.create_time desc
+    </sql>
+
+
+    <!-- 获取可爱猫回调店员绑定小微的未补充的数据 -->
+    <select id="getCatDataBindingList" parameterType="Object" resultType="com.hz.task.master.core.model.cat.CatDataBindingModel">
+        select
+        <include refid="Base_Column_List" />
+        from tb_fn_cat_data_binding a
+        <include refid="Example_Where_Clause"/>
+        limit #{limitNum}
+    </select>
+
+    <!-- 可爱猫回调店员绑定小微的状态、运行状态 -->
+    <update id="updateCatDataBindingStatus" parameterType="Object">
+        UPDATE tb_fn_cat_data_binding a
+        <trim prefix="set" suffixOverrides=",">
+            <if test="workType != null and workType != '' " >
+                a.work_type = #{workType},
+            </if>
+            <if test="info != null and info != '' " >
+                a.remark = #{info},
+            </if>
+            a.update_time = NOW(),
+        </trim>
+        where 1=1
+        and a.id = #{id}
+    </update>
+
+
+</mapper>
