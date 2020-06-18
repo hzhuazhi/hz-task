@@ -1154,10 +1154,11 @@ public class TaskMethod {
         }else {
             return null;
         }
+        //段峰
         if (!StringUtils.isBlank(msg.getShopowner())){
             if (msg.getShopowner().indexOf("(") > -1){
-                String [] wxNameArr = msg.getShopowner().split("\\(");
-                resBean.setWxName(wxNameArr[0]);
+                int index = msg.getShopowner().lastIndexOf("(");
+                resBean.setWxName(msg.getShopowner().substring(0, index));
             }else {
                 return null;
             }
@@ -1727,6 +1728,15 @@ public class TaskMethod {
 //        String sb1 = "1,0,0,4".replaceAll(",","");
         String sb1 = "1004".replaceAll(",","");
         System.out.println("sb1:" + sb1);
+
+        String sb2 = "老只((3asd1(**增)";
+        if (sb2.indexOf("(") > -1){
+            int a = sb2.lastIndexOf("(");
+//            String [] wxNameArr = sb2.split("\\(");
+//            resBean.setWxName(wxNameArr[0]);
+            String sb3 = sb2.substring(0, a);
+            System.out.println("sb3:" + sb3);
+        }
 
 
     }
