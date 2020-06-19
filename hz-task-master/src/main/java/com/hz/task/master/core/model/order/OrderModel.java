@@ -45,6 +45,11 @@ public class OrderModel extends BasePage implements Serializable {
     private Integer collectionType;
 
     /**
+     * 收款二维码的主键ID：对应表tb_fn_did_collection_account_qr_code的主键ID
+     */
+    private Long qrCodeId;
+
+    /**
      * 收款的二维码地址：转码之后的二维码
      */
     private String qrCode;
@@ -390,5 +395,13 @@ public class OrderModel extends BasePage implements Serializable {
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public Long getQrCodeId() {
+        return qrCodeId;
+    }
+
+    public void setQrCodeId(Long qrCodeId) {
+        this.qrCodeId = qrCodeId;
     }
 }

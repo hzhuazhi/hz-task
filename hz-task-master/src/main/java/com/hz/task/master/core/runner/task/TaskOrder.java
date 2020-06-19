@@ -6,6 +6,7 @@ import com.hz.task.master.core.common.utils.constant.CacheKey;
 import com.hz.task.master.core.common.utils.constant.CachedKeyUtils;
 import com.hz.task.master.core.common.utils.constant.ServerConstant;
 import com.hz.task.master.core.common.utils.constant.TkCacheKey;
+import com.hz.task.master.core.model.did.DidCollectionAccountQrCodeModel;
 import com.hz.task.master.core.model.did.DidModel;
 import com.hz.task.master.core.model.order.OrderModel;
 import com.hz.task.master.core.model.task.base.StatusModel;
@@ -166,6 +167,9 @@ public class TaskOrder {
                 String lockKey = CachedKeyUtils.getCacheKeyTask(TkCacheKey.LOCK_ORDER_SUCCESS, data.getId());
                 boolean flagLock = ComponentUtil.redisIdService.lock(lockKey);
                 if (flagLock){
+                    // 更新这个收款二维码成功收款的次数
+                    DidCollectionAccountQrCodeModel didCollectionAccountQrCodeModel = TaskMethod.assembleDidCollectionAccountQrCode(data.getQrCodeId(), 1);
+                    ComponentUtil.didCollectionAccountQrCodeService.updateIsLimitNum(didCollectionAccountQrCodeModel);
 
                     // 锁住这个用户
                     String lockKey_did = CachedKeyUtils.getCacheKey(CacheKey.LOCK_DID_MONEY, data.getDid());

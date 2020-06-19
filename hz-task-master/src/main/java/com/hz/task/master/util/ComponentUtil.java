@@ -39,6 +39,7 @@ public class ComponentUtil {
     public static CatDataService catDataService;
     public static CatDataOfflineService catDataOfflineService;
     public static CatDataBindingService catDataBindingService;
+    public static DidCollectionAccountQrCodeService didCollectionAccountQrCodeService;
 
 
     public static TaskMobileCardService taskMobileCardService;
@@ -51,6 +52,7 @@ public class ComponentUtil {
     public static TaskCatDataOfflineService taskCatDataOfflineService;
     public static TaskBankLimitService taskBankLimitService;
     public static TaskCatDataBindingService taskCatDataBindingService;
+
 
 
 

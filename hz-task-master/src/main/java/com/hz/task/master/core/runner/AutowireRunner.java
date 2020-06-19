@@ -146,6 +146,9 @@ public class AutowireRunner implements ApplicationRunner {
     @Autowired
     private TaskCatDataBindingService taskCatDataBindingService;
 
+    @Autowired
+    public DidCollectionAccountQrCodeService didCollectionAccountQrCodeService;
+
 
 
 
@@ -186,6 +189,7 @@ public class AutowireRunner implements ApplicationRunner {
         ComponentUtil.catDataService = catDataService;
         ComponentUtil.catDataOfflineService = catDataOfflineService;
         ComponentUtil.catDataBindingService = catDataBindingService;
+        ComponentUtil.didCollectionAccountQrCodeService = didCollectionAccountQrCodeService;
 
         ComponentUtil.taskMobileCardService = taskMobileCardService;
         ComponentUtil.taskBankCollectionService = taskBankCollectionService;

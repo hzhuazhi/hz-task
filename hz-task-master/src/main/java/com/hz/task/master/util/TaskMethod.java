@@ -1671,6 +1671,22 @@ public class TaskMethod {
     }
 
 
+    /**
+     * @Description: 组装修改二维码成功的次数修改数据
+     * @param id - 二维码主键ID
+     * @param isLimitNum - 已限制的次数
+     * @return
+     * @author yoko
+     * @date 2020/6/19 9:59
+    */
+    public static DidCollectionAccountQrCodeModel assembleDidCollectionAccountQrCode(long id, int isLimitNum){
+        DidCollectionAccountQrCodeModel resBean = new DidCollectionAccountQrCodeModel();
+        resBean.setId(id);
+        resBean.setIsLimitNum(1);
+        return resBean;
+    }
+
+
 
 
 
