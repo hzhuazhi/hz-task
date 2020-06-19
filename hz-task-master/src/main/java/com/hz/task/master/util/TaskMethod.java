@@ -21,6 +21,7 @@ import com.hz.task.master.core.model.strategy.StrategyData;
 import com.hz.task.master.core.model.strategy.StrategyModel;
 import com.hz.task.master.core.model.task.base.StatusModel;
 import com.hz.task.master.core.model.task.cat.CatMsg;
+import com.hz.task.master.core.model.task.did.TaskDidCollectionAccountDataModel;
 import com.hz.task.master.core.model.wx.WxClerkDataModel;
 import com.hz.task.master.core.model.wx.WxClerkModel;
 import com.hz.task.master.core.model.wx.WxModel;
@@ -1683,6 +1684,69 @@ public class TaskMethod {
         DidCollectionAccountQrCodeModel resBean = new DidCollectionAccountQrCodeModel();
         resBean.setId(id);
         resBean.setIsLimitNum(1);
+        return resBean;
+    }
+
+    /**
+     * @Description: 组装查询收款账号上限数据的查询条件
+     * @param orderStatus - 订单状态
+     * @param collectionAccountId - 用户账号ID
+     * @param curday - 日期
+     * @param dataLimitNum - 需要查询多少条数据
+     * @param whereOrderStatus - 查询订单状态大于几的订单状态
+     * @return com.hz.task.master.core.model.task.did.TaskDidCollectionAccountDataModel
+     * @author yoko
+     * @date 2020/6/19 11:28
+     */
+    public static TaskDidCollectionAccountDataModel assembleTaskDidCollectionAccountData(int orderStatus, long collectionAccountId, int curday, int dataLimitNum, int whereOrderStatus){
+        TaskDidCollectionAccountDataModel resBean = new TaskDidCollectionAccountDataModel();
+        if (orderStatus != 0){
+            resBean.setOrderStatus(orderStatus);
+        }
+        if (collectionAccountId != 0){
+            resBean.setCollectionAccountId(collectionAccountId);
+        }
+        if (curday != 0){
+            resBean.setCurday(curday);
+        }
+        if (dataLimitNum != 0){
+            resBean.setDataLimitNum(dataLimitNum);
+        }
+        if (whereOrderStatus != 0){
+            resBean.setWhereOrderStatus(whereOrderStatus);
+        }
+        return resBean;
+    }
+
+
+    /**
+     * @Description: 组装查询二维码的查询条件
+     * @param collectionAccountId - 收款账号的主键ID
+     * @return
+     * @author yoko
+     * @date 2020/6/18 19:34
+     */
+    public static DidCollectionAccountQrCodeModel assembleDidCollectionAccountQrCode(long collectionAccountId){
+        DidCollectionAccountQrCodeModel resBean = new DidCollectionAccountQrCodeModel();
+        resBean.setCollectionAccountId(collectionAccountId);
+        resBean.setIsLimitNum(1);
+        resBean.setUseStatus(1);
+        return resBean;
+    }
+
+    /**
+     * @Description: 组装更新收款账号被暂停的原因的方法
+     * @param id - 收款账号的主键ID
+     * @param checkInfo - 被暂停的原因
+     * @return
+     * @author yoko
+     * @date 2020/6/19 14:10
+    */
+    public static DidCollectionAccountModel assembleDidCollectionAccountUpdate(long id, String checkInfo){
+        DidCollectionAccountModel resBean = new DidCollectionAccountModel();
+        resBean.setId(id);
+        resBean.setUseStatus(2);
+        resBean.setCheckInfo(checkInfo);
         return resBean;
     }
 

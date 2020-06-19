@@ -149,6 +149,9 @@ public class AutowireRunner implements ApplicationRunner {
     @Autowired
     public DidCollectionAccountQrCodeService didCollectionAccountQrCodeService;
 
+    @Autowired
+    public TaskDidCollectionAccountDataService taskDidCollectionAccountDataService;
+
 
 
 
@@ -201,6 +204,7 @@ public class AutowireRunner implements ApplicationRunner {
         ComponentUtil.taskCatDataOfflineService = taskCatDataOfflineService;
         ComponentUtil.taskBankLimitService = taskBankLimitService;
         ComponentUtil.taskCatDataBindingService = taskCatDataBindingService;
+        ComponentUtil.taskDidCollectionAccountDataService = taskDidCollectionAccountDataService;
 
         runThread = new RunThread();
         runThread.start();

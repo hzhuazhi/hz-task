@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hz.task.master.core.mapper.task.TaskDidCollectionAccountDataMapper">
+
+
+
+
+    <!-- 定义数据库基本列,只适用代替单表的*-->
+    <sql id="Base_Column_List">
+    </sql>
+
+    <!-- 查询条件 -->
+    <sql id="Example_Where_Clause">
+        where 1=1
+        <trim  suffixOverrides="," >
+            <!--<if test="id != null and id != '' " >-->
+                <!--and a.id = #{id}-->
+            <!--</if>-->
+            <if test="collectionAccountId != null and collectionAccountId != '' " >
+                and a.collection_account_id = #{collectionAccountId}
+            </if>
+            <if test="orderStatus != null and orderStatus != '' " >
+                and a.order_status = #{orderStatus}
+            </if>
+            <if test="curday != null and curday != '' " >
+                and a.curday = #{curday}
+            </if>
+            <if test="curdayStart != null and curdayStart != '' and curdayEnd != null and curdayEnd != '' " >
+                and a.curday >= #{curdayStart} and a.curday &lt;= #{curdayEnd}
+            </if>
+            <!--<if test="runNum != null and runNum != '' " >-->
+                <!--and a.run_num &lt; #{runNum}-->
+            <!--</if>-->
+            <!--<if test="runStatus != null and runStatus != '' " >-->
+                <!--and a.run_status &lt; #{runStatus}-->
+            <!--</if>-->
+            <if test="whereOrderStatus != null and whereOrderStatus != '' " >
+                and a.order_status > #{whereOrderStatus}
+            </if>
+            and a.yn = 0
+        </trim>
+    </sql>
+
+
+    <!-- 查询条件_id -->
+    <sql id="Example_Where_Clause_id">
+        where 1=1
+        <trim  suffixOverrides="," >
+            <if test="id != null and id != '' " >
+                and a.id = #{id}
+            </if>
+            and a.yn =  0
+        </trim>
+    </sql>
+
+    <!-- 排序条件 -->
+    <sql id="Example_Order_By">
+        order by a.create_time desc
+    </sql>
+
+
+    <!-- 根据条件获取派发订单里面去重复的收款账号ID集合 -->
+    <select id="getDidCollectionAccountList" parameterType="Object" resultType="java.lang.Long">
+        select
+        DISTINCT(a.collection_account_id) as collection_account_id
+        from tb_fn_order a
+        <include refid="Example_Where_Clause"/>
+    </select>
+
+    <!-- 根据收款账号ID查询派发订单中当日给出码的总次数 -->
+    <select id="countLimitNum" parameterType="Object" resultType="java.lang.Integer">
+        select
+        count(1) as num
+        from tb_fn_order a
+        <include refid="Example_Where_Clause"/>
+    </select>
+
+
+    <!-- 根据收款账号ID查询派发订单当日给出码的总成功次数，以及总成功金额 -->
+    <select id="getSucLimitNumAndMoney" parameterType="Object" resultType="com.hz.task.master.core.model.task.did.TaskDidCollectionAccountDataModel">
+        select
+        count(1) as is_limit_num,ifnull(sum(a.order_money), '0.00') as money
+        from tb_fn_order a
+        <include refid="Example_Where_Clause"/>
+    </select>
+
+
+    <!-- 查询用户账号最近几条订单的成功状态集合 -->
+    <select id="getOrderStatusByDidCollectionAccount" parameterType="Object" resultType="com.hz.task.master.core.model.task.did.TaskDidCollectionAccountDataModel">
+        select
+        a.collection_account_id,a.order_status
+        from tb_fn_order a
+        <include refid="Example_Where_Clause"/>
+        order by a.create_time desc
+        limit #{dataLimitNum}
+    </select>
+
+
+
+
+</mapper>

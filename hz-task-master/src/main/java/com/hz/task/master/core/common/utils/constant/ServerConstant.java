@@ -89,6 +89,8 @@ public class ServerConstant {
         MOBILE_CARD_TYPE_LIST(9,""),
         DIRECT_REWARD(10,""),
         TEAM_REWARD(11,""),
+        QC_CODE_LIMIT_LIST(12,""),
+        QC_CODE_FAIL_NUM(13,""),
 
         ;
         private int stgType;

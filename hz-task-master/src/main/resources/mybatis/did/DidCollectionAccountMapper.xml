@@ -382,5 +382,19 @@
     </update>
 
 
+    <!-- 给出码连续失败次数超过策略部署的失败次数：修改用户收款账号修改成暂停使用状态 -->
+    <update id="updateDidCollectionAccountCheckDataByFail" parameterType="com.hz.task.master.core.model.did.DidCollectionAccountModel">
+        UPDATE tb_fn_did_collection_account a
+        <trim prefix="set" suffixOverrides=",">
+            a.use_status = #{useStatus},
+            a.check_info = #{checkInfo},
+            a.update_time = NOW(),
+        </trim>
+        where 1=1
+        and a.id = #{id}
+        and a.yn = 0
+    </update>
+
+
 
 </mapper>

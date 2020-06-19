@@ -114,4 +114,22 @@ public interface TkCacheKey {
      */
     String LOCK_CAT_DATA_BINDING = "-18";
 
+    /**
+     * 锁：检测用户收款账号给出码次数的数据的流水-这里锁用户账号ID
+     * 锁住
+     */
+    String LOCK_DID_COLLECTION_ACCOUNT_LIMIT_NUM = "-19";
+
+    /**
+     * 锁：检测用户收款账号给出码订单成功次数，订单金额的数据的流水-这里锁用户账号ID
+     * 锁住
+     */
+    String LOCK_DID_COLLECTION_ACCOUNT_LIMIT_SUC_NUM = "-20";
+
+    /**
+     * 锁：检测用户收款账号连续失败次数-这里锁用户账号ID
+     * 锁住
+     */
+    String LOCK_DID_COLLECTION_ACCOUNT_FAIL_NUM = "-21";
+
 }

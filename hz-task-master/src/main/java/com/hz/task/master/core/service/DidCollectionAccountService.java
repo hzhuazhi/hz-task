@@ -54,4 +54,14 @@ public interface DidCollectionAccountService<T> extends BaseService<T> {
     */
     public int updateDidCollectionAccountCheckData(DidCollectionAccountModel model);
 
+
+    /**
+     * @Description: 给出码连续失败次数超过策略部署的失败次数：修改用户收款账号修改成暂停使用状态
+     * @param model
+     * @return
+     * @author yoko
+     * @date 2020/6/19 13:57
+     */
+    public int updateDidCollectionAccountCheckDataByFail(DidCollectionAccountModel model);
+
 }

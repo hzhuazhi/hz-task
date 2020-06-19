@@ -52,6 +52,7 @@ public class ComponentUtil {
     public static TaskCatDataOfflineService taskCatDataOfflineService;
     public static TaskBankLimitService taskBankLimitService;
     public static TaskCatDataBindingService taskCatDataBindingService;
+    public static TaskDidCollectionAccountDataService taskDidCollectionAccountDataService;
 
 
 

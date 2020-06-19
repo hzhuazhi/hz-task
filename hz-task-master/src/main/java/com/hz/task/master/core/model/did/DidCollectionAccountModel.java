@@ -123,6 +123,11 @@ public class DidCollectionAccountModel extends BasePage implements Serializable 
      */
     private String remark;
 
+    /**
+     * 条件审核
+     */
+    private Integer whereCheckStatus;
+
 
     public Long getId() {
         return id;
@@ -298,5 +303,13 @@ public class DidCollectionAccountModel extends BasePage implements Serializable 
 
     public void setRemark(String remark) {
         this.remark = remark;
+    }
+
+    public Integer getWhereCheckStatus() {
+        return whereCheckStatus;
+    }
+
+    public void setWhereCheckStatus(Integer whereCheckStatus) {
+        this.whereCheckStatus = whereCheckStatus;
     }
 }
