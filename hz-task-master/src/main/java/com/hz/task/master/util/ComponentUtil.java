@@ -40,6 +40,8 @@ public class ComponentUtil {
     public static CatDataOfflineService catDataOfflineService;
     public static CatDataBindingService catDataBindingService;
     public static DidCollectionAccountQrCodeService didCollectionAccountQrCodeService;
+    public static DidBalanceDeductService didBalanceDeductService;
+
 
 
     public static TaskMobileCardService taskMobileCardService;

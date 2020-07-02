@@ -113,6 +113,9 @@ public class AutowireRunner implements ApplicationRunner {
     @Autowired
     private CatDataBindingService catDataBindingService;
 
+    @Autowired
+    private DidBalanceDeductService didBalanceDeductService;
+
 
 
 
@@ -193,6 +196,7 @@ public class AutowireRunner implements ApplicationRunner {
         ComponentUtil.catDataOfflineService = catDataOfflineService;
         ComponentUtil.catDataBindingService = catDataBindingService;
         ComponentUtil.didCollectionAccountQrCodeService = didCollectionAccountQrCodeService;
+        ComponentUtil.didBalanceDeductService = didBalanceDeductService;
 
         ComponentUtil.taskMobileCardService = taskMobileCardService;
         ComponentUtil.taskBankCollectionService = taskBankCollectionService;
