@@ -213,5 +213,20 @@
     </update>
 
 
+    <!-- 修改用户扣减余额流水的订单状态 -->
+    <update id="updateOrderStatus" parameterType="com.hz.task.master.core.model.did.DidBalanceDeductModel">
+        UPDATE tb_fn_did_balance_deduct a
+        <trim prefix="set" suffixOverrides=",">
+            <if test="orderStatus != null and orderStatus != '' " >
+                a.order_status = #{orderStatus},
+            </if>
+            a.update_time = NOW(),
+        </trim>
+        where 1=1
+        and a.order_no = #{orderNo}
+        and a.yn = 0
+    </update>
+
+
 
 </mapper>

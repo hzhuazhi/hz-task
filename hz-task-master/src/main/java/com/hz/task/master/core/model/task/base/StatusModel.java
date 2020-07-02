@@ -95,6 +95,11 @@ public class StatusModel implements Serializable {
      */
     private String invalidTime;
 
+    /**
+     * 订单状态_用户操作的状态：1初始化，2失败，3超时后默认成功，4用户点击成功
+     */
+    private Integer didStatus;
+
     public Long getId() {
         return id;
     }
@@ -239,5 +244,13 @@ public class StatusModel implements Serializable {
 
     public void setSendStatus(Integer sendStatus) {
         this.sendStatus = sendStatus;
+    }
+
+    public Integer getDidStatus() {
+        return didStatus;
+    }
+
+    public void setDidStatus(Integer didStatus) {
+        this.didStatus = didStatus;
     }
 }

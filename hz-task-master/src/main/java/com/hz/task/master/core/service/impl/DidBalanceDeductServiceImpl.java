@@ -3,6 +3,7 @@ package com.hz.task.master.core.service.impl;
 import com.hz.task.master.core.common.dao.BaseDao;
 import com.hz.task.master.core.common.service.impl.BaseServiceImpl;
 import com.hz.task.master.core.mapper.DidBalanceDeductMapper;
+import com.hz.task.master.core.model.did.DidBalanceDeductModel;
 import com.hz.task.master.core.service.DidBalanceDeductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,5 +28,10 @@ public class DidBalanceDeductServiceImpl<T> extends BaseServiceImpl<T> implement
 
     public BaseDao<T> getDao() {
         return didBalanceDeductMapper;
+    }
+
+    @Override
+    public int updateOrderStatus(DidBalanceDeductModel model) {
+        return didBalanceDeductMapper.updateOrderStatus(model);
     }
 }

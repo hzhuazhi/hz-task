@@ -6,6 +6,7 @@ import com.hz.task.master.core.common.utils.constant.CacheKey;
 import com.hz.task.master.core.common.utils.constant.CachedKeyUtils;
 import com.hz.task.master.core.common.utils.constant.ServerConstant;
 import com.hz.task.master.core.common.utils.constant.TkCacheKey;
+import com.hz.task.master.core.model.did.DidBalanceDeductModel;
 import com.hz.task.master.core.model.did.DidCollectionAccountQrCodeModel;
 import com.hz.task.master.core.model.did.DidModel;
 import com.hz.task.master.core.model.order.OrderModel;
@@ -80,8 +81,13 @@ public class TaskOrder {
      * @Description: task：执行派单失效/超时订单的逻辑运算
      * <p>
      *     每1每秒运行一次
-     *     1.查询出已失效的订单数据。
-     *     2.根据订单信息，修改用户账号金额数据：具体修改金额：余额 =  余额 + 订单金额， 冻结金额 = 冻结金额 - 订单金额。
+     *     微信订单：
+     *      1.查询出已失效的订单数据。
+     *      2.根据订单信息，修改用户账号金额数据：具体修改金额：余额 =  余额 + 订单金额， 冻结金额 = 冻结金额 - 订单金额。
+     *     支付宝订单：
+     *      1.查询出已失效的订单数据。
+     *      2.修改用户余额流水的订单状态。
+     *
      *
      * </p>
      * @author yoko
@@ -101,23 +107,40 @@ public class TaskOrder {
                 String lockKey = CachedKeyUtils.getCacheKeyTask(TkCacheKey.LOCK_ORDER_INVALID, data.getId());
                 boolean flagLock = ComponentUtil.redisIdService.lock(lockKey);
                 if (flagLock){
-                    // 锁住这个用户
-                    String lockKey_did = CachedKeyUtils.getCacheKey(CacheKey.LOCK_DID_MONEY, data.getDid());
-                    boolean flagLock_did = ComponentUtil.redisIdService.lock(lockKey_did);
-                    if (flagLock_did){
-                        DidModel didUpdateMoney = TaskMethod.assembleUpdateDidMoneyByInvalid(data.getDid(), data.getOrderMoney());
-                        num = ComponentUtil.didService.updateDidMoneyByInvalid(didUpdateMoney);
+                    if (data.getCollectionType() == 1){
+                        // 微信支付订单的处理逻辑
+                        // 锁住这个用户
+                        String lockKey_did = CachedKeyUtils.getCacheKey(CacheKey.LOCK_DID_MONEY, data.getDid());
+                        boolean flagLock_did = ComponentUtil.redisIdService.lock(lockKey_did);
+                        if (flagLock_did){
+                            DidModel didUpdateMoney = TaskMethod.assembleUpdateDidMoneyByInvalid(data.getDid(), data.getOrderMoney());
+                            num = ComponentUtil.didService.updateDidMoneyByInvalid(didUpdateMoney);
+                            if (num > 0){
+                                // 更新此次task的状态：更新成成功
+                                StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE, "");
+                                ComponentUtil.taskOrderService.updateOrderStatus(statusModel);
+                            }else{
+                                // 更新此次task的状态：更新成失败
+                                StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "更新的影响行为0");
+                                ComponentUtil.taskOrderService.updateOrderStatus(statusModel);
+                            }
+                            // 解锁
+                            ComponentUtil.redisIdService.delLock(lockKey_did);
+                        }
+                    }else if(data.getCollectionType() == 2){
+                        // 支付宝订单的逻辑处理
+                        DidBalanceDeductModel didBalanceDeductUpdate = TaskMethod.assembleDidBalanceDeductUpdate(data.getOrderNo(), 2);
+                        num = ComponentUtil.didBalanceDeductService.updateOrderStatus(didBalanceDeductUpdate);
                         if (num > 0){
                             // 更新此次task的状态：更新成成功
                             StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE, "");
                             ComponentUtil.taskOrderService.updateOrderStatus(statusModel);
                         }else{
                             // 更新此次task的状态：更新成失败
+                            log.info("");
                             StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "更新的影响行为0");
                             ComponentUtil.taskOrderService.updateOrderStatus(statusModel);
                         }
-                        // 解锁
-                        ComponentUtil.redisIdService.delLock(lockKey_did);
                     }
 
                     // 解锁
@@ -158,7 +181,7 @@ public class TaskOrder {
 //        log.info("----------------------------------TaskOrder.orderBySuccessOrder()----start");
 
         // 获取已成功的订单数据
-        StatusModel statusQuery = TaskMethod.assembleTaskByOrderStatusQuery(limitNum, 4);
+        StatusModel statusQuery = TaskMethod.assembleTaskByOrderDidStatusQuery(limitNum, 3);
         List<OrderModel> synchroList = ComponentUtil.taskOrderService.getOrderList(statusQuery);
         for (OrderModel data : synchroList){
             try{
@@ -167,33 +190,52 @@ public class TaskOrder {
                 String lockKey = CachedKeyUtils.getCacheKeyTask(TkCacheKey.LOCK_ORDER_SUCCESS, data.getId());
                 boolean flagLock = ComponentUtil.redisIdService.lock(lockKey);
                 if (flagLock){
-                    // 更新这个收款二维码成功收款的次数
-                    DidCollectionAccountQrCodeModel didCollectionAccountQrCodeModel = TaskMethod.assembleDidCollectionAccountQrCode(data.getQrCodeId(), 1);
-                    ComponentUtil.didCollectionAccountQrCodeService.updateIsLimitNum(didCollectionAccountQrCodeModel);
+                    if (data.getCollectionType() == 1){
+                        // 微信支付处理逻辑
+                        // 更新这个收款二维码成功收款的次数
+                        DidCollectionAccountQrCodeModel didCollectionAccountQrCodeModel = TaskMethod.assembleDidCollectionAccountQrCode(data.getQrCodeId(), 1);
+                        ComponentUtil.didCollectionAccountQrCodeService.updateIsLimitNum(didCollectionAccountQrCodeModel);
 
-                    // 锁住这个用户
-                    String lockKey_did = CachedKeyUtils.getCacheKey(CacheKey.LOCK_DID_MONEY, data.getDid());
-                    boolean flagLock_did = ComponentUtil.redisIdService.lock(lockKey_did);
-                    if (flagLock_did){
-                        DidModel didUpdateMoney = TaskMethod.assembleUpdateDidMoneyBySuccess(data.getDid(), data.getOrderMoney());
-                        num = ComponentUtil.didService.updateDidMoneyBySuccess(didUpdateMoney);
-                        if (num > 0){
+                        // 锁住这个用户
+                        String lockKey_did = CachedKeyUtils.getCacheKey(CacheKey.LOCK_DID_MONEY, data.getDid());
+                        boolean flagLock_did = ComponentUtil.redisIdService.lock(lockKey_did);
+                        if (flagLock_did){
+                            DidModel didUpdateMoney = TaskMethod.assembleUpdateDidMoneyBySuccess(data.getDid(), data.getOrderMoney());
+                            num = ComponentUtil.didService.updateDidMoneyBySuccess(didUpdateMoney);
+                            if (num > 0){
 
 //                            // 删除要删除的redis
 //                            String strKeyCache_did_collection_account_money = CachedKeyUtils.getCacheKey(CacheKey.LOCK_DID_COLLECTION_ACCOUNT_MONEY, data.getCollectionAccountId(), data.getOrderMoney());
 //                            ComponentUtil.redisService.remove(strKeyCache_did_collection_account_money);
-                            log.info("");
+                                log.info("");
+                                // 更新此次task的状态：更新成成功
+                                StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE, "");
+                                ComponentUtil.taskOrderService.updateOrderStatus(statusModel);
+                            }else{
+                                // 更新此次task的状态：更新成失败
+                                StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "更新的影响行为0");
+                                ComponentUtil.taskOrderService.updateOrderStatus(statusModel);
+                            }
+                            // 解锁
+                            ComponentUtil.redisIdService.delLock(lockKey_did);
+                        }
+                    }else if(data.getCollectionType() == 2){
+                        // 支付宝支付处理逻辑
+                        DidBalanceDeductModel didBalanceDeductUpdate = TaskMethod.assembleDidBalanceDeductUpdate(data.getOrderNo(), 4);
+                        num = ComponentUtil.didBalanceDeductService.updateOrderStatus(didBalanceDeductUpdate);
+                        if (num > 0){
                             // 更新此次task的状态：更新成成功
                             StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE, "");
                             ComponentUtil.taskOrderService.updateOrderStatus(statusModel);
                         }else{
                             // 更新此次task的状态：更新成失败
                             StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "更新的影响行为0");
+                            log.info("");
                             ComponentUtil.taskOrderService.updateOrderStatus(statusModel);
                         }
-                        // 解锁
-                        ComponentUtil.redisIdService.delLock(lockKey_did);
+
                     }
+
                     // 解锁
                     ComponentUtil.redisIdService.delLock(lockKey);
                 }

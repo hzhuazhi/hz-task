@@ -236,6 +236,24 @@ public class TaskMethod {
     /**
      * @Description: 组装查询定时任务根据订单状态-失效订单、成功订单等。
      * @param limitNum - 多少条数据
+     * @param didStatus - 订单状态_用户操作的状态：1初始化，2失败，3超时后默认成功，4用户点击成功
+     * @return
+     * @author yoko
+     * @date 2020/1/11 16:23
+     */
+    public static StatusModel assembleTaskByOrderDidStatusQuery(int limitNum, int didStatus){
+        StatusModel resBean = new StatusModel();
+        resBean.setDidStatus(didStatus);
+        resBean.setRunNum(ServerConstant.PUBLIC_CONSTANT.RUN_NUM_FIVE);
+        resBean.setRunStatus(ServerConstant.PUBLIC_CONSTANT.RUN_STATUS_THREE);
+        resBean.setLimitNum(limitNum);
+        return resBean;
+    }
+
+
+    /**
+     * @Description: 组装查询定时任务根据订单状态-失效订单、成功订单等。
+     * @param limitNum - 多少条数据
      * @return
      * @author yoko
      * @date 2020/1/11 16:23
@@ -1747,6 +1765,21 @@ public class TaskMethod {
         resBean.setId(id);
         resBean.setUseStatus(2);
         resBean.setCheckInfo(checkInfo);
+        return resBean;
+    }
+
+    /**
+     * @Description: 组装修改用户余额流水的订单状态
+     * @param orderNo - 订单号
+     * @param orderStatus - 订单状态：1初始化，2超时/失败，3有质疑，4成功
+     * @return com.hz.task.master.core.model.did.DidBalanceDeductModel
+     * @author yoko
+     * @date 2020/7/2 19:23
+     */
+    public static DidBalanceDeductModel assembleDidBalanceDeductUpdate(String orderNo, int orderStatus){
+        DidBalanceDeductModel resBean = new DidBalanceDeductModel();
+        resBean.setOrderNo(orderNo);
+        resBean.setOrderStatus(orderStatus);
         return resBean;
     }
 
