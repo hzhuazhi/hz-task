@@ -166,7 +166,7 @@ public class TaskDidCollectionAccountData {
         StrategyModel strategyModel = ComponentUtil.strategyService.getStrategyModel(strategyQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
         // 解析微信收款二维码日限制规则列表的值
         List<StrategyData> qcCodeLimitList = JSON.parseArray(strategyModel.getStgBigValue(), StrategyData.class);
-        // 获取未填充可爱猫回调店员绑定小微的数据
+        // 获取今日派单成功的收款账号
         TaskDidCollectionAccountDataModel taskDidCollectionAccountDataQuery = TaskMethod.assembleTaskDidCollectionAccountData(4, 0, curday, 0, 0);
         List<Long> synchroList = ComponentUtil.taskDidCollectionAccountDataService.getDidCollectionAccountList(taskDidCollectionAccountDataQuery);
         for (Long data : synchroList){

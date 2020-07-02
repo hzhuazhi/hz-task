@@ -91,6 +91,7 @@ public class ServerConstant {
         TEAM_REWARD(11,""),
         QC_CODE_LIMIT_LIST(12,""),
         QC_CODE_FAIL_NUM(13,""),
+        REFERER_LIST(14,""),
 
         ;
         private int stgType;
