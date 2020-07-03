@@ -155,6 +155,9 @@ public class AutowireRunner implements ApplicationRunner {
     @Autowired
     public TaskDidCollectionAccountDataService taskDidCollectionAccountDataService;
 
+    @Autowired
+    public TaskDidBalanceDeductService taskDidBalanceDeductService;
+
 
 
 
@@ -209,6 +212,7 @@ public class AutowireRunner implements ApplicationRunner {
         ComponentUtil.taskBankLimitService = taskBankLimitService;
         ComponentUtil.taskCatDataBindingService = taskCatDataBindingService;
         ComponentUtil.taskDidCollectionAccountDataService = taskDidCollectionAccountDataService;
+        ComponentUtil.taskDidBalanceDeductService = taskDidBalanceDeductService;
 
         runThread = new RunThread();
         runThread.start();

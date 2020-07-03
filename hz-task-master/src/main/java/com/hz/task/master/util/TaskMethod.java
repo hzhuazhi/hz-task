@@ -1783,6 +1783,21 @@ public class TaskMethod {
         return resBean;
     }
 
+    /**
+     * @Description: 更新用户的余额的组装方法
+     * @param did - 用户的主键ID
+     * @param money - 金额
+     * @return com.hz.task.master.core.model.did.DidModel
+     * @author yoko
+     * @date 2020/7/3 13:48
+     */
+    public static DidModel assembleDidUpdateBalance(long did, String money){
+        DidModel resBean = new DidModel();
+        resBean.setId(did);
+        resBean.setOrderMoney(money);
+        return resBean;
+    }
+
 
 
 

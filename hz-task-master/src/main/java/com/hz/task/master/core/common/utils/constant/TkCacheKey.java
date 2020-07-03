@@ -132,4 +132,10 @@ public interface TkCacheKey {
      */
     String LOCK_DID_COLLECTION_ACCOUNT_FAIL_NUM = "-21";
 
+    /**
+     * 锁：用户扣减余额流水的数据的流水
+     * 锁住
+     */
+    String LOCK_DID_BALANCE_DEDUCT = "-22";
+
 }

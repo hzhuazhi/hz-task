@@ -70,4 +70,13 @@ public interface DidMapper<T> extends BaseDao<T> {
      * @date 2020/6/8 14:21
      */
     public int updateDidMoneyBySuccess(DidModel model);
+
+    /**
+     * @Description: 更新用户的余额
+     * @param model
+     * @return
+     * @author yoko
+     * @date 2020/7/3 13:44
+    */
+    public int updateDidBalance(DidModel model);
 }

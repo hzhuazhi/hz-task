@@ -41,6 +41,7 @@ public class ComponentUtil {
     public static CatDataBindingService catDataBindingService;
     public static DidCollectionAccountQrCodeService didCollectionAccountQrCodeService;
     public static DidBalanceDeductService didBalanceDeductService;
+    public static TaskDidBalanceDeductService taskDidBalanceDeductService;
 
 
 
