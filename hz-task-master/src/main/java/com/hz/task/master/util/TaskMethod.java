@@ -643,11 +643,12 @@ public class TaskMethod {
      * @author yoko
      * @date 2020/6/4 15:03
     */
-    public static DidRechargeModel assembleDidRechargeQuery(long bankId){
+    public static DidRechargeModel assembleDidRechargeQuery(long bankId, int workType){
         DidRechargeModel resBean = new DidRechargeModel();
         resBean.setBankId(bankId);
         resBean.setOrderStatus(1);
         resBean.setInvalidTime("1");
+        resBean.setWorkType(workType);
         return resBean;
     }
 

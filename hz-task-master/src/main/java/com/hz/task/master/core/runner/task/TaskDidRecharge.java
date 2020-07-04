@@ -113,7 +113,8 @@ public class TaskDidRecharge {
      * @date 2019/12/6 20:25
      */
 //    @Scheduled(cron = "1 * * * * ?")
-    @Scheduled(fixedDelay = 1000) // 每秒执行
+//    @Scheduled(fixedDelay = 1000) // 每秒执行
+    @Scheduled(fixedDelay = 60000) // 每分钟执行
     public void didRechargeBySuccessOrder() throws Exception{
 //        log.info("----------------------------------TaskDidRecharge.didRechargeBySuccessOrder()----start");
 
@@ -140,72 +141,107 @@ public class TaskDidRecharge {
                 String lockKey = CachedKeyUtils.getCacheKeyTask(TkCacheKey.LOCK_DID_RECHARGE_SUCCESS_ORDER, data.getId());
                 boolean flagLock = ComponentUtil.redisIdService.lock(lockKey);
                 if (flagLock){
-                    // 计算用户充多少送多少的具体金额
-                    String rechargeProfit = TaskMethod.getRechargeProfit(moneyList, data.getMoneyId());
-                    if (StringUtils.isBlank(rechargeProfit)){
-                        // #这里会有一个漏洞，可能没有按照规则充多少送多少，会导致漏洞：但是我们制定的规则就是冲多少送多少的规则，所以如果用户没按照规则来就属于脏数据这里只是备注一下
-                        StatusModel statusModel = TaskMethod.assembleUpdateStatusByDidRechargeBySuccessOrderStatus(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "计算充多少送多少的收益值为空");
-                        ComponentUtil.taskDidRechargeService.updateDidRechargeStatus(statusModel);
-                    }else{
-                        // 计算用户档次奖励
 
-                        // 查询用户总充值 ; 总充值 = 之前总充值 + 这次的充值
-                        DidModel didQuery = TaskMethod.assembleDidQueryByDid(data.getDid());
-                        DidModel didModel = (DidModel) ComponentUtil.didService.findByObject(didQuery);
-                        if (didModel == null || didModel.getId() <= 0){
-                            // 更新此次task的状态：更新成失败：根据用户ID查询用户数据为空
-                            StatusModel statusModel = TaskMethod.assembleUpdateStatusByDidRechargeBySuccessOrderStatus(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "根据用户ID查询用户数据为空");
+                    if (data.getDataType() == 1){
+                        // 微信规则的充值
+                        // 计算用户充多少送多少的具体金额
+                        String rechargeProfit = TaskMethod.getRechargeProfit(moneyList, data.getMoneyId());
+                        if (StringUtils.isBlank(rechargeProfit)){
+                            // #这里会有一个漏洞，可能没有按照规则充多少送多少，会导致漏洞：但是我们制定的规则就是冲多少送多少的规则，所以如果用户没按照规则来就属于脏数据这里只是备注一下
+                            StatusModel statusModel = TaskMethod.assembleUpdateStatusByDidRechargeBySuccessOrderStatus(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "计算充多少送多少的收益值为空");
                             ComponentUtil.taskDidRechargeService.updateDidRechargeStatus(statusModel);
-                        }else {
-                            // 奖励：组装用户充多少从多少的数据
-                            DidRewardModel didRechargeProfit = TaskMethod.assembleDidRechargeProfit(data, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ONE, rechargeProfit);
+                        }else{
+                            // 计算用户档次奖励
 
-                            // 累计充值
-                            String totalRechargeMoney = "";
-                            if (StringUtils.isBlank(didModel.getTotalMoney())){
-                                totalRechargeMoney = "0.00";
-                            }else{
-                                totalRechargeMoney = StringUtil.getBigDecimalAdd(didModel.getTotalMoney(), data.getOrderMoney());
-                            }
+                            // 查询用户总充值 ; 总充值 = 之前总充值 + 这次的充值
+                            DidModel didQuery = TaskMethod.assembleDidQueryByDid(data.getDid());
+                            DidModel didModel = (DidModel) ComponentUtil.didService.findByObject(didQuery);
+                            if (didModel == null || didModel.getId() <= 0){
+                                // 更新此次task的状态：更新成失败：根据用户ID查询用户数据为空
+                                StatusModel statusModel = TaskMethod.assembleUpdateStatusByDidRechargeBySuccessOrderStatus(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "根据用户ID查询用户数据为空");
+                                ComponentUtil.taskDidRechargeService.updateDidRechargeStatus(statusModel);
+                            }else {
+                                // 奖励：组装用户充多少从多少的数据
+                                DidRewardModel didRechargeProfit = TaskMethod.assembleDidRechargeProfit(data, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ONE, rechargeProfit);
 
-                            // 计算用户的档次奖励金额
-                            Map<String, String> gradeProfitMap = TaskMethod.getGradeProfit(moneyGradeList, totalRechargeMoney, data.getOrderMoney());
-                            DidRewardModel didGradeProfit = null;
-                            if (gradeProfitMap != null && gradeProfitMap.size() > 0){
-                                didGradeProfit = new DidRewardModel();
-                                didGradeProfit = TaskMethod.assembleDidGradeProfit(data, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, gradeProfitMap.get("gradeProfit"), gradeProfitMap.get("stgGradeProfit"));
-                            }
-
-                            // 组装更新用户金额信息的数据
-                            DidModel upDidMoney = TaskMethod.assembleUpdateDidMoneyByRecharge(data.getDid(), data.getOrderMoney());
-
-                            // 锁住这个用户
-                            String lockKey_did = CachedKeyUtils.getCacheKey(CacheKey.LOCK_DID_MONEY, data.getDid());
-                            boolean flagLock_did = ComponentUtil.redisIdService.lock(lockKey_did);
-                            if (flagLock_did){
-                                boolean flag = ComponentUtil.taskDidRechargeService.didRechargeSuccessOrder(didRechargeProfit, didGradeProfit, upDidMoney);
-                                if (flag){
-
-                                    // 删除要删除的redis
-                                    String strKeyCache_HANG_MONEY = CachedKeyUtils.getCacheKey(CacheKey.HANG_MONEY, data.getBankId(), data.getDistributionMoney());// 银行卡具体的挂单金额
-                                    String strKeyCache_LOCK_DID_ORDER_INVALID_TIME = CachedKeyUtils.getCacheKey(CacheKey.LOCK_DID_ORDER_INVALID_TIME, data.getDid());// 用户调起充值订单的失效时间
-                                    ComponentUtil.redisService.remove(strKeyCache_HANG_MONEY);
-                                    ComponentUtil.redisService.remove(strKeyCache_LOCK_DID_ORDER_INVALID_TIME);
-
-                                    // 更新此次task的状态：更新成成功
-                                    StatusModel statusModel = TaskMethod.assembleUpdateStatusByDidRechargeBySuccessOrderStatus(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE, "");
-                                    ComponentUtil.taskDidRechargeService.updateDidRechargeStatus(statusModel);
-                                }else {
-                                    // 更新此次task的状态：更新成失败：执行SQL操作更新用户信息出错
-                                    StatusModel statusModel = TaskMethod.assembleUpdateStatusByDidRechargeBySuccessOrderStatus(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "执行SQL操作更新用户信息出错");
-                                    ComponentUtil.taskDidRechargeService.updateDidRechargeStatus(statusModel);
+                                // 累计充值
+                                String totalRechargeMoney = "";
+                                if (StringUtils.isBlank(didModel.getTotalMoney())){
+                                    totalRechargeMoney = "0.00";
+                                }else{
+                                    totalRechargeMoney = StringUtil.getBigDecimalAdd(didModel.getTotalMoney(), data.getOrderMoney());
                                 }
 
-                                // 解锁
-                                ComponentUtil.redisIdService.delLock(lockKey_did);
+                                // 计算用户的档次奖励金额
+                                Map<String, String> gradeProfitMap = TaskMethod.getGradeProfit(moneyGradeList, totalRechargeMoney, data.getOrderMoney());
+                                DidRewardModel didGradeProfit = null;
+                                if (gradeProfitMap != null && gradeProfitMap.size() > 0){
+                                    didGradeProfit = new DidRewardModel();
+                                    didGradeProfit = TaskMethod.assembleDidGradeProfit(data, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, gradeProfitMap.get("gradeProfit"), gradeProfitMap.get("stgGradeProfit"));
+                                }
+
+                                // 组装更新用户金额信息的数据
+                                DidModel upDidMoney = TaskMethod.assembleUpdateDidMoneyByRecharge(data.getDid(), data.getOrderMoney());
+
+                                // 锁住这个用户
+                                String lockKey_did = CachedKeyUtils.getCacheKey(CacheKey.LOCK_DID_MONEY, data.getDid());
+                                boolean flagLock_did = ComponentUtil.redisIdService.lock(lockKey_did);
+                                if (flagLock_did){
+                                    boolean flag = ComponentUtil.taskDidRechargeService.didRechargeSuccessOrder(didRechargeProfit, didGradeProfit, upDidMoney);
+                                    if (flag){
+
+                                        // 删除要删除的redis
+                                        String strKeyCache_HANG_MONEY = CachedKeyUtils.getCacheKey(CacheKey.HANG_MONEY, data.getBankId(), data.getDistributionMoney());// 银行卡具体的挂单金额
+                                        String strKeyCache_LOCK_DID_ORDER_INVALID_TIME = CachedKeyUtils.getCacheKey(CacheKey.LOCK_DID_ORDER_INVALID_TIME, data.getDid());// 用户调起充值订单的失效时间
+                                        ComponentUtil.redisService.remove(strKeyCache_HANG_MONEY);
+                                        ComponentUtil.redisService.remove(strKeyCache_LOCK_DID_ORDER_INVALID_TIME);
+
+                                        // 更新此次task的状态：更新成成功
+                                        StatusModel statusModel = TaskMethod.assembleUpdateStatusByDidRechargeBySuccessOrderStatus(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE, "");
+                                        ComponentUtil.taskDidRechargeService.updateDidRechargeStatus(statusModel);
+                                    }else {
+                                        // 更新此次task的状态：更新成失败：执行SQL操作更新用户信息出错
+                                        StatusModel statusModel = TaskMethod.assembleUpdateStatusByDidRechargeBySuccessOrderStatus(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "执行SQL操作更新用户信息出错");
+                                        ComponentUtil.taskDidRechargeService.updateDidRechargeStatus(statusModel);
+                                    }
+
+                                    // 解锁
+                                    ComponentUtil.redisIdService.delLock(lockKey_did);
+                                }
                             }
                         }
+                    }else if(data.getDataType() == 2){
+                        // 支付宝规则的充值
+
+                        // 组装更新用户金额信息的数据
+                        DidModel upDidMoney = TaskMethod.assembleUpdateDidMoneyByRecharge(data.getDid(), data.getOrderMoney());
+
+                        // 锁住这个用户
+                        String lockKey_did = CachedKeyUtils.getCacheKey(CacheKey.LOCK_DID_MONEY, data.getDid());
+                        boolean flagLock_did = ComponentUtil.redisIdService.lock(lockKey_did);
+                        if (flagLock_did){
+                            int didNum = ComponentUtil.didService.updateDidMoneyByRecharge(upDidMoney);
+                            if (didNum > 0){
+                                // 删除要删除的redis
+                                String strKeyCache_HANG_MONEY = CachedKeyUtils.getCacheKey(CacheKey.HANG_MONEY, data.getBankId(), data.getDistributionMoney());// 银行卡具体的挂单金额
+                                String strKeyCache_LOCK_DID_ORDER_INVALID_TIME = CachedKeyUtils.getCacheKey(CacheKey.LOCK_DID_ORDER_INVALID_TIME, data.getDid());// 用户调起充值订单的失效时间
+                                ComponentUtil.redisService.remove(strKeyCache_HANG_MONEY);
+                                ComponentUtil.redisService.remove(strKeyCache_LOCK_DID_ORDER_INVALID_TIME);
+                                log.info("");
+                                // 更新此次task的状态：更新成成功
+                                StatusModel statusModel = TaskMethod.assembleUpdateStatusByDidRechargeBySuccessOrderStatus(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE, "");
+                                ComponentUtil.taskDidRechargeService.updateDidRechargeStatus(statusModel);
+                            }else {
+                                // 更新此次task的状态：更新成失败：执行SQL操作更新用户信息出错
+                                StatusModel statusModel = TaskMethod.assembleUpdateStatusByDidRechargeBySuccessOrderStatus(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "更新用户金额响应行为0");
+                                ComponentUtil.taskDidRechargeService.updateDidRechargeStatus(statusModel);
+                            }
+                            // 解锁
+                            ComponentUtil.redisIdService.delLock(lockKey_did);
+                        }
+
                     }
+
 
                     // 解锁
                     ComponentUtil.redisIdService.delLock(lockKey);

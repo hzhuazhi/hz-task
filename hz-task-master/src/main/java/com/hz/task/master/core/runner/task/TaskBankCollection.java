@@ -159,7 +159,7 @@ public class TaskBankCollection {
                 String lockKey = CachedKeyUtils.getCacheKeyTask(TkCacheKey.LOCK_BANK_COLLECTION_DATA_WORK_TYPE_IS_OK, data.getId());
                 boolean flagLock = ComponentUtil.redisIdService.lock(lockKey);
                 if (flagLock){
-                    DidRechargeModel didRechargeModel = TaskMethod.assembleDidRechargeQuery(data.getBankId());
+                    DidRechargeModel didRechargeModel = TaskMethod.assembleDidRechargeQuery(data.getBankId(), 2);
                     List<DidRechargeModel> didRechargeList = ComponentUtil.didRechargeService.findByCondition(didRechargeModel);
 
                     if (didRechargeList == null || didRechargeList.size() <= 0){
