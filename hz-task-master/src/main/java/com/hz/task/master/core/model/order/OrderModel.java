@@ -85,6 +85,16 @@ public class OrderModel extends BasePage implements Serializable {
     private String invalidTime;
 
     /**
+     * 支付宝的用户ID
+     */
+    private String userId;
+
+    /**
+     * 支付宝的账号
+     */
+    private String zfbAcNum;
+
+    /**
      * 创建日期：存的日期格式20160530
      */
     private Integer curday;
@@ -403,5 +413,21 @@ public class OrderModel extends BasePage implements Serializable {
 
     public void setQrCodeId(Long qrCodeId) {
         this.qrCodeId = qrCodeId;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getZfbAcNum() {
+        return zfbAcNum;
+    }
+
+    public void setZfbAcNum(String zfbAcNum) {
+        this.zfbAcNum = zfbAcNum;
     }
 }

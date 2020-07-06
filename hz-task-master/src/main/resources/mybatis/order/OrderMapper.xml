@@ -9,6 +9,7 @@
     <sql id="Base_Column_List">
         a.id,a.did,a.order_no,a.order_money,a.collection_account_id,a.collection_type,a.qr_code_id,
         a.qr_code,a.wx_nickname,a.wx_id,a.out_trade_no,a.notify_url,a.order_status,a.invalid_time,
+        a.user_id,a.zfb_ac_num,
         a.curday,a.curhour,a.curminute,a.run_num,a.run_status,
         a.create_time,a.update_time,a.yn,
         b.ac_name,b.ac_num
@@ -41,6 +42,9 @@
             </if>
             <if test="wxId != null and wxId != '' " >
                 and a.wx_id = #{wxId}
+            </if>
+            <if test="userId != null and userId != '' " >
+                and a.user_id = #{userId}
             </if>
             <if test="orderStatus != null and orderStatus != '' " >
                 and a.order_status = #{orderStatus}
@@ -305,6 +309,20 @@
         <if test="wxNickname != null and wxNickname != '' " >
             and a.wx_nickname = #{wxNickname}
         </if>
+        and a.collection_type = #{collectionType}
+        and a.order_status = #{orderStatus}
+        and a.invalid_time > now()
+    </select>
+
+
+    <!-- 获取初始化的订单数据（未超时）- 支付宝 -->
+    <select id="getInitOrderByZfbList" parameterType="Object" resultType="com.hz.task.master.core.model.order.OrderModel">
+        select
+        <include refid="Base_Column_List" />
+        from tb_fn_order a left join tb_fn_did_collection_account b on a.collection_account_id = b.id
+        where 1=1
+        and a.user_id = #{userId}
+        and a.did = #{did}
         and a.collection_type = #{collectionType}
         and a.order_status = #{orderStatus}
         and a.invalid_time > now()

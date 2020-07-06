@@ -149,7 +149,7 @@ public class TaskCatData {
                                     num = 1;// 执行状态的更改了
 
                                     // 组装要更新的可爱猫回调订单的数据
-                                    CatDataModel catDataModel = TaskMethod.assembleCatDataUpdate(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE, orderModel.getOrderNo());
+                                    CatDataModel catDataModel = TaskMethod.assembleCatDataUpdate(data.getId(), 4, orderModel.getOrderNo());
                                     // 组装要更新的派单的订单状态的数据
                                     OrderModel orderUpdate = TaskMethod.assembleUpdateOrderStatus(orderModel.getId(), 4);
                                     boolean flag = ComponentUtil.taskCatDataService.catDataMatchingOrderSuccess(catDataModel, orderUpdate);

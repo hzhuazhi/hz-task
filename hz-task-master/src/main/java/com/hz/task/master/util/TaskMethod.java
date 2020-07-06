@@ -1904,6 +1904,76 @@ public class TaskMethod {
     }
 
 
+    /**
+     * @Description: 根据支付宝账号ID查询收款账号信息
+     * @param userId - 支付宝账号ID
+     * @return
+     * @author yoko
+     * @date 2020/7/6 21:08
+    */
+    public static DidCollectionAccountModel assembleDidCollectionAccountByUserIdQuery(String userId){
+        DidCollectionAccountModel resBean = new DidCollectionAccountModel();
+        resBean.setUserId(userId);
+        return resBean;
+    }
+
+
+    /**
+     * @Description: 组装更新可爱猫回调订单的数据
+     * @param id - 可爱猫回调订单的主键ID
+     * @param wxId - 归属小微管理的主键ID：对应表tb_fn_wx的主键ID
+     * @return
+     *
+     * @author yoko
+     * @date 2020/6/6 19:59
+     */
+    public static ClientDataModel assembleClientDataUpdate(long id, long did){
+        ClientDataModel resBean = new ClientDataModel();
+        resBean.setId(id);
+        resBean.setDid(did);
+        return resBean;
+    }
+
+    /**
+     * @Description: 组装查询初始化的订单信息（未超过有效期的）-支付宝
+     * @param did - 用户ID
+     * @param userId - 支付宝账号ID
+     * @param collectionType - 收款账号类型：1微信，2支付宝，3银行卡
+     * @return com.hz.task.master.core.model.order.OrderModel
+     * @author yoko
+     * @date 2020/6/6 21:37
+     */
+    public static OrderModel assembleOrderByZfbQuery(long did, String userId, int collectionType){
+        OrderModel resBean = new OrderModel();
+        resBean.setDid(did);
+        resBean.setUserId(userId);
+        resBean.setCollectionType(collectionType);
+        resBean.setOrderStatus(1);
+        resBean.setInvalidTime("1");
+        return resBean;
+    }
+
+
+    /**
+     * @Description: 组装更新客户端监听数据回调订单数据
+     * @param id - 主键ID
+     * @param orderStatus - 订单状态：1初始化，2超时/失败，3有质疑，4成功
+     * @param orderNo - 派单的那个订单号
+     * @return com.hz.task.master.core.model.cat.CatDataModel
+     * @author yoko
+     * @date 2020/6/7 9:24
+     */
+    public static ClientDataModel assembleClientDataUpdate(long id, int orderStatus, String orderNo){
+        ClientDataModel resBean = new ClientDataModel();
+        resBean.setId(id);
+        resBean.setOrderStatus(orderStatus);
+        if (!StringUtils.isBlank(orderNo)){
+            resBean.setOrderNo(orderNo);
+        }
+        return resBean;
+    }
+
+
 
 
 

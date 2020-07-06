@@ -144,4 +144,16 @@ public interface TkCacheKey {
      */
     String LOCK_CLIENT_ALL_DATA = "-23";
 
+    /**
+     * 锁：客户端监听数据回调订单-补充数据的流水
+     * 锁住
+     */
+    String LOCK_CLIENT_DATA_WORK_TYPE = "-24";
+
+    /**
+     * 锁：客户端监听数据回调订单-正式匹配派单数据
+     * 锁住
+     */
+    String LOCK_CLIENT_DATA = "-25";
+
 }

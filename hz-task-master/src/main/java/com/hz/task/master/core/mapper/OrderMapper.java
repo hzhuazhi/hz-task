@@ -35,6 +35,15 @@ public interface OrderMapper<T> extends BaseDao<T> {
      */
     public List<OrderModel> getInitOrderList(OrderModel model);
 
+    /**
+     * @Description: 获取初始化的订单数据（未超时）- 支付宝
+     * @param model
+     * @return
+     * @author yoko
+     * @date 2020/6/6 21:42
+     */
+    public List<OrderModel> getInitOrderByZfbList(OrderModel model);
+
 
     /**
      * @Description: 更新派单的订单状态

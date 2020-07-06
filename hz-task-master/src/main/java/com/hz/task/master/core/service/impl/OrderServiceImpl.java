@@ -160,6 +160,11 @@ public class OrderServiceImpl<T> extends BaseServiceImpl<T> implements OrderServ
     }
 
     @Override
+    public List<OrderModel> getInitOrderByZfbList(OrderModel model) {
+        return orderMapper.getInitOrderByZfbList(model);
+    }
+
+    @Override
     public int updateOrderStatus(OrderModel model) {
         return orderMapper.updateOrderStatus(model);
     }
