@@ -94,6 +94,8 @@ public class ServerConstant {
         REFERER_LIST(14,""),
         CONSUME_MONEY_LIST(15,""),
         LAST_TIME(16,""),
+        ZFB_RULE(17,""),
+        ZFB_MONEY_RULE(18,""),
 
         ;
         private int stgType;

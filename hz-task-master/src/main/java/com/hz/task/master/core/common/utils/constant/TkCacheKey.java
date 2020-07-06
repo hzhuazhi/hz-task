@@ -138,4 +138,10 @@ public interface TkCacheKey {
      */
     String LOCK_DID_BALANCE_DEDUCT = "-22";
 
+    /**
+     * 锁：客户端监听数据回调原始数据的的流水
+     * 锁住
+     */
+    String LOCK_CLIENT_ALL_DATA = "-23";
+
 }

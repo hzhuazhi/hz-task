@@ -117,10 +117,10 @@ public class AutowireRunner implements ApplicationRunner {
     private DidBalanceDeductService didBalanceDeductService;
 
     @Autowired
-    private static ClientDataService clientDataService;
+    private ClientDataService clientDataService;
 
     @Autowired
-    private static ClientAllDataService clientAllDataService;
+    private ClientAllDataService clientAllDataService;
 
 
 

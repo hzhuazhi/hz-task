@@ -13,14 +13,18 @@ import com.hz.task.master.core.model.bank.BankTransferModel;
 import com.hz.task.master.core.model.cat.CatDataBindingModel;
 import com.hz.task.master.core.model.cat.CatDataModel;
 import com.hz.task.master.core.model.cat.CatDataOfflineModel;
+import com.hz.task.master.core.model.client.ClientDataModel;
 import com.hz.task.master.core.model.did.*;
 import com.hz.task.master.core.model.mobilecard.MobileCardDataModel;
 import com.hz.task.master.core.model.mobilecard.MobileCardModel;
 import com.hz.task.master.core.model.order.OrderModel;
 import com.hz.task.master.core.model.strategy.StrategyData;
 import com.hz.task.master.core.model.strategy.StrategyModel;
+import com.hz.task.master.core.model.strategy.StrategyZfbMoneyRule;
+import com.hz.task.master.core.model.strategy.StrategyZfbRule;
 import com.hz.task.master.core.model.task.base.StatusModel;
 import com.hz.task.master.core.model.task.cat.CatMsg;
+import com.hz.task.master.core.model.task.client.ClientModel;
 import com.hz.task.master.core.model.task.did.TaskDidCollectionAccountDataModel;
 import com.hz.task.master.core.model.wx.WxClerkDataModel;
 import com.hz.task.master.core.model.wx.WxClerkModel;
@@ -1174,7 +1178,6 @@ public class TaskMethod {
         }else {
             return null;
         }
-        //段峰
         if (!StringUtils.isBlank(msg.getShopowner())){
             if (msg.getShopowner().indexOf("(") > -1){
                 int index = msg.getShopowner().lastIndexOf("(");
@@ -1800,6 +1803,107 @@ public class TaskMethod {
     }
 
 
+    /**
+     * @Description: check校验客户端监听的原始数据必填字段值
+     * @param clientModel
+     * @return
+     * @author yoko
+     * @date 2020/7/6 20:10
+    */
+    public static boolean checkClientModel(ClientModel clientModel){
+        if (StringUtils.isBlank(clientModel.getContent())){
+            return false;
+        }
+        if (StringUtils.isBlank(clientModel.getToken())){
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * @Description: check校验数据是否属于支付宝收款信息
+     * @param content - 客户端监听到的支付宝数据
+     * @param strategyZfbRule - 检测定位客户端监听的数据是否属于支付宝转账规则配置
+     * @return boolean
+     * @author yoko
+     * @date 2020/7/6 20:17
+     */
+    public static boolean checkZfbData(String content, StrategyZfbRule strategyZfbRule){
+        String [] fg_str = strategyZfbRule.getKey().split("#");
+        int checkNum = strategyZfbRule.getKeyNum();
+        int num = 0;
+
+        for (String str : fg_str){
+            if (content.indexOf(str) > -1){
+                num ++;
+            }
+        }
+        if (num >= checkNum){
+            return true;
+        }else {
+            return false;
+        }
+    }
+
+    /**
+     * @Description: 截取数据里面的收款金额
+     * @param content - 客户端监听到的支付宝数据
+     * @param strategyZfbMoneyRule - 检测截取客户端监听的数据中支付宝转账的具体金额规则配置
+     * @return java.lang.String
+     * @author yoko
+     * @date 2020/7/6 20:22
+     */
+    public static String getZfbMoney(String content, StrategyZfbMoneyRule strategyZfbMoneyRule){
+        //截取短信类容获取短信类容里面的金额
+        String [] startKeyArr = strategyZfbMoneyRule.getStartKey().split("#");
+        String [] endKeyArr = strategyZfbMoneyRule.getEndKey().split("#");
+
+        int startIndex = 0;
+        int endIndex = 0;
+        for (String str : startKeyArr){
+            startIndex = getIndexOfByStr(content, str);
+            if (startIndex > 0){
+                startIndex = startIndex + str.length();
+                break;
+            }
+        }
+
+        for (String str : endKeyArr){
+            endIndex = getIndexOfByStr(content, str);
+            if (endIndex > 0){
+                break;
+            }
+        }
+        String money = content.substring(startIndex, endIndex).replaceAll(",","");
+        if (StringUtils.isBlank(money)){
+            return null;
+        }else {
+            return money;
+        }
+    }
+
+
+    /**
+     * @Description: 组装客户端监听数据回调订单的数据
+     * @param clientModel - 客户端监听数据回调原始数据
+     * @param orderMoney - 收款金额
+     * @param allId - 客户端监听数据回调原始数据的主键ID
+     * @return com.hz.task.master.core.model.client.ClientDataModel
+     * @author yoko
+     * @date 2020/7/6 20:38
+     */
+    public static ClientDataModel assembleClientDataModel(ClientModel clientModel, String orderMoney, long allId){
+        ClientDataModel resBean = new ClientDataModel();
+        resBean.setAllId(allId);
+        resBean.setUserId(clientModel.getToken());
+        resBean.setOrderMoney(orderMoney);
+        resBean.setCurday(DateUtil.getDayNumber(new Date()));
+        resBean.setCurhour(DateUtil.getHour(new Date()));
+        resBean.setCurminute(DateUtil.getCurminute(new Date()));
+        return resBean;
+    }
+
+
 
 
 
@@ -1866,6 +1970,11 @@ public class TaskMethod {
             String sb3 = sb2.substring(0, a);
             System.out.println("sb3:" + sb3);
         }
+        StrategyZfbMoneyRule strategyZfbMoneyRule = new StrategyZfbMoneyRule();
+        strategyZfbMoneyRule.setStartKey("付款#收款");
+        strategyZfbMoneyRule.setEndKey("元");
+        String sb4 = getZfbMoney("卢云通过扫码向你付款0.01元收款通知", strategyZfbMoneyRule);
+        System.out.println("sb4:" + sb4);
 
 
     }
