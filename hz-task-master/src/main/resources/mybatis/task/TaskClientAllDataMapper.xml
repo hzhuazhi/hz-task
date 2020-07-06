@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hz.task.master.core.mapper.task.TaskClientAllDataMapper">
+
+
+
+
+    <!-- 定义数据库基本列,只适用代替单表的*-->
+    <sql id="Base_Column_List">
+        a.id,a.json_data,
+        a.curday,a.curhour,a.curminute,a.run_num,a.run_status,
+        a.create_time,a.update_time,a.yn
+    </sql>
+
+    <!-- 查询条件 -->
+    <sql id="Example_Where_Clause">
+        where 1=1
+        <trim  suffixOverrides="," >
+            <if test="id != null and id != '' " >
+                and a.id = #{id}
+            </if>
+            <if test="curday != null and curday != '' " >
+                and a.curday = #{curday}
+            </if>
+            <if test="curdayStart != null and curdayStart != '' and curdayEnd != null and curdayEnd != '' " >
+                and a.curday >= #{curdayStart} and a.curday &lt;= #{curdayEnd}
+            </if>
+            <if test="runNum != null and runNum != '' " >
+                and a.run_num &lt; #{runNum}
+            </if>
+            <if test="runStatus != null and runStatus != '' " >
+                and a.run_status &lt; #{runStatus}
+            </if>
+            and a.yn = 0
+        </trim>
+    </sql>
+
+
+    <!-- 查询条件_id -->
+    <sql id="Example_Where_Clause_id">
+        where 1=1
+        <trim  suffixOverrides="," >
+            <if test="id != null and id != '' " >
+                and a.id = #{id}
+            </if>
+            and a.yn =  0
+        </trim>
+    </sql>
+
+    <!-- 排序条件 -->
+    <sql id="Example_Order_By">
+        order by a.create_time desc
+    </sql>
+
+
+
+    <!-- 查询未解析的客户端监听数据回调原始数据 -->
+    <select id="getClientAllDataList" parameterType="Object" resultType="com.hz.task.master.core.model.client.ClientAllDataModel">
+        select
+        <include refid="Base_Column_List" />
+        from tb_fn_client_all_data a
+        <include refid="Example_Where_Clause"/>
+        limit #{limitNum}
+    </select>
+
+    <!-- 更新客户端监听数据回调原始数据的状态、运行状态 -->
+    <update id="updateClientAllDataStatus" parameterType="Object">
+        UPDATE tb_fn_client_all_data a
+        <trim prefix="set" suffixOverrides=",">
+            <if test="runNum != null and runNum != '' " >
+                a.run_num = a.run_num + #{runNum},
+            </if>
+            <if test="runStatus != null and runStatus != '' " >
+                a.run_status = #{runStatus},
+            </if>
+            <if test="info != null and info != '' " >
+                a.remark = #{info},
+            </if>
+            a.update_time = NOW(),
+        </trim>
+        where 1=1
+        and a.id = #{id}
+    </update>
+
+
+</mapper>

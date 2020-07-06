@@ -41,7 +41,9 @@ public class ComponentUtil {
     public static CatDataBindingService catDataBindingService;
     public static DidCollectionAccountQrCodeService didCollectionAccountQrCodeService;
     public static DidBalanceDeductService didBalanceDeductService;
-    public static TaskDidBalanceDeductService taskDidBalanceDeductService;
+    public static ClientDataService clientDataService;
+    public static ClientAllDataService clientAllDataService;
+
 
 
 
@@ -56,7 +58,9 @@ public class ComponentUtil {
     public static TaskBankLimitService taskBankLimitService;
     public static TaskCatDataBindingService taskCatDataBindingService;
     public static TaskDidCollectionAccountDataService taskDidCollectionAccountDataService;
-
+    public static TaskDidBalanceDeductService taskDidBalanceDeductService;
+    public static TaskClientAllDataService taskClientAllDataService;
+    public static TaskClientDataService taskClientDataService;
 
 
 

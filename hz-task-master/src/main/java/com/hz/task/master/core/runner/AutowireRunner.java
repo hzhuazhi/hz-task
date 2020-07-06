@@ -116,6 +116,12 @@ public class AutowireRunner implements ApplicationRunner {
     @Autowired
     private DidBalanceDeductService didBalanceDeductService;
 
+    @Autowired
+    private static ClientDataService clientDataService;
+
+    @Autowired
+    private static ClientAllDataService clientAllDataService;
+
 
 
 
@@ -150,13 +156,21 @@ public class AutowireRunner implements ApplicationRunner {
     private TaskCatDataBindingService taskCatDataBindingService;
 
     @Autowired
-    public DidCollectionAccountQrCodeService didCollectionAccountQrCodeService;
+    private DidCollectionAccountQrCodeService didCollectionAccountQrCodeService;
 
     @Autowired
-    public TaskDidCollectionAccountDataService taskDidCollectionAccountDataService;
+    private TaskDidCollectionAccountDataService taskDidCollectionAccountDataService;
 
     @Autowired
-    public TaskDidBalanceDeductService taskDidBalanceDeductService;
+    private TaskDidBalanceDeductService taskDidBalanceDeductService;
+
+    @Autowired
+    private TaskClientAllDataService taskClientAllDataService;
+
+    @Autowired
+    private TaskClientDataService taskClientDataService;
+
+
 
 
 
@@ -200,6 +214,8 @@ public class AutowireRunner implements ApplicationRunner {
         ComponentUtil.catDataBindingService = catDataBindingService;
         ComponentUtil.didCollectionAccountQrCodeService = didCollectionAccountQrCodeService;
         ComponentUtil.didBalanceDeductService = didBalanceDeductService;
+        ComponentUtil.clientAllDataService = clientAllDataService;
+        ComponentUtil.clientDataService = clientDataService;
 
         ComponentUtil.taskMobileCardService = taskMobileCardService;
         ComponentUtil.taskBankCollectionService = taskBankCollectionService;
@@ -213,6 +229,8 @@ public class AutowireRunner implements ApplicationRunner {
         ComponentUtil.taskCatDataBindingService = taskCatDataBindingService;
         ComponentUtil.taskDidCollectionAccountDataService = taskDidCollectionAccountDataService;
         ComponentUtil.taskDidBalanceDeductService = taskDidBalanceDeductService;
+        ComponentUtil.taskClientAllDataService = taskClientAllDataService;
+        ComponentUtil.taskClientDataService = taskClientDataService;
 
         runThread = new RunThread();
         runThread.start();
