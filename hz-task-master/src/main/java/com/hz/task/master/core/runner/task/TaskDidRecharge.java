@@ -113,8 +113,8 @@ public class TaskDidRecharge {
      * @date 2019/12/6 20:25
      */
 //    @Scheduled(cron = "1 * * * * ?")
-//    @Scheduled(fixedDelay = 1000) // 每秒执行
-    @Scheduled(fixedDelay = 60000) // 每分钟执行
+    @Scheduled(fixedDelay = 1000) // 每秒执行
+//    @Scheduled(fixedDelay = 60000) // 每分钟执行
     public void didRechargeBySuccessOrder() throws Exception{
 //        log.info("----------------------------------TaskDidRecharge.didRechargeBySuccessOrder()----start");
 

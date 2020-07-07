@@ -146,7 +146,8 @@ public class TaskBankCollection {
      * @date 2019/12/6 20:25
      */
 //    @Scheduled(cron = "1 * * * * ?")
-    @Scheduled(fixedDelay = 1000) // 每秒执行
+//    @Scheduled(fixedDelay = 1000) // 每秒执行
+    @Scheduled(fixedDelay = 60000) // 每分钟执行
     public void bankCollectionDataByOrder() throws Exception{
 //        log.info("----------------------------------TaskBankCollection.bankCollectionDataByOrder()----start");
         // 获取需要填充的银行回调数据
