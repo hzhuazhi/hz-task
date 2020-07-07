@@ -58,4 +58,6 @@ public interface TaskDidRechargeService<T> extends BaseService<T> {
      * @date 2020/6/5 18:45
     */
     public List<Long> getRechargeDidList(DidRechargeModel model);
+
+
 }

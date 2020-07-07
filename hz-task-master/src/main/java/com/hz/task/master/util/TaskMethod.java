@@ -1103,7 +1103,7 @@ public class TaskMethod {
 
     /**
      * @Description: 组装团队奖励用户的奖励数据
-     * @param rewardType - 奖励类型：1充值奖励，2充值总金额档次奖励，3直推奖励，4裂变奖励，5团队奖励
+     * @param rewardType - 奖励类型：1充值奖励，2充值总金额档次奖励，3直推奖励，4裂变奖励，5团队奖励，6订单成功消耗奖励，7团队日派单消耗成功
      * @param did - 获得奖励的用户ID
      * @param teamProfit - 团队奖励的金额
      * @param directSumMoney - 昨日团队总充值成功金额
@@ -1150,6 +1150,10 @@ public class TaskMethod {
             resBean.setTotalIndirectProfit(didRewardModel.getMoney());
         }else if(didRewardModel.getRewardType() == 5){
             resBean.setTotalTeamProfit(didRewardModel.getMoney());
+        }else if(didRewardModel.getRewardType() == 6){
+            resBean.setTotalConsumeProfit(didRewardModel.getMoney());
+        }else if(didRewardModel.getRewardType() == 7){
+            resBean.setTotalTeamConsumeProfit(didRewardModel.getMoney());
         }
 
         return resBean;
@@ -1993,6 +1997,35 @@ public class TaskMethod {
         resBean.setCurday(DateUtil.getDayNumber(new Date()));
         resBean.setCurhour(DateUtil.getHour(new Date()));
         resBean.setCurminute(DateUtil.getCurminute(new Date()));
+        return resBean;
+    }
+
+    /**
+     * @Description: 组装查询属于团队长的用户ID集合
+     * @param isTeam
+     * @return
+     * @author yoko
+     * @date 2020/7/7 22:11
+    */
+    public static DidModel assembleDidByIsTeamQuery(int isTeam){
+        DidModel resBean = new DidModel();
+        resBean.setIsTeam(isTeam);
+        return resBean;
+    }
+
+
+    /**
+     * @Description: 组装查询直推用户昨天派单消耗成功的总金额的查询条件
+     * @param didList - 用户ID集合：直推用户集合
+     * @return
+     * @author yoko
+     * @date 2020/6/6 11:40
+     */
+    public static OrderModel assembleOrderQuery(List<Long> didList){
+        OrderModel resBean = new OrderModel();
+        resBean.setDidList(didList);
+        resBean.setOrderStatus(4);
+        resBean.setCurday(DateUtil.getIntYesterday());
         return resBean;
     }
 

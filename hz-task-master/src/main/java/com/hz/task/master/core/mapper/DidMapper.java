@@ -79,4 +79,13 @@ public interface DidMapper<T> extends BaseDao<T> {
      * @date 2020/7/3 13:44
     */
     public int updateDidBalance(DidModel model);
+
+    /**
+     * @Description: 获取团队长用户Id集合
+     * @param model
+     * @return
+     * @author yoko
+     * @date 2020/7/7 22:04
+     */
+    public List<Long> getIsTeamDidList(DidModel model);
 }

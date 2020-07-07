@@ -10,6 +10,7 @@ import com.hz.task.master.core.model.did.DidLevelModel;
 import com.hz.task.master.core.model.did.DidModel;
 import com.hz.task.master.core.model.did.DidRechargeModel;
 import com.hz.task.master.core.model.did.DidRewardModel;
+import com.hz.task.master.core.model.order.OrderModel;
 import com.hz.task.master.core.model.strategy.StrategyData;
 import com.hz.task.master.core.model.strategy.StrategyModel;
 import com.hz.task.master.core.model.task.base.StatusModel;
@@ -267,6 +268,7 @@ public class TaskDidRecharge {
     /**
      * @Description: task：执行用户直推充值奖励的逻辑运算
      * <p>
+     *     废弃-属于微信
      *     每凌晨1点运行一次
      *     1.查询系统时间昨天的充值成功的所有用户
      *     2.根据已昨天已充值的用户找出这些用户下面直推的用户。
@@ -278,7 +280,7 @@ public class TaskDidRecharge {
      * @date 2019/12/6 20:25
      */
 
-    @Scheduled(cron = "0 0 1 * * ?")
+//    @Scheduled(cron = "0 0 1 * * ?")
 //    @Scheduled(fixedDelay = 1000) // 每秒执行
     public void didRechargeByDirect() throws Exception{
         log.info("----------------------------------TaskDidRecharge.didRechargeByDirect()----start");
@@ -331,6 +333,7 @@ public class TaskDidRecharge {
     /**
      * @Description: task：执行用户团队奖励的逻辑运算
      * <p>
+     *     废弃-属于微信
      *     每凌晨1点运行一次
      *     1.查询系统时间昨天的充值成功的所有用户
      *     2.根据已昨天已充值的用户找出这些用户下面直推的用户。
@@ -341,7 +344,7 @@ public class TaskDidRecharge {
      * @author yoko
      * @date 2019/12/6 20:25
      */
-    @Scheduled(cron = "0 0 1 * * ?")
+//    @Scheduled(cron = "0 0 1 * * ?")
 //    @Scheduled(fixedDelay = 1000) // 每秒执行
     public void didRechargeByTeam() throws Exception{
         log.info("----------------------------------TaskDidRecharge.didRechargeByTeam()----start");
@@ -391,7 +394,65 @@ public class TaskDidRecharge {
 
 
 
+    /**
+     * @Description: task：执行用户团队日派单消耗成功累计总额奖励的逻辑运算
+     * <p>
+     *     每凌晨1点运行一次
+     *     1.查询用户数据属于团队长的用户
+     *     2.根据团队长用户找出所属的直推用户。
+     *     3.根据直推的用户找出派单消耗成功的所有订单进行求和总金额。
+     *     4.判断计算与策略团队日派单消耗成功累计总额奖励规则是否达标：如果达标进行奖励金额计算。
+     *
+     * </p>
+     * @author yoko
+     * @date 2019/12/6 20:25
+     */
+    @Scheduled(cron = "0 0 1 * * ?")
+//    @Scheduled(fixedDelay = 1000) // 每秒执行
+    public void didRechargeByTeamConsumeReward() throws Exception{
+        log.info("----------------------------------TaskDidRecharge.didRechargeByTeamConsumeReward()----start");
 
+        // 查询策略里面的团队日充值累计总额奖励规则列表
+        StrategyModel strategyQuery = HodgepodgeMethod.assembleStrategyQuery(ServerConstant.StrategyEnum.TEAM_CONSUME_REWARD_LIST.getStgType());
+        StrategyModel strategyModel = ComponentUtil.strategyService.getStrategyModel(strategyQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
+        // 解析奖励规则的值
+        List<StrategyData> teamConsumeRewardList = JSON.parseArray(strategyModel.getStgBigValue(), StrategyData.class);
+
+
+        // 获取获取团队长用户Id集合的数据
+        DidModel didQuery = TaskMethod.assembleDidByIsTeamQuery(ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO);
+        List<Long> synchroList = ComponentUtil.didService.getIsTeamDidList(didQuery);
+        for (Long data : synchroList){
+            try{
+                // 循环查询这些 用户的直推用户
+                DidLevelModel didLevelQuery = TaskMethod.assembleDidLevelQuery(data, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ONE);
+                List<DidLevelModel> didLevelList = ComponentUtil.didLevelService.findByCondition(didLevelQuery);
+
+                if (didLevelList != null && didLevelList.size() > 0){
+                    // 直推的用户ID集合
+                    List<Long> didList = didLevelList.stream().map(DidLevelModel::getDid).collect(Collectors.toList());
+
+                    // 获取直推用户昨天派单消耗成功的总金额
+                    OrderModel orderQuery = TaskMethod.assembleOrderQuery(didList);
+                    String directSumMoney = ComponentUtil.orderService.directSumMoney(orderQuery);
+
+                    if (!StringUtils.isBlank(directSumMoney) && !directSumMoney.equals("0.00")){
+                        // 计算团队充值奖励
+                        String teamProfit = TaskMethod.getTeamProfit(teamConsumeRewardList, directSumMoney);
+                        if (!StringUtils.isBlank(teamProfit)){
+                            // 添加团队奖励收益
+                            DidRewardModel didRewardModel = TaskMethod.assembleDidDirectProfit(7, data, teamProfit, directSumMoney);
+                            ComponentUtil.didRewardService.add(didRewardModel);
+                        }
+                    }
+                }
+                log.info("----------------------------------TaskDidRecharge.didRechargeByTeamConsumeReward()----end");
+            }catch (Exception e){
+                log.error(String.format("this TaskDidRecharge.didRechargeByTeamConsumeReward() is error , the dataId=%s !", data));
+                e.printStackTrace();
+            }
+        }
+    }
 
 
 

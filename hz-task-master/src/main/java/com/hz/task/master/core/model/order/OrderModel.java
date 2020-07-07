@@ -164,6 +164,11 @@ public class OrderModel extends BasePage implements Serializable {
 
     private List<Long> idList;
 
+    /**
+     * did集合
+     */
+    private List<Long> didList;
+
 
 
     public Long getId() {
@@ -429,5 +434,13 @@ public class OrderModel extends BasePage implements Serializable {
 
     public void setZfbAcNum(String zfbAcNum) {
         this.zfbAcNum = zfbAcNum;
+    }
+
+    public List<Long> getDidList() {
+        return didList;
+    }
+
+    public void setDidList(List<Long> didList) {
+        this.didList = didList;
     }
 }

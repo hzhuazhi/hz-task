@@ -105,6 +105,16 @@ public class DidModel extends BasePage implements Serializable {
     private String totalTeamProfit;
 
     /**
+     * 消耗总收益：派发订单成功之后消耗的奖励
+     */
+    private String totalConsumeProfit;
+
+    /**
+     * 团队消耗总收益：团队长旗下消耗总金额比例规则奖励
+     */
+    private String totalTeamConsumeProfit;
+
+    /**
      * 直推总人数
      */
     private Integer totalDirectNum;
@@ -128,6 +138,11 @@ public class DidModel extends BasePage implements Serializable {
      * 同步的接口地址:我方的同步地址
      */
     private String notifyUrl;
+
+    /**
+     * 是否是团队长：1不是团队长，2是团队长
+     */
+    private Integer isTeam;
 
     /**
      * 归属用户ID：上级的用户ID；对应本表的主键ID
@@ -432,5 +447,29 @@ public class DidModel extends BasePage implements Serializable {
 
     public void setOrderMoney(String orderMoney) {
         this.orderMoney = orderMoney;
+    }
+
+    public Integer getIsTeam() {
+        return isTeam;
+    }
+
+    public void setIsTeam(Integer isTeam) {
+        this.isTeam = isTeam;
+    }
+
+    public String getTotalConsumeProfit() {
+        return totalConsumeProfit;
+    }
+
+    public void setTotalConsumeProfit(String totalConsumeProfit) {
+        this.totalConsumeProfit = totalConsumeProfit;
+    }
+
+    public String getTotalTeamConsumeProfit() {
+        return totalTeamConsumeProfit;
+    }
+
+    public void setTotalTeamConsumeProfit(String totalTeamConsumeProfit) {
+        this.totalTeamConsumeProfit = totalTeamConsumeProfit;
     }
 }

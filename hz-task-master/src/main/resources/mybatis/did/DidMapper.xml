@@ -404,6 +404,12 @@
             <if test="totalTeamProfit != null and totalTeamProfit != '' " >
                 a.total_team_profit = a.total_team_profit + #{totalTeamProfit},
             </if>
+            <if test="totalConsumeProfit != null and totalConsumeProfit != '' " >
+                a.total_consume_profit = a.total_consume_profit + #{totalConsumeProfit},
+            </if>
+            <if test="totalTeamConsumeProfit != null and totalTeamConsumeProfit != '' " >
+                a.total_team_consume_profit = a.total_team_consume_profit + #{totalTeamConsumeProfit},
+            </if>
             <if test="totalProfit != null and totalProfit != '' " >
                 a.total_profit = a.total_profit + #{totalProfit},
             </if>
@@ -458,6 +464,15 @@
         and a.id = #{id}
         and a.yn = 0
     </update>
+
+
+    <!-- 获取团队长用户Id集合 -->
+    <select id="getIsTeamDidList" parameterType="com.hz.task.master.core.model.did.DidModel" resultType="java.lang.Long">
+        select id from tb_fn_did a
+        where 1=1
+        and a.is_team = #{isTeam}
+        and a.yn = 0
+    </select>
 
 
 
