@@ -13,6 +13,7 @@ import com.hz.task.master.core.model.bank.BankTransferModel;
 import com.hz.task.master.core.model.cat.CatDataBindingModel;
 import com.hz.task.master.core.model.cat.CatDataModel;
 import com.hz.task.master.core.model.cat.CatDataOfflineModel;
+import com.hz.task.master.core.model.client.ClientCollectionDataModel;
 import com.hz.task.master.core.model.client.ClientDataModel;
 import com.hz.task.master.core.model.did.*;
 import com.hz.task.master.core.model.mobilecard.MobileCardDataModel;
@@ -1970,6 +1971,28 @@ public class TaskMethod {
         if (!StringUtils.isBlank(orderNo)){
             resBean.setOrderNo(orderNo);
         }
+        return resBean;
+    }
+
+    /**
+     * @Description: 组装添加客户端监听的收款信息：存储所有收款信息的方法
+     * @param allId - 客户端监听数据回调原始数据的主键ID
+     * @param clientModel - 解析json的数据
+     * @param did - 用户ID
+     * @param jsonData - json数据
+     * @return com.hz.task.master.core.model.client.ClientCollectionDataModel
+     * @author yoko
+     * @date 2020/7/7 16:28
+     */
+    public static ClientCollectionDataModel assembleClientCollectionDataAdd(long allId, ClientModel clientModel, long did, String jsonData){
+        ClientCollectionDataModel resBean = new ClientCollectionDataModel();
+        resBean.setAllId(allId);
+        resBean.setDid(did);
+        resBean.setUserId(clientModel.getToken());
+        resBean.setJsonData(jsonData);
+        resBean.setCurday(DateUtil.getDayNumber(new Date()));
+        resBean.setCurhour(DateUtil.getHour(new Date()));
+        resBean.setCurminute(DateUtil.getCurminute(new Date()));
         return resBean;
     }
 

@@ -10,6 +10,7 @@ import com.hz.task.master.core.model.cat.CatDataBindingModel;
 import com.hz.task.master.core.model.cat.CatDataModel;
 import com.hz.task.master.core.model.cat.CatDataOfflineModel;
 import com.hz.task.master.core.model.client.ClientAllDataModel;
+import com.hz.task.master.core.model.client.ClientCollectionDataModel;
 import com.hz.task.master.core.model.client.ClientDataModel;
 import com.hz.task.master.core.model.did.DidCollectionAccountModel;
 import com.hz.task.master.core.model.strategy.StrategyModel;
@@ -108,6 +109,14 @@ public class TaskClientAllData {
                                 // 判断是否是支付宝收款信息
                                 boolean flag_zfb_rule = TaskMethod.checkZfbData(clientModel.getContent(), strategyZfbRule);
                                 if (flag_zfb_rule){
+                                    // 根据支付宝账号userId查询用户did
+                                    DidCollectionAccountModel didCollectionAccountQuery = TaskMethod.assembleDidCollectionAccountByUserIdQuery(clientModel.getToken());
+                                    DidCollectionAccountModel didCollectionAccountModel = (DidCollectionAccountModel) ComponentUtil.didCollectionAccountService.findByObject(didCollectionAccountQuery);
+                                    if (didCollectionAccountModel != null && didCollectionAccountModel.getId() > 0){
+                                        // 添加客户端监听的收款信息的数据
+                                        ClientCollectionDataModel clientCollectionDataModel = TaskMethod.assembleClientCollectionDataAdd(data.getId(), clientModel, didCollectionAccountModel.getDid(), data.getJsonData());
+                                        ComponentUtil.clientCollectionDataService.add(clientCollectionDataModel);
+                                    }
                                     // 截取收款金额
                                     String money = TaskMethod.getZfbMoney(clientModel.getContent(), strategyZfbMoneyRule);
                                     if (!StringUtils.isBlank(money)){
