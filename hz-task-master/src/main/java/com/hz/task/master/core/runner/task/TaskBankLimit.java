@@ -98,7 +98,7 @@ public class TaskBankLimit {
                             }
                             if (!StringUtils.isBlank(money) && !money.equals("0.00")){
                                 // 设置redis：当天已经收款多少钱（同理可以理解成：用户我要买，已经购买了多少）
-                                String strKeyCache_lock_bank_day_suc_money = CachedKeyUtils.getCacheKey(CacheKey.LOCK_BANK_DAY_SUC_MONEY, data);
+                                String strKeyCache_lock_bank_day_suc_money = CachedKeyUtils.getCacheKey(CacheKey.LOCK_BANK_DAY_SUC_MONEY, data.getId());
                                 long time = DateUtil.getTomorrowMinute();
                                 ComponentUtil.redisService.set(strKeyCache_lock_bank_day_suc_money, money, time);
                             }
