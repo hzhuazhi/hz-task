@@ -43,6 +43,7 @@ public class ComponentUtil {
     public static DidBalanceDeductService didBalanceDeductService;
     public static ClientDataService clientDataService;
     public static ClientAllDataService clientAllDataService;
+    public static ClientCollectionDataService clientCollectionDataService;
 
 
 
