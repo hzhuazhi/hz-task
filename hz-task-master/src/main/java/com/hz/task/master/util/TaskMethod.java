@@ -2030,6 +2030,20 @@ public class TaskMethod {
     }
 
 
+    /**
+     * @Description: 组装根据allId查询客户端监听的收款信息的方法
+     * @param allId
+     * @return
+     * @author yoko
+     * @date 2020/7/8 19:32
+    */
+    public static ClientCollectionDataModel assembleClientCollectionDataByAllId(long allId){
+        ClientCollectionDataModel resBean = new ClientCollectionDataModel();
+        resBean.setAllId(allId);
+        return resBean;
+    }
+
+
 
 
 

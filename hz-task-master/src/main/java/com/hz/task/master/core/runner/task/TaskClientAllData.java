@@ -109,14 +109,20 @@ public class TaskClientAllData {
                                 // 判断是否是支付宝收款信息
                                 boolean flag_zfb_rule = TaskMethod.checkZfbData(clientModel.getContent(), strategyZfbRule);
                                 if (flag_zfb_rule){
-                                    // 根据支付宝账号userId查询用户did
-                                    DidCollectionAccountModel didCollectionAccountQuery = TaskMethod.assembleDidCollectionAccountByUserIdQuery(clientModel.getToken());
-                                    DidCollectionAccountModel didCollectionAccountModel = (DidCollectionAccountModel) ComponentUtil.didCollectionAccountService.findByObject(didCollectionAccountQuery);
-                                    if (didCollectionAccountModel != null && didCollectionAccountModel.getId() > 0){
-                                        // 添加客户端监听的收款信息的数据
-                                        ClientCollectionDataModel clientCollectionDataModel = TaskMethod.assembleClientCollectionDataAdd(data.getId(), clientModel, didCollectionAccountModel.getDid(), data.getJsonData());
-                                        ComponentUtil.clientCollectionDataService.add(clientCollectionDataModel);
+                                    //查询此任务是否已添加过
+                                    ClientCollectionDataModel clientCollectionDataQuery = TaskMethod.assembleClientCollectionDataByAllId(data.getId());
+                                    ClientCollectionDataModel clientCollectionData = (ClientCollectionDataModel) ComponentUtil.clientCollectionDataService.findByObject(clientCollectionDataQuery);
+                                    if (clientCollectionData == null || clientCollectionData.getId() <= 0){
+                                        // 根据支付宝账号userId查询用户did
+                                        DidCollectionAccountModel didCollectionAccountQuery = TaskMethod.assembleDidCollectionAccountByUserIdQuery(clientModel.getToken());
+                                        DidCollectionAccountModel didCollectionAccountModel = (DidCollectionAccountModel) ComponentUtil.didCollectionAccountService.findByObject(didCollectionAccountQuery);
+                                        if (didCollectionAccountModel != null && didCollectionAccountModel.getId() > 0){
+                                            // 添加客户端监听的收款信息的数据
+                                            ClientCollectionDataModel clientCollectionDataModel = TaskMethod.assembleClientCollectionDataAdd(data.getId(), clientModel, didCollectionAccountModel.getDid(), data.getJsonData());
+                                            ComponentUtil.clientCollectionDataService.add(clientCollectionDataModel);
+                                        }
                                     }
+
                                     // 截取收款金额
                                     String money = TaskMethod.getZfbMoney(clientModel.getContent(), strategyZfbMoneyRule);
                                     if (!StringUtils.isBlank(money)){
