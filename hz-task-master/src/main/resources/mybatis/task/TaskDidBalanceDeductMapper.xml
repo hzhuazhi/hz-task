@@ -19,9 +19,9 @@
             <if test="id != null and id != '' " >
                 and a.id = #{id}
             </if>
-            <if test="orderStatus != null and orderStatus != '' " >
-                and a.order_status > #{orderStatus}
-            </if>
+            <!--<if test="orderStatus != null and orderStatus != '' " >-->
+                <!--and a.order_status > #{orderStatus}-->
+            <!--</if>-->
             <if test="curday != null and curday != '' " >
                 and a.curday = #{curday}
             </if>
@@ -34,6 +34,7 @@
             <if test="runStatus != null and runStatus != '' " >
                 and a.run_status &lt; #{runStatus}
             </if>
+            and ((a.order_status = 4) or (a.order_status = 2 and a.delay_time &lt;= now()))
             and a.yn = 0
         </trim>
     </sql>
