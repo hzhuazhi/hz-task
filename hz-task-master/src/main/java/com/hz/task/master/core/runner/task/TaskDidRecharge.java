@@ -564,8 +564,8 @@ public class TaskDidRecharge {
      * @author yoko
      * @date 2019/12/6 20:25
      */
-//    @Scheduled(cron = "0 0 1 * * ?")
-    @Scheduled(fixedDelay = 1000) // 每秒执行
+    @Scheduled(cron = "0 0 1 * * ?")
+//    @Scheduled(fixedDelay = 1000) // 每秒执行
     public void didRechargeByTeamConsumeCumulativeGradeReward() throws Exception{
         log.info("----------------------------------TaskDidRecharge.didRechargeByTeamConsumeCumulativeGradeReward()----start");
 
