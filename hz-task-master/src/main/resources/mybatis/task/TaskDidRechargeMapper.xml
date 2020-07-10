@@ -8,7 +8,7 @@
     <!-- 定义数据库基本列,只适用代替单表的*-->
     <sql id="Base_Column_List">
         a.id,a.did,a.order_no,a.money_id,a.order_money,a.distribution_money,a.bank_id,a.picture_ads,a.invalid_time,a.order_status,
-        a.data_type,
+        a.data_type,a.check_status,
         a.curday,a.curhour,a.curminute,a.run_num,a.run_status,
         a.create_time,a.update_time,a.yn
     </sql>

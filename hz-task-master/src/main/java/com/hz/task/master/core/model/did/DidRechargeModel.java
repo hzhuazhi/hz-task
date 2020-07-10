@@ -95,6 +95,16 @@ public class DidRechargeModel extends BasePage implements Serializable {
     private Integer dataType;
 
     /**
+     * 审核状态：1初始化，2审核中，3审核失败，4审核通过/成功
+     */
+    private Integer checkStatus;
+
+    /**
+     * 审核缘由/审核备注
+     */
+    private String checkInfo;
+
+    /**
      * 创建日期：存的日期格式20160530
      */
     private Integer curday;
@@ -383,5 +393,21 @@ public class DidRechargeModel extends BasePage implements Serializable {
 
     public void setDataType(Integer dataType) {
         this.dataType = dataType;
+    }
+
+    public Integer getCheckStatus() {
+        return checkStatus;
+    }
+
+    public void setCheckStatus(Integer checkStatus) {
+        this.checkStatus = checkStatus;
+    }
+
+    public String getCheckInfo() {
+        return checkInfo;
+    }
+
+    public void setCheckInfo(String checkInfo) {
+        this.checkInfo = checkInfo;
     }
 }

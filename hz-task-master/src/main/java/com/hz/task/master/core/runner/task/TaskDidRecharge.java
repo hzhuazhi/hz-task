@@ -223,11 +223,18 @@ public class TaskDidRecharge {
                         if (flagLock_did){
                             int didNum = ComponentUtil.didService.updateDidMoneyByRecharge(upDidMoney);
                             if (didNum > 0){
-                                // 删除要删除的redis
-                                String strKeyCache_HANG_MONEY = CachedKeyUtils.getCacheKey(CacheKey.HANG_MONEY, data.getBankId(), data.getDistributionMoney());// 银行卡具体的挂单金额
-                                String strKeyCache_LOCK_DID_ORDER_INVALID_TIME = CachedKeyUtils.getCacheKey(CacheKey.LOCK_DID_ORDER_INVALID_TIME, data.getDid());// 用户调起充值订单的失效时间
-                                ComponentUtil.redisService.remove(strKeyCache_HANG_MONEY);
-                                ComponentUtil.redisService.remove(strKeyCache_LOCK_DID_ORDER_INVALID_TIME);
+                                if (data.getCheckStatus() == 4){
+                                    // 因为属于人工审核的订单，所以银行卡挂单金额让它自动失效，因为属于人工审核，怕短信延迟回传给服务端，造成数据错乱，所以才不释放银行卡的金额
+                                    String strKeyCache_LOCK_DID_ORDER_INVALID_TIME = CachedKeyUtils.getCacheKey(CacheKey.LOCK_DID_ORDER_INVALID_TIME, data.getDid());// 用户调起充值订单的失效时间
+                                    ComponentUtil.redisService.remove(strKeyCache_LOCK_DID_ORDER_INVALID_TIME);
+                                }else{
+                                    // 删除要删除的redis
+                                    String strKeyCache_HANG_MONEY = CachedKeyUtils.getCacheKey(CacheKey.HANG_MONEY, data.getBankId(), data.getDistributionMoney());// 银行卡具体的挂单金额
+                                    String strKeyCache_LOCK_DID_ORDER_INVALID_TIME = CachedKeyUtils.getCacheKey(CacheKey.LOCK_DID_ORDER_INVALID_TIME, data.getDid());// 用户调起充值订单的失效时间
+                                    ComponentUtil.redisService.remove(strKeyCache_HANG_MONEY);
+                                    ComponentUtil.redisService.remove(strKeyCache_LOCK_DID_ORDER_INVALID_TIME);
+                                }
+
                                 log.info("");
                                 // 更新此次task的状态：更新成成功
                                 StatusModel statusModel = TaskMethod.assembleUpdateStatusByDidRechargeBySuccessOrderStatus(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE, "");
