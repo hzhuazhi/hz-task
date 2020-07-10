@@ -404,6 +404,7 @@ public class TaskDidRecharge {
     /**
      * @Description: task：执行用户团队日派单消耗成功累计总额奖励的逻辑运算
      * <p>
+     *     废弃
      *     每凌晨1点运行一次
      *     1.查询用户数据属于团队长的用户
      *     2.根据团队长用户找出所属的直推用户。
@@ -414,7 +415,7 @@ public class TaskDidRecharge {
      * @author yoko
      * @date 2019/12/6 20:25
      */
-    @Scheduled(cron = "0 0 1 * * ?")
+//    @Scheduled(cron = "0 0 1 * * ?")
 //    @Scheduled(fixedDelay = 1000) // 每秒执行
     public void didRechargeByTeamConsumeReward() throws Exception{
         log.info("----------------------------------TaskDidRecharge.didRechargeByTeamConsumeReward()----start");
@@ -462,5 +463,171 @@ public class TaskDidRecharge {
     }
 
 
+
+    /**
+     * @Description: task：执行用户团队触发额度奖励的逻辑运算
+     * <p>
+     *     每凌晨1点运行一次
+     *     1.查询用户数据属于团队长的用户
+     *     2.根据团队长用户找出所属的直推用户。
+     *     3.根据直推的用户找出派单消耗成功的所有订单进行求和总金额。
+     *     4.判断金额是否超过策略里面的《触发额度奖励》配置。
+     *     5.如果超过则策略里面的触发的金额时，则用所有直推消耗成功的总金额除以策略触发金额，获取整数，结果与用户字段trigger_quota_grade进行比较，
+     *     结果大于trigger_quota_grade字段多少次就奖励多少次。
+     *
+     * </p>
+     * @author yoko
+     * @date 2019/12/6 20:25
+     */
+    @Scheduled(cron = "0 0 1 * * ?")
+//    @Scheduled(fixedDelay = 1000) // 每秒执行
+    public void didRechargeByTriggerQuotaGradeReward() throws Exception{
+        log.info("----------------------------------TaskDidRecharge.didRechargeByTriggerQuotaGradeReward()----start");
+
+        // 查询策略里面的触发额度奖励
+        StrategyModel strategyQuery = HodgepodgeMethod.assembleStrategyQuery(ServerConstant.StrategyEnum.TRIGGER_QUOTA_REWARD.getStgType());
+        StrategyModel strategyModel = ComponentUtil.strategyService.getStrategyModel(strategyQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
+        String ruleMoney = strategyModel.getStgValue();// 触发奖励的具体规则金额
+        String rewardMoney = String.valueOf(strategyModel.getStgNumValue());// 触发成功的具体奖励金额
+
+
+
+        // 获取获取团队长用户Id集合的数据
+        DidModel didQuery = TaskMethod.assembleDidByIsTeamQuery(ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO);
+        List<Long> synchroList = ComponentUtil.didService.getIsTeamDidList(didQuery);
+        for (Long data : synchroList){
+            try{
+                // 获取此用户的属性数据
+                DidModel didByIdQuery = TaskMethod.assembleDidQueryByDid(data);
+                DidModel didModel = (DidModel) ComponentUtil.didService.findByObject(didByIdQuery);
+                if (didModel != null && didModel.getId() > 0){
+                    // 循环查询这些 用户的直推用户
+                    DidLevelModel didLevelQuery = TaskMethod.assembleDidLevelQuery(data, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ONE);
+                    List<DidLevelModel> didLevelList = ComponentUtil.didLevelService.findByCondition(didLevelQuery);
+
+                    if (didLevelList != null && didLevelList.size() > 0){
+                        // 直推的用户ID集合
+                        List<Long> didList = didLevelList.stream().map(DidLevelModel::getDid).collect(Collectors.toList());
+
+                        // 获取直推用户所有派单消耗成功的总金额
+                        OrderModel orderQuery = TaskMethod.assembleOrderQuery(didList);
+                        String directSumMoney = ComponentUtil.orderService.directAllSumMoney(orderQuery);
+
+                        if (!StringUtils.isBlank(directSumMoney) && !directSumMoney.equals("0.00")){
+                            boolean flag = StringUtil.getBigDecimalSubtract(directSumMoney, ruleMoney);
+                            if (flag){
+                                String divideResult = StringUtil.getBigDecimalDivide(directSumMoney, ruleMoney);
+                                // 计算奖励的次数
+                                int numReward =  TaskMethod.getDivideResult(divideResult, didModel.getTriggerQuotaGrade());
+                                if (numReward > 0){
+                                    // 计算触发额度奖励的具体金额
+                                    String moneyReward = StringUtil.getMultiply(String.valueOf(numReward), rewardMoney);
+                                    if (!StringUtils.isBlank(moneyReward)){
+                                        // 修改用户的触发奖励等级
+                                        DidModel updateDid = TaskMethod.assembleUpdateDidData(data, numReward + didModel.getTriggerQuotaGrade(), 0);
+                                        int num = ComponentUtil.didService.updateDidMoneyByReward(updateDid);
+                                        if (num > 0){
+                                            // 添加触发额度奖励收益
+                                            DidRewardModel didRewardModel = TaskMethod.assembleDidDirectProfit(8, data, moneyReward, directSumMoney);
+                                            ComponentUtil.didRewardService.add(didRewardModel);
+                                        }
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                }
+                log.info("----------------------------------TaskDidRecharge.didRechargeByTriggerQuotaGradeReward()----end");
+            }catch (Exception e){
+                log.error(String.format("this TaskDidRecharge.didRechargeByTriggerQuotaGradeReward() is error , the dataId=%s !", data));
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+
+    /**
+     * @Description: task：执行用户团队团队总额等级奖励的逻辑运算
+     * <p>
+     *     每凌晨1点运行一次
+     *     1.查询用户数据属于团队长的用户
+     *     2.根据团队长用户找出所属的直推用户。
+     *     3.根据直推的用户找出派单消耗成功的所有订单进行求和总金额。
+     *     4.判断金额是否超过策略里面的《触发额度奖励》配置。
+     *     5.如果超过则策略里面的触发的金额时，则用所有直推消耗成功的总金额除以策略触发金额，获取整数，结果与用户字段trigger_quota_grade进行比较，
+     *     结果大于trigger_quota_grade字段多少次就奖励多少次。
+     *
+     * </p>
+     * @author yoko
+     * @date 2019/12/6 20:25
+     */
+    @Scheduled(cron = "0 0 1 * * ?")
+//    @Scheduled(fixedDelay = 1000) // 每秒执行
+    public void didRechargeByTeamConsumeCumulativeGradeReward() throws Exception{
+        log.info("----------------------------------TaskDidRecharge.didRechargeByTeamConsumeCumulativeGradeReward()----start");
+
+        // 查询策略里面的触发额度奖励
+        StrategyModel strategyQuery = HodgepodgeMethod.assembleStrategyQuery(ServerConstant.StrategyEnum.TRIGGER_QUOTA_REWARD.getStgType());
+        StrategyModel strategyModel = ComponentUtil.strategyService.getStrategyModel(strategyQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
+        String ruleMoney = strategyModel.getStgValue();// 触发奖励的具体规则金额
+        String rewardMoney = String.valueOf(strategyModel.getStgNumValue());// 触发成功的具体奖励金额
+
+
+
+        // 获取获取团队长用户Id集合的数据
+        DidModel didQuery = TaskMethod.assembleDidByIsTeamQuery(ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO);
+        List<Long> synchroList = ComponentUtil.didService.getIsTeamDidList(didQuery);
+        for (Long data : synchroList){
+            try{
+                // 获取此用户的属性数据
+                DidModel didByIdQuery = TaskMethod.assembleDidQueryByDid(data);
+                DidModel didModel = (DidModel) ComponentUtil.didService.findByObject(didByIdQuery);
+                if (didModel != null && didModel.getId() > 0){
+                    // 循环查询这些 用户的直推用户
+                    DidLevelModel didLevelQuery = TaskMethod.assembleDidLevelQuery(data, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ONE);
+                    List<DidLevelModel> didLevelList = ComponentUtil.didLevelService.findByCondition(didLevelQuery);
+
+                    if (didLevelList != null && didLevelList.size() > 0){
+                        // 直推的用户ID集合
+                        List<Long> didList = didLevelList.stream().map(DidLevelModel::getDid).collect(Collectors.toList());
+
+                        // 获取直推用户所有派单消耗成功的总金额
+                        OrderModel orderQuery = TaskMethod.assembleOrderQuery(didList);
+                        String directSumMoney = ComponentUtil.orderService.directAllSumMoney(orderQuery);
+
+                        if (!StringUtils.isBlank(directSumMoney) && !directSumMoney.equals("0.00")){
+                            boolean flag = StringUtil.getBigDecimalSubtract(directSumMoney, ruleMoney);
+                            if (flag){
+                                String divideResult = StringUtil.getBigDecimalDivide(directSumMoney, ruleMoney);
+                                // 计算奖励的次数
+                                int numReward =  TaskMethod.getDivideResult(divideResult, didModel.getTriggerQuotaGrade());
+                                if (numReward > 0){
+                                    // 计算触发额度奖励的具体金额
+                                    String moneyReward = StringUtil.getMultiply(String.valueOf(numReward), rewardMoney);
+                                    if (!StringUtils.isBlank(moneyReward)){
+                                        // 修改用户的触发奖励等级
+                                        DidModel updateDid = TaskMethod.assembleUpdateDidData(data, numReward + didModel.getTriggerQuotaGrade(), 0);
+                                        int num = ComponentUtil.didService.updateDidMoneyByReward(updateDid);
+                                        if (num > 0){
+                                            // 添加触发额度奖励收益
+                                            DidRewardModel didRewardModel = TaskMethod.assembleDidDirectProfit(8, data, moneyReward, directSumMoney);
+                                            ComponentUtil.didRewardService.add(didRewardModel);
+                                        }
+                                    }
+                                }
+
+                            }
+                        }
+                    }
+                }
+                log.info("----------------------------------TaskDidRecharge.didRechargeByTeamConsumeCumulativeGradeReward()----end");
+            }catch (Exception e){
+                log.error(String.format("this TaskDidRecharge.didRechargeByTeamConsumeCumulativeGradeReward() is error , the dataId=%s !", data));
+                e.printStackTrace();
+            }
+        }
+    }
 
 }

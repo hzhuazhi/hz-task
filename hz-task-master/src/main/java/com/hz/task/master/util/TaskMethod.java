@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 
@@ -1154,6 +1155,10 @@ public class TaskMethod {
             resBean.setTotalConsumeProfit(didRewardModel.getMoney());
         }else if(didRewardModel.getRewardType() == 7){
             resBean.setTotalTeamConsumeProfit(didRewardModel.getMoney());
+        }else if(didRewardModel.getRewardType() == 8){
+            resBean.setTotalTriggerQuotaProfit(didRewardModel.getMoney());
+        }else if(didRewardModel.getRewardType() == 9){
+            resBean.setTotalTeamConsumeCumulativeProfit(didRewardModel.getMoney());
         }
 
         return resBean;
@@ -2043,6 +2048,95 @@ public class TaskMethod {
         return resBean;
     }
 
+    /**
+     * @Description: 计算可以奖励几次-触发奖励
+     * @param divideStr - 总成功金额除以触发奖励的金额的结果
+     * @param triggerQuotaGrade - 触发奖励的等级：团队消耗总和除以10万得到的整数就是等级
+     * @return int
+     * @author yoko
+     * @date 2020/7/10 17:28
+     */
+    public static int getDivideResult(String divideStr, int triggerQuotaGrade){
+        int num = 0;
+        if (!StringUtils.isBlank(divideStr)){
+            if (divideStr.equals("0")){
+                return num;
+            }else {
+                boolean flag = isInteger(divideStr);
+                if (flag){
+                    // 整数
+                    int resultNum = Integer.parseInt(divideStr);
+                    if (resultNum > 0){
+                        if (resultNum > triggerQuotaGrade){
+                            num = resultNum - triggerQuotaGrade;
+                        }else{
+                            return num;
+                        }
+                    }else {
+                        return num;
+                    }
+                }else{
+                    if (divideStr.indexOf("\\.")> -1){
+                        String [] str = divideStr.split("\\.");
+                        if (str != null && str.length == 2){
+                            int resultNum = Integer.parseInt(str[0]);
+                            if (resultNum > 0){
+                                if (resultNum > triggerQuotaGrade){
+                                    num = resultNum - triggerQuotaGrade;
+                                }else{
+                                    return num;
+                                }
+                            }else {
+                                num = 0;
+                                return num;
+                            }
+                        }else {
+                            return num;
+                        }
+                    }else {
+                        return num;
+                    }
+                }
+
+            }
+        }
+        return num;
+    }
+
+    /**
+     * @Description: 判断是否是整数
+     * @param str
+     * @return
+     * @author yoko
+     * @date 2020/7/10 17:17
+    */
+    public static boolean isInteger(String str){
+        Pattern pattern = Pattern.compile("^[-\\+]?[\\d]*$");
+        return pattern.matcher(str).matches();
+    }
+
+
+    /**
+     * @Description: 用户奖励的具体等级更新的数据组装
+     * @param did - 用户ID
+     * @param triggerQuotaGrade - 触发奖励的等级：团队消耗总和除以10万得到的整数就是等级
+     * @param teamConsumeCumulativeGrade - 团队总额等级：总和到达多少级
+     * @return com.hz.task.master.core.model.did.DidModel
+     * @author yoko
+     * @date 2020/7/10 17:46
+     */
+    public static DidModel assembleUpdateDidData(long did, int triggerQuotaGrade, int teamConsumeCumulativeGrade){
+        DidModel resBean = new DidModel();
+        resBean.setId(did);
+        if (triggerQuotaGrade > 0){
+            resBean.setTriggerQuotaGrade(triggerQuotaGrade);
+        }
+        if (teamConsumeCumulativeGrade > 0){
+            resBean.setTeamConsumeCumulativeGrade(teamConsumeCumulativeGrade);
+        }
+        return resBean;
+    }
+
 
 
 
@@ -2116,6 +2210,11 @@ public class TaskMethod {
         String sb4 = getZfbMoney("卢云通过扫码向你付款0.01元收款通知", strategyZfbMoneyRule);
         System.out.println("sb4:" + sb4);
 
+        boolean flag = isInteger("0");
+        System.out.println("flag:" + flag);
+        String divideStr = "55.55";
+        String [] str = divideStr.split("\\.");
+        System.out.println("str:" + str.length);
 
     }
 

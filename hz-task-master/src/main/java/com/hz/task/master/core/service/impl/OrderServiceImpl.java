@@ -189,6 +189,11 @@ public class OrderServiceImpl<T> extends BaseServiceImpl<T> implements OrderServ
         return orderMapper.directSumMoney(model);
     }
 
+    @Override
+    public String directAllSumMoney(OrderModel model) {
+        return orderMapper.directAllSumMoney(model);
+    }
+
 
     /**
      * @Description: 组装缓存key查询缓存中存在的数据

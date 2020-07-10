@@ -9,6 +9,7 @@
     <sql id="Base_Column_List">
         a.id,a.nickname,a.ac_num,a.phone_num,a.pass_wd,a.operate_wd,a.icode,a.total_money,a.balance,a.lock_money,a.vip_type,a.total_recharge_profit,a.total_grade_profit,
         a.total_direct_profit,a.total_indirect_profit,a.total_direct_num,a.total_indirect_num,a.total_profit,a.is_notify,a.notify_url,a.own_id,a.use_status,
+        a.trigger_quota_grade,a.total_trigger_quota_profit,a.team_consume_cumulative_grade,a.total_team_consume_cumulative_profit,
         a.create_time,a.update_time,a.yn
     </sql>
 
@@ -412,6 +413,18 @@
             </if>
             <if test="totalProfit != null and totalProfit != '' " >
                 a.total_profit = a.total_profit + #{totalProfit},
+            </if>
+            <if test="triggerQuotaGrade != null and triggerQuotaGrade != '' " >
+                a.trigger_quota_grade = #{triggerQuotaGrade},
+            </if>
+            <if test="totalTriggerQuotaProfit != null and totalTriggerQuotaProfit != '' " >
+                a.total_trigger_quota_profit = a.total_trigger_quota_profit + #{totalTriggerQuotaProfit},
+            </if>
+            <if test="teamConsumeCumulativeGrade != null and teamConsumeCumulativeGrade != '' " >
+                a.team_consume_cumulative_grade = #{teamConsumeCumulativeGrade},
+            </if>
+            <if test="totalTeamConsumeCumulativeProfit != null and totalTeamConsumeCumulativeProfit != '' " >
+                a.total_team_consume_cumulative_profit = a.total_team_consume_cumulative_profit + #{totalTeamConsumeCumulativeProfit},
             </if>
             a.update_time = NOW(),
         </trim>

@@ -98,6 +98,8 @@ public class ServerConstant {
         ZFB_MONEY_RULE(18,""),
         SHARE_SWITCH(19,""),
         TEAM_CONSUME_REWARD_LIST(20,""),
+        TRIGGER_QUOTA_REWARD(21,""),
+        TEAM_CONSUME_CUMULATIVE_REWARD_LIST(22,""),
 
         ;
         private int stgType;
