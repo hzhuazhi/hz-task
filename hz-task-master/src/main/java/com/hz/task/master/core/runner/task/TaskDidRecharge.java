@@ -25,8 +25,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -555,24 +557,23 @@ public class TaskDidRecharge {
      *     1.查询用户数据属于团队长的用户
      *     2.根据团队长用户找出所属的直推用户。
      *     3.根据直推的用户找出派单消耗成功的所有订单进行求和总金额。
-     *     4.判断金额是否超过策略里面的《触发额度奖励》配置。
-     *     5.如果超过则策略里面的触发的金额时，则用所有直推消耗成功的总金额除以策略触发金额，获取整数，结果与用户字段trigger_quota_grade进行比较，
-     *     结果大于trigger_quota_grade字段多少次就奖励多少次。
+     *     4.判断金额是否超过策略里面的《团队总额等级奖励》配置。
+     *     5.如果超过则策略里面的团队总额等级奖励金额时，用用户字段team_consume_cumulative_grade的值进行for循环比较策略配置大于team_consume_cumulative_grade的数据配置进行比较，如果有金额超出规则的则进行奖励。
      *
      * </p>
      * @author yoko
      * @date 2019/12/6 20:25
      */
-    @Scheduled(cron = "0 0 1 * * ?")
-//    @Scheduled(fixedDelay = 1000) // 每秒执行
+//    @Scheduled(cron = "0 0 1 * * ?")
+    @Scheduled(fixedDelay = 1000) // 每秒执行
     public void didRechargeByTeamConsumeCumulativeGradeReward() throws Exception{
         log.info("----------------------------------TaskDidRecharge.didRechargeByTeamConsumeCumulativeGradeReward()----start");
 
-        // 查询策略里面的触发额度奖励
-        StrategyModel strategyQuery = HodgepodgeMethod.assembleStrategyQuery(ServerConstant.StrategyEnum.TRIGGER_QUOTA_REWARD.getStgType());
+        // 查询策略里面的团队总额等级奖励规则列表
+        StrategyModel strategyQuery = HodgepodgeMethod.assembleStrategyQuery(ServerConstant.StrategyEnum.TEAM_CONSUME_CUMULATIVE_REWARD_LIST.getStgType());
         StrategyModel strategyModel = ComponentUtil.strategyService.getStrategyModel(strategyQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
-        String ruleMoney = strategyModel.getStgValue();// 触发奖励的具体规则金额
-        String rewardMoney = String.valueOf(strategyModel.getStgNumValue());// 触发成功的具体奖励金额
+        // 解析奖励规则的值
+        List<StrategyData> teamConsumeCumulativeRewardList = JSON.parseArray(strategyModel.getStgBigValue(), StrategyData.class);
 
 
 
@@ -598,26 +599,24 @@ public class TaskDidRecharge {
                         String directSumMoney = ComponentUtil.orderService.directAllSumMoney(orderQuery);
 
                         if (!StringUtils.isBlank(directSumMoney) && !directSumMoney.equals("0.00")){
-                            boolean flag = StringUtil.getBigDecimalSubtract(directSumMoney, ruleMoney);
-                            if (flag){
-                                String divideResult = StringUtil.getBigDecimalDivide(directSumMoney, ruleMoney);
-                                // 计算奖励的次数
-                                int numReward =  TaskMethod.getDivideResult(divideResult, didModel.getTriggerQuotaGrade());
-                                if (numReward > 0){
-                                    // 计算触发额度奖励的具体金额
-                                    String moneyReward = StringUtil.getMultiply(String.valueOf(numReward), rewardMoney);
-                                    if (!StringUtils.isBlank(moneyReward)){
-                                        // 修改用户的触发奖励等级
-                                        DidModel updateDid = TaskMethod.assembleUpdateDidData(data, numReward + didModel.getTriggerQuotaGrade(), 0);
-                                        int num = ComponentUtil.didService.updateDidMoneyByReward(updateDid);
-                                        if (num > 0){
-                                            // 添加触发额度奖励收益
-                                            DidRewardModel didRewardModel = TaskMethod.assembleDidDirectProfit(8, data, moneyReward, directSumMoney);
-                                            ComponentUtil.didRewardService.add(didRewardModel);
-                                        }
+                            List<StrategyData> stgList = TaskMethod.getTeamConsumeCumulativeRewardList(teamConsumeCumulativeRewardList, directSumMoney, didModel.getTeamConsumeCumulativeGrade());
+                            if (stgList != null && stgList.size() > 0){
+                                // 可获得团队总额等级奖励
+                                int maxGrade = 0;// 获取目前最大等级
+                                Optional<StrategyData> maxStgy = stgList.stream().max(Comparator.comparing(StrategyData :: getStgValue));
+                                StrategyData maxEmp = maxStgy.get();
+                                maxGrade = maxEmp.getStgValueTwo();
+                                // 修改用户的团队总额等级
+                                DidModel updateDid = TaskMethod.assembleUpdateDidData(data, 0, maxGrade);
+                                int num = ComponentUtil.didService.updateDidMoneyByReward(updateDid);
+                                if (num > 0){
+                                    for (StrategyData stgModel : stgList){
+                                        // 添加团队总额等级奖励收益
+                                        DidRewardModel didRewardModel = TaskMethod.assembleDidDirectProfit(9, data, stgModel.getStgValueOne(), stgModel.getStgValue());
+                                        ComponentUtil.didRewardService.add(didRewardModel);
                                     }
-                                }
 
+                                }
                             }
                         }
                     }

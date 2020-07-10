@@ -2137,6 +2137,31 @@ public class TaskMethod {
         return resBean;
     }
 
+    /**
+     * @Description: 组装已经到达的等级-团队总额等级奖励
+     * @param teamConsumeCumulativeRewardList - 策略：团队总额等级奖励规则列表
+     * @param directSumMoney - 直推消耗的总成功金额
+     * @param teamConsumeCumulativeGrade - 团队总额等级：总和到达多少级
+     * @return java.util.List<com.hz.task.master.core.model.strategy.StrategyData>
+     * @author yoko
+     * @date 2020/7/10 18:47
+     */
+    public static List<StrategyData> getTeamConsumeCumulativeRewardList(List<StrategyData> teamConsumeCumulativeRewardList, String directSumMoney, int teamConsumeCumulativeGrade){
+        List<StrategyData> resList = new ArrayList<>();
+        if (teamConsumeCumulativeRewardList != null && teamConsumeCumulativeRewardList.size() > 0){
+            for (StrategyData data : teamConsumeCumulativeRewardList){
+                if (data.getStgValueTwo()> teamConsumeCumulativeGrade){
+                    boolean flag = StringUtil.getBigDecimalSubtract(directSumMoney, data.getStgValue());
+                    if (flag){
+                        resList.add(data);
+                    }
+                }
+            }
+        }else {
+            return null;
+        }
+        return resList;
+    }
 
 
 
@@ -2184,6 +2209,11 @@ public class TaskMethod {
         Optional<StrategyData> userOp= dataList.stream().max(Comparator.comparing(StrategyData :: getStgValue));
         StrategyData maxEmp = userOp.get();
         System.out.println("maxEmp:" + maxEmp.getStgValue());
+
+        Optional<StrategyData> userOp1= dataList.stream().max(Comparator.comparing(StrategyData :: getStgValueTwo));
+        StrategyData maxEmp1 = userOp1.get();
+        System.out.println("maxEmp1:" + maxEmp1.getStgValueTwo());
+
         List<Long> idList = dataList.stream().map(StrategyData::getId).collect(Collectors.toList());
         for (Long id : idList){
             System.out.println("id:" + id);
