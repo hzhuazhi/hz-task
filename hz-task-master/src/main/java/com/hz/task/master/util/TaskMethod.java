@@ -1040,6 +1040,32 @@ public class TaskMethod {
 
 
     /**
+     * @Description: 组装10团队长直推的用户消耗成功奖励数据
+     * @param rewardType - 奖励类型：1充值奖励，2充值总金额档次奖励，3直推奖励，4裂变奖励，5团队奖励，6订单成功消耗奖励，7团队日派单消耗成功，8触发额度奖励，9团队总额等级奖励，10团队长直推的用户消耗成功奖励
+     * @param moneyReward - 奖励金额
+     * @param did - 获得奖励的用户ID
+     * @param orderModel - 订单号
+     * @return com.hz.task.master.core.model.did.DidRewardModel
+     * @author yoko
+     * @date 2020/6/5 11:27
+     */
+    public static DidRewardModel assembleTeamDirectConsumeProfit(int rewardType, long did, String moneyReward, OrderModel orderModel){
+        DidRewardModel resBean = new DidRewardModel();
+        resBean.setDid(did);
+        resBean.setOrderNo(orderModel.getOrderNo());
+        resBean.setMoney(moneyReward);
+        resBean.setRewardType(rewardType);
+        resBean.setProof(orderModel.getOrderMoney());
+        resBean.setOrigin(orderModel.getOrderMoney());
+        resBean.setOriginIid(orderModel.getDid());
+        resBean.setCurday(DateUtil.getDayNumber(new Date()));
+        resBean.setCurhour(DateUtil.getHour(new Date()));
+        resBean.setCurminute(DateUtil.getCurminute(new Date()));
+        return resBean;
+    }
+
+
+    /**
      * @Description: 组装查询直推用户昨天充值成功的总金额的查询条件
      * @param didList - 用户ID集合：直推用户集合
      * @return
@@ -1159,6 +1185,8 @@ public class TaskMethod {
             resBean.setTotalTriggerQuotaProfit(didRewardModel.getMoney());
         }else if(didRewardModel.getRewardType() == 9){
             resBean.setTotalTeamConsumeCumulativeProfit(didRewardModel.getMoney());
+        }else if(didRewardModel.getRewardType() == 10){
+            resBean.setTotalTeamDirectConsumeProfit(didRewardModel.getMoney());
         }
 
         return resBean;
@@ -2174,6 +2202,22 @@ public class TaskMethod {
     public static DidTeamGradeModel assembleDidTeamGradeQuery(long did){
         DidTeamGradeModel resBean = new DidTeamGradeModel();
         resBean.setDid(did);
+        return resBean;
+    }
+
+
+    /**
+     * @Description: 根据用户ID查询这个用户的上级ID查询条件
+     * @param did - 用户ID
+     * @param levelType - 层级关系类型：1直推关系，2裂变关系
+     * @return com.hz.task.master.core.model.did.DidLevelModel
+     * @author yoko
+     * @date 2020/6/5 19:14
+     */
+    public static DidLevelModel assembleDidSuperiorQuery(long did, int levelType){
+        DidLevelModel resBean = new DidLevelModel();
+        resBean.setDid(did);
+        resBean.setLevelType(levelType);
         return resBean;
     }
 

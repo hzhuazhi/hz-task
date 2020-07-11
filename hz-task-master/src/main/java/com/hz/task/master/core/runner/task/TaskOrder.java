@@ -2,16 +2,17 @@ package com.hz.task.master.core.runner.task;
 
 import com.alibaba.fastjson.JSON;
 import com.hz.task.master.core.common.utils.HttpSendUtils;
+import com.hz.task.master.core.common.utils.StringUtil;
 import com.hz.task.master.core.common.utils.constant.CacheKey;
 import com.hz.task.master.core.common.utils.constant.CachedKeyUtils;
 import com.hz.task.master.core.common.utils.constant.ServerConstant;
 import com.hz.task.master.core.common.utils.constant.TkCacheKey;
-import com.hz.task.master.core.model.did.DidBalanceDeductModel;
-import com.hz.task.master.core.model.did.DidCollectionAccountQrCodeModel;
-import com.hz.task.master.core.model.did.DidModel;
+import com.hz.task.master.core.model.did.*;
 import com.hz.task.master.core.model.order.OrderModel;
+import com.hz.task.master.core.model.strategy.StrategyModel;
 import com.hz.task.master.core.model.task.base.StatusModel;
 import com.hz.task.master.util.ComponentUtil;
+import com.hz.task.master.util.HodgepodgeMethod;
 import com.hz.task.master.util.TaskMethod;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -179,7 +180,10 @@ public class TaskOrder {
     @Scheduled(fixedDelay = 1000) // 每秒执行
     public void orderBySuccessOrder() throws Exception{
 //        log.info("----------------------------------TaskOrder.orderBySuccessOrder()----start");
-
+        // 查询策略里面的团队长奖励固定比例数据
+        StrategyModel strategyQuery = HodgepodgeMethod.assembleStrategyQuery(ServerConstant.StrategyEnum.TEAM_CONSUME_REWARD.getStgType());
+        StrategyModel strategyModel = ComponentUtil.strategyService.getStrategyModel(strategyQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
+        String ratioReward = strategyModel.getStgValue();// 团队长奖励固定比例数据
         // 获取已成功的订单数据
         StatusModel statusQuery = TaskMethod.assembleTaskByOrderDidStatusQuery(limitNum, 3);
         List<OrderModel> synchroList = ComponentUtil.taskOrderService.getOrderList(statusQuery);
@@ -231,6 +235,29 @@ public class TaskOrder {
                             // 更新此次task的状态：更新成成功
                             StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE, "");
                             ComponentUtil.taskOrderService.updateOrderStatus(statusModel);
+
+                            // 添加团队长奖励数据-start
+
+                            // 获取此用户的上级用户ID
+                            DidLevelModel didLevelQuery = TaskMethod.assembleDidSuperiorQuery(data.getDid(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ONE);
+                            DidLevelModel didLevelModel = (DidLevelModel) ComponentUtil.didLevelService.findByObject(didLevelQuery);
+                            if (didLevelModel != null && didLevelModel.getId() > 0){
+                                // 根据用户ID查询此用户是否属于团队长
+                                DidModel didByIdQuery = TaskMethod.assembleDidQueryByDid(didLevelModel.getLevelDid());
+                                DidModel didModel = (DidModel) ComponentUtil.didService.findByObject(didByIdQuery);
+                                if (didModel.getIsTeam() == 2){
+                                    // 属于团队长属性:计算需要给与每单的奖励的金额 = 订单金额 * 奖励比例
+                                    String moneyReward = StringUtil.getMultiply(data.getOrderMoney(), ratioReward);
+                                    if (!StringUtils.isBlank(moneyReward) && !moneyReward.equals("0.00")){
+                                        DidRewardModel didRewardModel = TaskMethod.assembleTeamDirectConsumeProfit(10, didModel.getId(), moneyReward, data);
+                                        ComponentUtil.didRewardService.add(didRewardModel);
+                                    }
+
+                                }
+                            }
+
+                            // 添加团队长奖励数据-end
+
                         }else{
                             // 更新此次task的状态：更新成失败
                             StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "更新的影响行为0");

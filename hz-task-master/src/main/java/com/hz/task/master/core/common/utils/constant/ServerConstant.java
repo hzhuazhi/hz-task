@@ -101,6 +101,7 @@ public class ServerConstant {
         TRIGGER_QUOTA_REWARD(21,""),
         TEAM_CONSUME_CUMULATIVE_REWARD_LIST(22,""),
         TEAM_REWARD_LIST(23,""),
+        TEAM_CONSUME_REWARD(24,""),
 
         ;
         private int stgType;
