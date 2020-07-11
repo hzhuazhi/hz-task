@@ -2164,6 +2164,26 @@ public class TaskMethod {
     }
 
 
+    /**
+     * @Description: 组装查询团队长奖励金额等级纪录数据的查询条件
+     * @param did - 用户ID
+     * @return
+     * @author yoko
+     * @date 2020/7/11 21:51
+    */
+    public static DidTeamGradeModel assembleDidTeamGradeQuery(long did){
+        DidTeamGradeModel resBean = new DidTeamGradeModel();
+        resBean.setDid(did);
+        return resBean;
+    }
+
+
+
+
+
+
+
+
 
 
 

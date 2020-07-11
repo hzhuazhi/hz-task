@@ -125,6 +125,9 @@ public class AutowireRunner implements ApplicationRunner {
     @Autowired
     private ClientCollectionDataService clientCollectionDataService;
 
+    @Autowired
+    private DidTeamGradeService didTeamGradeService;
+
 
 
 
@@ -220,6 +223,7 @@ public class AutowireRunner implements ApplicationRunner {
         ComponentUtil.clientAllDataService = clientAllDataService;
         ComponentUtil.clientDataService = clientDataService;
         ComponentUtil.clientCollectionDataService = clientCollectionDataService;
+        ComponentUtil.didTeamGradeService = didTeamGradeService;
 
         ComponentUtil.taskMobileCardService = taskMobileCardService;
         ComponentUtil.taskBankCollectionService = taskBankCollectionService;
