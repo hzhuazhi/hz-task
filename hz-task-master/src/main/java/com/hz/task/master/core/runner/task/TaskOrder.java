@@ -225,7 +225,7 @@ public class TaskOrder {
                         }
                     }else if(data.getCollectionType() == 2){
                         // 支付宝支付处理逻辑
-                        DidBalanceDeductModel didBalanceDeductUpdate = TaskMethod.assembleDidBalanceDeductUpdate(data.getOrderNo(), 4);
+                        DidBalanceDeductModel didBalanceDeductUpdate = TaskMethod.assembleDidBalanceDeductUpdate(data.getOrderNo(), data.getOrderStatus());
                         num = ComponentUtil.didBalanceDeductService.updateOrderStatus(didBalanceDeductUpdate);
 
                         // 删除此用户名下的挂单
@@ -236,27 +236,31 @@ public class TaskOrder {
                             StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE, "");
                             ComponentUtil.taskOrderService.updateOrderStatus(statusModel);
 
-                            // 添加团队长奖励数据-start
+                            // 只有用户手动点击成功的订单状态团队长才有奖励
+                            if (data.getOrderStatus() == 4){
+                                // 添加团队长奖励数据-start
 
-                            // 获取此用户的上级用户ID
-                            DidLevelModel didLevelQuery = TaskMethod.assembleDidSuperiorQuery(data.getDid(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ONE);
-                            DidLevelModel didLevelModel = (DidLevelModel) ComponentUtil.didLevelService.findByObject(didLevelQuery);
-                            if (didLevelModel != null && didLevelModel.getId() > 0){
-                                // 根据用户ID查询此用户是否属于团队长
-                                DidModel didByIdQuery = TaskMethod.assembleDidQueryByDid(didLevelModel.getLevelDid());
-                                DidModel didModel = (DidModel) ComponentUtil.didService.findByObject(didByIdQuery);
-                                if (didModel.getIsTeam() == 2){
-                                    // 属于团队长属性:计算需要给与每单的奖励的金额 = 订单金额 * 奖励比例
-                                    String moneyReward = StringUtil.getMultiply(data.getOrderMoney(), ratioReward);
-                                    if (!StringUtils.isBlank(moneyReward) && !moneyReward.equals("0.00")){
-                                        DidRewardModel didRewardModel = TaskMethod.assembleTeamDirectConsumeProfit(10, didModel.getId(), moneyReward, data);
-                                        ComponentUtil.didRewardService.add(didRewardModel);
+                                // 获取此用户的上级用户ID
+                                DidLevelModel didLevelQuery = TaskMethod.assembleDidSuperiorQuery(data.getDid(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ONE);
+                                DidLevelModel didLevelModel = (DidLevelModel) ComponentUtil.didLevelService.findByObject(didLevelQuery);
+                                if (didLevelModel != null && didLevelModel.getId() > 0){
+                                    // 根据用户ID查询此用户是否属于团队长
+                                    DidModel didByIdQuery = TaskMethod.assembleDidQueryByDid(didLevelModel.getLevelDid());
+                                    DidModel didModel = (DidModel) ComponentUtil.didService.findByObject(didByIdQuery);
+                                    if (didModel.getIsTeam() == 2){
+                                        // 属于团队长属性:计算需要给与每单的奖励的金额 = 订单金额 * 奖励比例
+                                        String moneyReward = StringUtil.getMultiply(data.getOrderMoney(), ratioReward);
+                                        if (!StringUtils.isBlank(moneyReward) && !moneyReward.equals("0.00")){
+                                            DidRewardModel didRewardModel = TaskMethod.assembleTeamDirectConsumeProfit(10, didModel.getId(), moneyReward, data);
+                                            ComponentUtil.didRewardService.add(didRewardModel);
+                                        }
+
                                     }
-
                                 }
+
+                                // 添加团队长奖励数据-end
                             }
 
-                            // 添加团队长奖励数据-end
 
                         }else{
                             // 更新此次task的状态：更新成失败

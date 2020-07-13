@@ -146,7 +146,7 @@ public class TaskClientData {
                                     // 表示金额一致:可以匹配到派单
                                     num = 1;// 执行状态的更改了
 
-                                    // 组装要更新的可爱猫回调订单的数据
+                                    // 组装要更新客户端更新订单的数据
                                     ClientDataModel clientDataModel = TaskMethod.assembleClientDataUpdate(data.getId(), 4, orderModel.getOrderNo());
                                     // 组装要更新的派单的订单状态的数据
                                     OrderModel orderUpdate = TaskMethod.assembleUpdateOrderStatus(orderModel.getId(), 4);

@@ -68,7 +68,7 @@ public class TaskDidBalanceDeduct {
                 String lockKey = CachedKeyUtils.getCacheKeyTask(TkCacheKey.LOCK_DID_BALANCE_DEDUCT, data.getId());
                 boolean flagLock = ComponentUtil.redisIdService.lock(lockKey);
                 if (flagLock){
-                    if (data.getOrderStatus() == 4){
+                    if (data.getOrderStatus() == 4 || data.getOrderStatus() == 3){
                         // 成功订单
                         // 更新此次task的状态：更新成成功
                         StatusModel statusModel = TaskMethod.assembleTaskUpdateStatusModel(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE);
