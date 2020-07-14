@@ -2222,6 +2222,34 @@ public class TaskMethod {
     }
 
 
+    /**
+     * @Description: 组装更改运行状态的数据
+     * @param id - 主键ID
+     * @param runStatus - 运行计算状态：：0初始化，1锁定，2计算失败，3计算成功
+     * @param orderStatus - 订单状态
+     * @param info - 纪录失败的原因
+     * @return StatusModel
+     * @author yoko
+     * @date 2019/12/10 10:42
+     */
+    public static StatusModel assembleUpdateStatusByOrderStatusAndInfo(long id, int runStatus, int orderStatus, String info){
+        StatusModel resBean = new StatusModel();
+        resBean.setRunStatus(runStatus);
+        if (orderStatus > 0){
+            resBean.setOrderStatus(orderStatus);
+        }
+        resBean.setId(id);
+        if (runStatus == ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO){
+            // 表示失败：失败则需要运行次数加一
+            resBean.setRunNum(ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ONE);
+        }
+        if (!StringUtils.isBlank(info)){
+            resBean.setInfo(info);
+        }
+        return resBean;
+    }
+
+
 
 
 

@@ -118,4 +118,5 @@ public interface OrderService<T> extends BaseService<T> {
      * @date 2020/6/6 11:22
      */
     public String directAllSumMoney(OrderModel model);
+
 }

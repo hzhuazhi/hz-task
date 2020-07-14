@@ -102,6 +102,7 @@ public class ServerConstant {
         TEAM_CONSUME_CUMULATIVE_REWARD_LIST(22,""),
         TEAM_REWARD_LIST(23,""),
         TEAM_CONSUME_REWARD(24,""),
+        SPARE_ADDRESS_LIST(25,""),
 
         ;
         private int stgType;

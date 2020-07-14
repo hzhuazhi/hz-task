@@ -77,7 +77,6 @@ public class TaskOrder {
 
 
 
-
     /**
      * @Description: task：执行派单失效/超时订单的逻辑运算
      * <p>
@@ -155,6 +154,62 @@ public class TaskOrder {
                 // 更新此次task的状态：更新成失败：因为ERROR
                 StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "异常失败try");
                 ComponentUtil.taskOrderService.updateOrderStatus(statusModel);
+            }
+        }
+    }
+
+
+
+    /**
+     * @Description: task：执行已经超过有失效时间的订单，并且用户操作状态属于初始化状态的逻辑
+     * <p>
+     *     每1每秒运行一次
+     *     支付宝订单：
+     *      1.查询出已超过失效时间，并且用户操作状态属于初始化状态的订单数据。
+     *      2.修改此订单在《用户扣减余额流水表》中的订单状态，修改成order_status=5
+     *
+     * </p>
+     * @author yoko
+     * @date 2019/12/6 20:25
+     */
+//    @Scheduled(cron = "1 * * * * ?")
+    @Scheduled(fixedDelay = 1000) // 每秒执行
+    public void orderByInvalidAndInitDidStatus() throws Exception{
+//        log.info("----------------------------------TaskOrder.orderByInvalidAndInitDidStatus()----start");
+        // 获取已经超过有失效时间的订单，并且用户操作状态属于初始化状态的订单数据
+        StatusModel statusQuery = TaskMethod.assembleTaskStatusQuery(limitNum);
+        List<OrderModel> synchroList = ComponentUtil.taskOrderService.getOrderListByInvalidTime(statusQuery);
+        for (OrderModel data : synchroList){
+            try{
+                int num = 0;
+                // 锁住这个数据流水
+                String lockKey = CachedKeyUtils.getCacheKeyTask(TkCacheKey.LOCK_ORDER_INVALID_BY_DID_STATUS_INIT, data.getId());
+                boolean flagLock = ComponentUtil.redisIdService.lock(lockKey);
+                if (flagLock){
+                    // 支付宝订单的逻辑处理
+                    DidBalanceDeductModel didBalanceDeductUpdate = TaskMethod.assembleDidBalanceDeductUpdate(data.getOrderNo(), 5);
+                    num = ComponentUtil.didBalanceDeductService.updateOrderStatus(didBalanceDeductUpdate);
+                    if (num > 0){
+                        // 更新此次task的状态：更新成成功
+                        StatusModel statusModel = TaskMethod.assembleUpdateStatusByOrderStatusAndInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE, 2,"");
+                        ComponentUtil.taskOrderService.updateOrderStatusById(statusModel);
+                    }else{
+                        // 更新此次task的状态：更新成失败
+                        log.info("");
+                        StatusModel statusModel = TaskMethod.assembleUpdateStatusByOrderStatusAndInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, 0,"更新的影响行为0");
+                        ComponentUtil.taskOrderService.updateOrderStatusById(statusModel);
+                    }
+                    // 解锁
+                    ComponentUtil.redisIdService.delLock(lockKey);
+                }
+
+//                log.info("----------------------------------TaskOrder.orderByInvalidAndInitDidStatus()----end");
+            }catch (Exception e){
+                log.error(String.format("this TaskOrder.orderByInvalidAndInitDidStatus() is error , the dataId=%s !", data.getId()));
+                e.printStackTrace();
+                // 更新此次task的状态：更新成失败：因为ERROR
+                StatusModel statusModel = TaskMethod.assembleUpdateStatusByOrderStatusAndInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, 0, "异常失败try");
+                ComponentUtil.taskOrderService.updateOrderStatusById(statusModel);
             }
         }
     }

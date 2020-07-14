@@ -156,4 +156,10 @@ public interface TkCacheKey {
      */
     String LOCK_CLIENT_DATA = "-25";
 
+    /**
+     * 锁：已超过失效时间，并且用户操作状态属于初始化状态的流水- 派单数据
+     * 锁住
+     */
+    String LOCK_ORDER_INVALID_BY_DID_STATUS_INIT = "-26";
+
 }

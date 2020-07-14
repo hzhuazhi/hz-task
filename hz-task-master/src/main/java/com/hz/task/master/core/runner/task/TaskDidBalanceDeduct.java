@@ -73,7 +73,7 @@ public class TaskDidBalanceDeduct {
                         // 更新此次task的状态：更新成成功
                         StatusModel statusModel = TaskMethod.assembleTaskUpdateStatusModel(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE);
                         ComponentUtil.taskDidBalanceDeductService.updateDidBalanceDeductStatus(statusModel);
-                    }else if (data.getOrderStatus() == 2){
+                    }else if (data.getOrderStatus() == 2 || data.getOrderStatus() == 5){
                         // 失效订单
 
                         // 锁住这个用户

@@ -46,4 +46,14 @@ public class TaskOrderServiceImpl<T> extends BaseServiceImpl<T> implements TaskO
     public List<OrderModel> getOrderNotifyList(Object obj) {
         return taskOrderMapper.getOrderNotifyList(obj);
     }
+
+    @Override
+    public List<OrderModel> getOrderListByInvalidTime(Object obj) {
+        return taskOrderMapper.getOrderListByInvalidTime(obj);
+    }
+
+    @Override
+    public int updateOrderStatusById(Object obj) {
+        return taskOrderMapper.updateOrderStatusById(obj);
+    }
 }

@@ -43,4 +43,29 @@ public interface TaskOrderMapper<T> extends BaseDao<T> {
      */
     public List<OrderModel> getOrderNotifyList(Object obj);
 
+
+    /**
+     * @Description: 获取用户未点击用户操作的状态的超时订单
+     * <p>
+     *     did_status = 1
+     *     order_status = 1
+     *     invalid_time <= now()
+     * </p>
+     *
+     * @param obj
+     * @return
+     * @author yoko
+     * @date 2020/7/14 10:39
+     */
+    public List<OrderModel> getOrderListByInvalidTime(Object obj);
+
+    /**
+     * @Description: 修改订单状态修改成失效订单状态
+     * @param obj
+     * @return
+     * @author yoko
+     * @date 2020/7/14 18:24
+     */
+    public int updateOrderStatusById(Object obj);
+
 }

@@ -358,9 +358,9 @@
         </trim>
         where 1=1
         and a.order_status = 1
-        AND a.did_status &lt;= 2
+        and a.did_status = 2
         and a.invalid_time &lt;= now()
-
+        and a.yn = 0
     </update>
 
 
