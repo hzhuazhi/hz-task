@@ -45,6 +45,7 @@ public class ComponentUtil {
     public static ClientAllDataService clientAllDataService;
     public static ClientCollectionDataService clientCollectionDataService;
     public static DidTeamGradeService didTeamGradeService;
+    public static CatDataAnalysisService catDataAnalysisService;
 
 
 
