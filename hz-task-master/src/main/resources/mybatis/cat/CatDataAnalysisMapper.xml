@@ -9,7 +9,7 @@
     <sql id="Base_Column_List">
         a.id,a.all_id,a.wx_id,a.order_no,a.order_money,a.final_from_wxid,a.from_name,
         a.final_from_name,a.from_wxid,a.msg,a.msg_type,a.robot_wxid,a.type,a.group_wxid,
-        a.group_name,a.guest,a.data_type,a.is_matching,
+        a.group_name,a.guest,a.member_wxid,a.member_nickname,a.data_type,a.is_matching,
         a.curday,a.curhour,a.curminute,a.work_type,a.remark,a.run_num,a.run_status,
         a.create_time,a.update_time,a.yn
     </sql>
@@ -188,6 +188,12 @@
             <if test="guest != null and guest != '' " >
                 guest,
             </if>
+            <if test="memberWxid != null and memberWxid != '' " >
+                member_wxid,
+            </if>
+            <if test="memberNickname != null and memberNickname != '' " >
+                member_nickname,
+            </if>
             <if test="dataType != null and dataType != '' " >
                 data_type,
             </if>
@@ -254,6 +260,12 @@
             </if>
             <if test="guest != null and guest != '' " >
                 <![CDATA[  #{guest}, ]]>
+            </if>
+            <if test="memberWxid != null and memberWxid != '' " >
+                <![CDATA[  #{memberWxid}, ]]>
+            </if>
+            <if test="memberNickname != null and memberNickname != '' " >
+                <![CDATA[  #{memberNickname}, ]]>
             </if>
             <if test="dataType != null and dataType != '' " >
                 <![CDATA[  #{dataType}, ]]>
@@ -325,6 +337,12 @@
             </if>
             <if test="guest != null and guest != '' " >
                 a.guest = #{guest},
+            </if>
+            <if test="memberWxid != null and memberWxid != '' " >
+                a.member_wxid = #{memberWxid},
+            </if>
+            <if test="memberNickname != null and memberNickname != '' " >
+                a.member_nickname = #{memberNickname},
             </if>
             <if test="dataType != null and dataType != '' " >
                 a.data_type = #{dataType},

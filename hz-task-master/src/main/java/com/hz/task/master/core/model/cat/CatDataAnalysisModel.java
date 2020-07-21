@@ -94,6 +94,16 @@ public class CatDataAnalysisModel extends BasePage implements Serializable {
     private String guest;
 
     /**
+     * 成员的微信ID-踢出群类型里面的字段
+     */
+    private String memberWxid;
+
+    /**
+     * 成员的微信昵称-踢出群类型里面的字段
+     */
+    private String memberNickname;
+
+    /**
      * 数据类型：1初始化，2其它，3发送固定指令4表示审核使用，4加群信息，5发红包，6剔除成员，7成功收款，8收款失败，9订单完结
      */
     private Integer dataType;
@@ -395,5 +405,21 @@ public class CatDataAnalysisModel extends BasePage implements Serializable {
 
     public void setCurdayEnd(Integer curdayEnd) {
         this.curdayEnd = curdayEnd;
+    }
+
+    public String getMemberWxid() {
+        return memberWxid;
+    }
+
+    public void setMemberWxid(String memberWxid) {
+        this.memberWxid = memberWxid;
+    }
+
+    public String getMemberNickname() {
+        return memberNickname;
+    }
+
+    public void setMemberNickname(String memberNickname) {
+        this.memberNickname = memberNickname;
     }
 }

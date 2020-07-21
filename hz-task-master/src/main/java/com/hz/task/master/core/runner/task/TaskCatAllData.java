@@ -224,9 +224,11 @@ public class TaskCatAllData {
                                         ComponentUtil.taskCatAllDataService.updateCatAllDataStatus(statusModel);
                                     }
 
+                                }else if(fromCatModel.getType().equals("200")){
+                                    // 普通信息
                                 }else {
-                                    // 更新此次task的状态：更新成失败-type不等于600或者不等于100
-                                    StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "type不等于600也不等于100");
+                                    // 更新此次task的状态：更新成失败-type不等于需要的数据类型
+                                    StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "type不等于需要的数据类型");
                                     ComponentUtil.taskCatAllDataService.updateCatAllDataStatus(statusModel);
                                 }
                             }

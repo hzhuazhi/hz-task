@@ -61,6 +61,30 @@ public class CatMsg implements Serializable {
      */
     private Long timestamp;
 
+    /**
+     * 微信群组的ID
+     */
+    private String group_wxid;
+
+    /**
+     * 微信群名称
+     */
+    private String group_name;
+
+    /**
+     * 微信群成员
+     */
+    private String guest;
+
+    /**
+     * 成员的微信ID-踢出群类型里面的字段
+     */
+    private String member_wxid;
+
+    /**
+     * 成员的微信昵称-踢出群类型里面的字段
+     */
+    private String member_nickname;
 
     public CatMsg(){
 
@@ -144,5 +168,45 @@ public class CatMsg implements Serializable {
 
     public void setTimestamp(Long timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public String getGroup_wxid() {
+        return group_wxid;
+    }
+
+    public void setGroup_wxid(String group_wxid) {
+        this.group_wxid = group_wxid;
+    }
+
+    public String getGroup_name() {
+        return group_name;
+    }
+
+    public void setGroup_name(String group_name) {
+        this.group_name = group_name;
+    }
+
+    public String getGuest() {
+        return guest;
+    }
+
+    public void setGuest(String guest) {
+        this.guest = guest;
+    }
+
+    public String getMember_wxid() {
+        return member_wxid;
+    }
+
+    public void setMember_wxid(String member_wxid) {
+        this.member_wxid = member_wxid;
+    }
+
+    public String getMember_nickname() {
+        return member_nickname;
+    }
+
+    public void setMember_nickname(String member_nickname) {
+        this.member_nickname = member_nickname;
     }
 }
