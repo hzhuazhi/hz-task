@@ -64,4 +64,22 @@ public interface DidCollectionAccountService<T> extends BaseService<T> {
      */
     public int updateDidCollectionAccountCheckDataByFail(DidCollectionAccountModel model);
 
+    /**
+     * @Description: 根据小微ID以及微信群来确定收款账号
+     * @param model
+     * @return
+     * @author yoko
+     * @date 2020/7/22 14:32
+    */
+    public DidCollectionAccountModel getDidCollectionAccountByWxIdAndWxName(DidCollectionAccountModel model);
+
+    /**
+     * @Description: 更新微信群的信息
+     * @param model
+     * @return
+     * @author yoko
+     * @date 2020/7/22 15:02
+    */
+    public int updateDidCollectionAccountByWxData(DidCollectionAccountModel model);
+
 }

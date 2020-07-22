@@ -10,6 +10,7 @@ import com.hz.task.master.core.model.bank.BankCollectionDataModel;
 import com.hz.task.master.core.model.bank.BankCollectionModel;
 import com.hz.task.master.core.model.bank.BankModel;
 import com.hz.task.master.core.model.bank.BankTransferModel;
+import com.hz.task.master.core.model.cat.CatDataAnalysisModel;
 import com.hz.task.master.core.model.cat.CatDataBindingModel;
 import com.hz.task.master.core.model.cat.CatDataModel;
 import com.hz.task.master.core.model.cat.CatDataOfflineModel;
@@ -25,6 +26,7 @@ import com.hz.task.master.core.model.strategy.StrategyZfbMoneyRule;
 import com.hz.task.master.core.model.strategy.StrategyZfbRule;
 import com.hz.task.master.core.model.task.base.StatusModel;
 import com.hz.task.master.core.model.task.cat.CatMsg;
+import com.hz.task.master.core.model.task.cat.FromCatModel;
 import com.hz.task.master.core.model.task.client.ClientModel;
 import com.hz.task.master.core.model.task.did.TaskDidCollectionAccountDataModel;
 import com.hz.task.master.core.model.wx.WxClerkDataModel;
@@ -2250,6 +2252,207 @@ public class TaskMethod {
     }
 
 
+//    /**
+//     * @Description: 解析可爱猫数据，根据msg数据来确定此数据的类型
+//     * @param msg
+//     * @return
+//     * @author yoko
+//     * @date 2020/7/21 21:16
+//    */
+//    public static Map<String, Object> getCatDataType(String msg){
+//        Map<String, Object> map = new HashMap<>();
+//        int dataType = 0;
+//        String dataValue = "";
+//        // 首先解析数据是否是json数据
+//        boolean flag = false;
+//        CatMsg catMsg = new CatMsg();
+//        try {
+//            catMsg = JSON.parseObject(msg, CatMsg.class);
+//            flag = true;
+//        }catch (Exception e){
+//            flag = false;
+//        }
+//
+//        if (flag){
+//            // 属于json数据
+//            if (catMsg.get)
+//        }else {
+//            // 不属于json数据：普通数据
+//            if (msg.equals("4")){
+//                // 表示群审核完毕更新微信参数
+//                dataType = 3;
+//            }
+//
+//        }
+//
+//        return null;
+//    }
+
+
+
+    /**
+     * @Description: 解析可爱猫数据type =200的数据，根据msg数据来确定此数据的类型
+     * @param msg
+     * @return
+     * @author yoko
+     * @date 2020/7/21 21:16
+     */
+    public static int getCatDataTypeByTwoHundred(String msg){
+        int num = 0;
+        if (msg.equals("3")){
+            num = 3;
+        }else if (msg.equals("2")){
+            num = 8;
+        }else if (msg.equals("收到红包，请在手机上查看")){
+            num = 5;
+        }else if(msg.substring(0,2).equals("你被") && msg.substring(msg.length() - 4, msg.length()).equals("移出群聊")){
+            num = 6;
+        }else if(msg.indexOf("1#") > -1){
+            num = 7;
+        }else{
+            num = 2;
+        }
+        return num;
+    }
+
+    /**
+     * @Description: 组装查询收款账号的查询条件
+     * @param robot_wxid - 小微的toWxid
+     * @param from_name - 微信群名称
+     * @return
+     * @author yoko
+     * @date 2020/7/22 14:51
+    */
+    public static DidCollectionAccountModel assembleDidCollectionAccountByToWxidAndPayeeQuery(String robot_wxid, String from_name){
+        DidCollectionAccountModel resBean = new DidCollectionAccountModel();
+        resBean.setToWxid(robot_wxid);
+        resBean.setPayee(from_name);
+        return resBean;
+    }
+
+    /**
+     * @Description: 组装根据微信群名称查询收款账号
+     * @param from_name - 微信群名称
+     * @return
+     * @author yoko
+     * @date 2020/7/22 16:03
+    */
+    public static DidCollectionAccountModel assembleDidCollectionAccountByPayee(String from_name, int acType){
+        DidCollectionAccountModel resBean = new DidCollectionAccountModel();
+        resBean.setPayee(from_name);
+        resBean.setAcType(acType);
+        return resBean;
+    }
+
+    /**
+     * @Description: 组装添加可爱猫解析数据
+     * @param fromCatModel - 可爱猫数据
+     * @param dataType - 数据类型：1初始化，2其它，3发送固定指令3表示审核使用，4加群信息，5发红包，6剔除成员，7成功收款，8收款失败
+     * @param allId - 可爱猫原始数据
+     * @param wxId - 小微的主键ID
+     * @return com.hz.task.master.core.model.cat.CatDataAnalysisModel
+     * @author yoko
+     * @date 2020/7/22 16:45
+     */
+    public static CatDataAnalysisModel assembleCatDataAnalysisData(FromCatModel fromCatModel, int dataType, long allId, long wxId){
+        CatDataAnalysisModel resBean = new CatDataAnalysisModel();
+        resBean.setAllId(allId);
+        resBean.setWxId(wxId);
+        if (!StringUtils.isBlank(fromCatModel.getFinal_from_wxid())){
+            resBean.setFinalFromWxid(fromCatModel.getFinal_from_wxid());
+        }
+        if (!StringUtils.isBlank(fromCatModel.getFrom_name())){
+            resBean.setFromName(fromCatModel.getFrom_name());
+        }
+        if (!StringUtils.isBlank(fromCatModel.getFinal_from_name())){
+            resBean.setFinalFromName(fromCatModel.getFinal_from_name());
+        }
+        if (!StringUtils.isBlank(fromCatModel.getFrom_wxid())){
+            resBean.setFromWxid(fromCatModel.getFrom_wxid());
+        }
+        if (!StringUtils.isBlank(fromCatModel.getMsg())){
+            resBean.setMsg(fromCatModel.getMsg());
+        }
+        if (!StringUtils.isBlank(fromCatModel.getMsg_type())){
+            resBean.setMsgType(fromCatModel.getMsg_type());
+        }
+        if (!StringUtils.isBlank(fromCatModel.getRobot_wxid())){
+            resBean.setRobotWxid(fromCatModel.getRobot_wxid());
+        }
+        if (!StringUtils.isBlank(fromCatModel.getType())){
+            resBean.setType(fromCatModel.getType());
+        }
+        CatMsg catMsg = new CatMsg();
+        try{
+            catMsg = JSON.parseObject(fromCatModel.getMsg(), CatMsg.class);
+        }catch (Exception e){
+            catMsg = null;
+        }
+        if (catMsg != null){
+            if (!StringUtils.isBlank(catMsg.getGroup_wxid())){
+                resBean.setGroupWxid(catMsg.getGroup_wxid());
+            }
+            if (!StringUtils.isBlank(catMsg.getGroup_name())){
+                resBean.setGroupName(catMsg.getGroup_name());
+            }
+            if (!StringUtils.isBlank(catMsg.getGuest())){
+                resBean.setGuest(catMsg.getGuest());
+            }
+            if (!StringUtils.isBlank(catMsg.getMember_wxid())){
+                resBean.setGuest(catMsg.getMember_wxid());
+            }
+            if (!StringUtils.isBlank(catMsg.getMember_nickname())){
+                resBean.setMemberNickname(catMsg.getMember_nickname());
+            }
+        }
+        resBean.setDataType(dataType);
+
+        return resBean;
+
+    }
+
+
+    /**
+     * @Description: 解析可爱猫数据type =400的数据，根据msg数据来确定此数据的类型
+     * <p>
+     *     加群信息
+     * </p>
+     * @param msg
+     * @return
+     * @author yoko
+     * @date 2020/7/21 21:16
+     */
+    public static int getCatDataTypeByFourHundred(String msg){
+        int num = 0;
+        if (msg.indexOf("group_wxid") > -1){
+            num = 4;
+        }else{
+            num = 2;
+        }
+        return num;
+    }
+
+
+    /**
+     * @Description: 解析可爱猫数据type =410的数据，根据msg数据来确定此数据的类型
+     * <p>
+     *     移出群信息
+     * </p>
+     * @param msg
+     * @return
+     * @author yoko
+     * @date 2020/7/21 21:16
+     */
+    public static int getCatDataTypeByFourHundredAndTen(String msg){
+        int num = 0;
+        if (msg.indexOf("member_wxid") > -1){
+            num = 6;
+        }else{
+            num = 2;
+        }
+        return num;
+    }
+
 
 
 
@@ -2337,6 +2540,12 @@ public class TaskMethod {
         String divideStr = "55.55";
         String [] str = divideStr.split("\\.");
         System.out.println("str:" + str.length);
+
+        String sb5 = "你被\"卢云\"移出群聊";
+        String sb5_start = sb5.substring(0,2);
+        String sb5_end = sb5.substring(sb5.length()-4,sb5.length());
+        System.out.println("sb5_start:"+ sb5_start);
+        System.out.println("sb5_end:"+ sb5_end);
 
     }
 

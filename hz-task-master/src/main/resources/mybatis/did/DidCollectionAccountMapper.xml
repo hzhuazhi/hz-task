@@ -399,5 +399,34 @@
     </update>
 
 
+    <!-- 根据小微ID以及微信群来确定收款账号-->
+    <select id="getDidCollectionAccountByWxIdAndWxName" parameterType="Object" resultType="com.hz.task.master.core.model.did.DidCollectionAccountModel">
+        select
+        <include refid="Base_Column_List" />
+        from tb_fn_did_collection_account a where a.id in (
+        select collection_account_id from tb_fn_wx_clerk where wx_id =
+        (
+        select id from tb_fn_wx where to_wxid = #{toWxid} and yn =0
+        ) and yn = 0)
+        and a.payee = #{payee}
+        and a.ac_type = 3
+        and a.yn = 0
+        limit 1
+    </select>
+
+    <!-- 更新用户收款账号信息 -->
+    <update id="updateDidCollectionAccountByWxData" parameterType="com.hz.task.master.core.model.did.DidCollectionAccountModel">
+        UPDATE tb_fn_did_collection_account a
+        <trim prefix="set" suffixOverrides=",">
+            a.ac_name = #{acName},
+            a.ac_num = #{acNum},
+            a.user_id = #{userId},
+            a.update_time = NOW(),
+        </trim>
+        where 1=1
+        and a.id = #{id}
+    </update>
+
+
 
 </mapper>

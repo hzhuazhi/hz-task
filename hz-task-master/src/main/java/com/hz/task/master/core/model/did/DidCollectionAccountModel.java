@@ -133,6 +133,11 @@ public class DidCollectionAccountModel extends BasePage implements Serializable 
      */
     private Integer whereCheckStatus;
 
+    /**
+     * 小微ID
+     */
+    private String toWxid;
+
 
     public Long getId() {
         return id;
@@ -324,5 +329,13 @@ public class DidCollectionAccountModel extends BasePage implements Serializable 
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public String getToWxid() {
+        return toWxid;
+    }
+
+    public void setToWxid(String toWxid) {
+        this.toWxid = toWxid;
     }
 }

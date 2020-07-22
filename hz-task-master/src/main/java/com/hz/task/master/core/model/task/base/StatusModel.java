@@ -100,6 +100,11 @@ public class StatusModel implements Serializable {
      */
     private Integer didStatus;
 
+    /**
+     * 是否能匹配到数据关系：1初始化，2匹配不成功，3匹配成功；根据我方wx_id加上微信群名匹配关联关系
+     */
+    private Integer isMatching;
+
     public Long getId() {
         return id;
     }
@@ -252,5 +257,13 @@ public class StatusModel implements Serializable {
 
     public void setDidStatus(Integer didStatus) {
         this.didStatus = didStatus;
+    }
+
+    public Integer getIsMatching() {
+        return isMatching;
+    }
+
+    public void setIsMatching(Integer isMatching) {
+        this.isMatching = isMatching;
     }
 }

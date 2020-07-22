@@ -5,10 +5,7 @@ import com.hz.task.master.core.common.utils.constant.CacheKey;
 import com.hz.task.master.core.common.utils.constant.CachedKeyUtils;
 import com.hz.task.master.core.common.utils.constant.ServerConstant;
 import com.hz.task.master.core.common.utils.constant.TkCacheKey;
-import com.hz.task.master.core.model.cat.CatAllDataModel;
-import com.hz.task.master.core.model.cat.CatDataBindingModel;
-import com.hz.task.master.core.model.cat.CatDataModel;
-import com.hz.task.master.core.model.cat.CatDataOfflineModel;
+import com.hz.task.master.core.model.cat.*;
 import com.hz.task.master.core.model.did.DidCollectionAccountModel;
 import com.hz.task.master.core.model.task.base.StatusModel;
 import com.hz.task.master.core.model.task.cat.CatMsg;
@@ -226,6 +223,113 @@ public class TaskCatAllData {
 
                                 }else if(fromCatModel.getType().equals("200")){
                                     // 普通信息
+                                    if (!StringUtils.isBlank(fromCatModel.getMsg())){
+                                        int dataType = TaskMethod.getCatDataTypeByTwoHundred(fromCatModel.getMsg());
+                                        if (!StringUtils.isBlank(fromCatModel.getRobot_wxid()) && !StringUtils.isBlank(fromCatModel.getFrom_name())){
+                                            // 根据小微ID查询小微信息
+                                            WxModel wxQuery = TaskMethod.assembleWxModel(fromCatModel.getRobot_wxid());
+                                            WxModel wxModel = (WxModel) ComponentUtil.wxService.findByObject(wxQuery);
+                                            if (wxModel != null && wxModel.getId() > 0){
+                                                CatDataAnalysisModel catDataAnalysisModel = TaskMethod.assembleCatDataAnalysisData(fromCatModel, dataType, data.getId(), wxModel.getId());
+                                                int addNum = ComponentUtil.catDataAnalysisService.add(catDataAnalysisModel);
+                                                if (addNum > 0){
+                                                    // 更新此次task的状态：更新成成功
+                                                    StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE, "");
+                                                    ComponentUtil.taskCatAllDataService.updateCatAllDataStatus(statusModel);
+                                                }else{
+                                                    // 更新此次task的状态：更新成失败-type等于200，添加数据到可爱猫解析表中影响行0
+                                                    StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "type等于200，添加数据到可爱猫解析表中影响行0");
+                                                    ComponentUtil.taskCatAllDataService.updateCatAllDataStatus(statusModel);
+                                                }
+                                            }else {
+                                                // 更新此次task的状态：更新成失败-type等于200，但是根据robot_wxid查询小微账号数据为空
+                                                StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "type等于200，但是根据robot_wxid查询小微账号数据为空");
+                                                ComponentUtil.taskCatAllDataService.updateCatAllDataStatus(statusModel);
+                                            }
+
+                                        }else {
+                                            // 更新此次task的状态：更新成失败-type等于200，但是robot_wxid,from_name其中数据为空
+                                            StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "type等于200，但是robot_wxid,from_name其中数据为空");
+                                            ComponentUtil.taskCatAllDataService.updateCatAllDataStatus(statusModel);
+                                        }
+                                    }else {
+                                        // 更新此次task的状态：更新成失败-type等于200，但是msg数据为空
+                                        StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "type等于200，但是msg数据为空");
+                                        ComponentUtil.taskCatAllDataService.updateCatAllDataStatus(statusModel);
+                                    }
+                                }else if (fromCatModel.getType().equals("400")){
+                                    // 加群信息
+                                    if (!StringUtils.isBlank(fromCatModel.getMsg())){
+                                        int dataType = TaskMethod.getCatDataTypeByFourHundred(fromCatModel.getMsg());
+                                        if (!StringUtils.isBlank(fromCatModel.getRobot_wxid()) && !StringUtils.isBlank(fromCatModel.getFrom_name())){
+                                            // 根据小微ID查询小微信息
+                                            WxModel wxQuery = TaskMethod.assembleWxModel(fromCatModel.getRobot_wxid());
+                                            WxModel wxModel = (WxModel) ComponentUtil.wxService.findByObject(wxQuery);
+                                            if (wxModel != null && wxModel.getId() > 0){
+                                                CatDataAnalysisModel catDataAnalysisModel = TaskMethod.assembleCatDataAnalysisData(fromCatModel, dataType, data.getId(), wxModel.getId());
+                                                int addNum = ComponentUtil.catDataAnalysisService.add(catDataAnalysisModel);
+                                                if (addNum > 0){
+                                                    // 更新此次task的状态：更新成成功
+                                                    StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE, "");
+                                                    ComponentUtil.taskCatAllDataService.updateCatAllDataStatus(statusModel);
+                                                }else{
+                                                    // 更新此次task的状态：更新成失败-type等于400，添加数据到可爱猫解析表中影响行0
+                                                    StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "type等于400，添加数据到可爱猫解析表中影响行0");
+                                                    ComponentUtil.taskCatAllDataService.updateCatAllDataStatus(statusModel);
+                                                }
+                                            }else {
+                                                // 更新此次task的状态：更新成失败-type等于400，但是根据robot_wxid查询小微账号数据为空
+                                                StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "type等于400，但是根据robot_wxid查询小微账号数据为空");
+                                                ComponentUtil.taskCatAllDataService.updateCatAllDataStatus(statusModel);
+                                            }
+
+                                        }else {
+                                            // 更新此次task的状态：更新成失败-type等于400，但是robot_wxid,from_name其中数据为空
+                                            StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "type等于400，但是robot_wxid,from_name其中数据为空");
+                                            ComponentUtil.taskCatAllDataService.updateCatAllDataStatus(statusModel);
+                                        }
+                                    }else {
+                                        // 更新此次task的状态：更新成失败-type等于400，但是msg数据为空
+                                        StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "type等于400，但是msg数据为空");
+                                        ComponentUtil.taskCatAllDataService.updateCatAllDataStatus(statusModel);
+                                    }
+
+                                }else if (fromCatModel.getType().equals("410")){
+                                    // 移出群信息
+                                    if (!StringUtils.isBlank(fromCatModel.getMsg())){
+                                        int dataType = TaskMethod.getCatDataTypeByFourHundredAndTen(fromCatModel.getMsg());
+                                        if (!StringUtils.isBlank(fromCatModel.getRobot_wxid()) && !StringUtils.isBlank(fromCatModel.getFrom_name())){
+                                            // 根据小微ID查询小微信息
+                                            WxModel wxQuery = TaskMethod.assembleWxModel(fromCatModel.getRobot_wxid());
+                                            WxModel wxModel = (WxModel) ComponentUtil.wxService.findByObject(wxQuery);
+                                            if (wxModel != null && wxModel.getId() > 0){
+                                                CatDataAnalysisModel catDataAnalysisModel = TaskMethod.assembleCatDataAnalysisData(fromCatModel, dataType, data.getId(), wxModel.getId());
+                                                int addNum = ComponentUtil.catDataAnalysisService.add(catDataAnalysisModel);
+                                                if (addNum > 0){
+                                                    // 更新此次task的状态：更新成成功
+                                                    StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE, "");
+                                                    ComponentUtil.taskCatAllDataService.updateCatAllDataStatus(statusModel);
+                                                }else{
+                                                    // 更新此次task的状态：更新成失败-type等于410，添加数据到可爱猫解析表中影响行0
+                                                    StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "type等于410，添加数据到可爱猫解析表中影响行0");
+                                                    ComponentUtil.taskCatAllDataService.updateCatAllDataStatus(statusModel);
+                                                }
+                                            }else {
+                                                // 更新此次task的状态：更新成失败-type等于410，但是根据robot_wxid查询小微账号数据为空
+                                                StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "type等于410，但是根据robot_wxid查询小微账号数据为空");
+                                                ComponentUtil.taskCatAllDataService.updateCatAllDataStatus(statusModel);
+                                            }
+
+                                        }else {
+                                            // 更新此次task的状态：更新成失败-type等于410，但是robot_wxid,from_name其中数据为空
+                                            StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "type等于410，但是robot_wxid,from_name其中数据为空");
+                                            ComponentUtil.taskCatAllDataService.updateCatAllDataStatus(statusModel);
+                                        }
+                                    }else {
+                                        // 更新此次task的状态：更新成失败-type等于410，但是msg数据为空
+                                        StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "type等于410，但是msg数据为空");
+                                        ComponentUtil.taskCatAllDataService.updateCatAllDataStatus(statusModel);
+                                    }
                                 }else {
                                     // 更新此次task的状态：更新成失败-type不等于需要的数据类型
                                     StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "type不等于需要的数据类型");

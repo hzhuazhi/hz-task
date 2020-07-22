@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hz.task.master.core.mapper.task.TaskCatDataAnalysisMapper">
+
+
+
+
+    <!-- 定义数据库基本列,只适用代替单表的*-->
+    <sql id="Base_Column_List">
+        a.id,a.all_id,a.wx_id,a.order_no,a.order_money,a.final_from_wxid,a.from_name,
+        a.final_from_name,a.from_wxid,a.msg,a.msg_type,a.robot_wxid,a.type,a.group_wxid,
+        a.group_name,a.guest,a.member_wxid,a.member_nickname,a.data_type,a.is_matching,
+        a.curday,a.curhour,a.curminute,a.work_type,a.remark,a.run_num,a.run_status,
+        a.create_time,a.update_time,a.yn
+    </sql>
+
+    <!-- 查询条件 -->
+    <sql id="Example_Where_Clause">
+        where 1=1
+        <trim  suffixOverrides="," >
+            <if test="id != null and id != '' " >
+                and a.id = #{id}
+            </if>
+            <if test="isMatching != null and isMatching != '' " >
+                and a.is_matching = #{isMatching}
+            </if>
+            <if test="curday != null and curday != '' " >
+                and a.curday = #{curday}
+            </if>
+            <if test="curdayStart != null and curdayStart != '' and curdayEnd != null and curdayEnd != '' " >
+                and a.curday >= #{curdayStart} and a.curday &lt;= #{curdayEnd}
+            </if>
+            <if test="runNum != null and runNum != '' " >
+                and a.run_num &lt; #{runNum}
+            </if>
+            <if test="runStatus != null and runStatus != '' " >
+                and a.run_status &lt; #{runStatus}
+            </if>
+            <if test="workType != null and workType != '' " >
+                and a.work_type = #{workType}
+            </if>
+            and a.yn = 0
+        </trim>
+    </sql>
+
+
+    <!-- 查询条件_id -->
+    <sql id="Example_Where_Clause_id">
+        where 1=1
+        <trim  suffixOverrides="," >
+            <if test="id != null and id != '' " >
+                and a.id = #{id}
+            </if>
+            and a.yn =  0
+        </trim>
+    </sql>
+
+    <!-- 排序条件 -->
+    <sql id="Example_Order_By">
+        order by a.create_time desc
+    </sql>
+
+
+    <!-- 获取可爱猫数据解析的的数据 -->
+    <select id="getCatDataAnalysisList" parameterType="Object" resultType="com.hz.task.master.core.model.cat.CatDataAnalysisModel">
+        select
+        <include refid="Base_Column_List" />
+        from tb_fn_cat_data_analysis a
+        <include refid="Example_Where_Clause"/>
+        limit #{limitNum}
+    </select>
+
+    <!-- 更新可爱猫数据解析数据的状态、运行状态 -->
+    <update id="updateCatDataAnalysisStatus" parameterType="Object">
+        UPDATE tb_fn_cat_data_analysis a
+        <trim prefix="set" suffixOverrides=",">
+            <if test="runNum != null and runNum != '' " >
+                a.run_num = a.run_num + #{runNum},
+            </if>
+            <if test="runStatus != null and runStatus != '' " >
+                a.run_status = #{runStatus},
+            </if>
+            <if test="workType != null and workType != '' " >
+                a.work_type = #{workType},
+            </if>
+            <if test="info != null and info != '' " >
+                a.remark = #{info},
+            </if>
+            a.update_time = NOW(),
+        </trim>
+        where 1=1
+        and a.id = #{id}
+    </update>
+
+
+
+
+</mapper>
