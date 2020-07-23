@@ -414,10 +414,11 @@
         limit 1
     </select>
 
-    <!-- 更新用户收款账号信息 -->
+    <!-- 更新微信群的信息 -->
     <update id="updateDidCollectionAccountByWxData" parameterType="com.hz.task.master.core.model.did.DidCollectionAccountModel">
         UPDATE tb_fn_did_collection_account a
         <trim prefix="set" suffixOverrides=",">
+            a.wx_id = #{wxId},
             a.ac_name = #{acName},
             a.ac_num = #{acNum},
             a.user_id = #{userId},

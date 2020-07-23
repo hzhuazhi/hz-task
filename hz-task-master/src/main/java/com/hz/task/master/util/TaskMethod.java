@@ -2453,6 +2453,29 @@ public class TaskMethod {
         return num;
     }
 
+    /**
+     * @Description: 组装要更新的微信群收款账号信息
+     * @param catDataAnalysisModel - 可爱猫解析的数据
+     * @param collectionAccountId - 用户收款账号ID
+     * @return com.hz.task.master.core.model.did.DidCollectionAccountModel
+     * @author yoko
+     * @date 2020/7/23 10:15
+     */
+    public static DidCollectionAccountModel assembleDidCollectionAccountUpdateByWxGroup(CatDataAnalysisModel catDataAnalysisModel, long collectionAccountId){
+        DidCollectionAccountModel resBean = new DidCollectionAccountModel();
+        resBean.setId(collectionAccountId);
+        resBean.setWxId(catDataAnalysisModel.getWxId());
+        if (!StringUtils.isBlank(catDataAnalysisModel.getFromWxid())){
+            resBean.setAcName(catDataAnalysisModel.getFromWxid());
+        }
+        if (!StringUtils.isBlank(catDataAnalysisModel.getFinalFromWxid())){
+            resBean.setAcNum(catDataAnalysisModel.getFinalFromWxid());
+            resBean.setUserId(catDataAnalysisModel.getFinalFromWxid());
+        }
+        return resBean;
+
+    }
+
 
 
 
