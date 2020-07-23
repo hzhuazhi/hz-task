@@ -2659,6 +2659,21 @@ public class TaskMethod {
         return resBean;
     }
 
+    /**
+     * @Description: 组装查询订单数据的查询条件
+     * @param did - 用户ID
+     * @return
+     * @author yoko
+     * @date 2020/7/23 17:50
+    */
+    public static OrderModel assembleOrderByCreateTime(long did, long collectionAccountId){
+        OrderModel resBean = new OrderModel();
+        resBean.setDid(did);
+        resBean.setCollectionAccountId(collectionAccountId);
+        resBean.setCreateTime(DateUtil.addDateMinute(-30));
+        return resBean;
+    }
+
 
 
 

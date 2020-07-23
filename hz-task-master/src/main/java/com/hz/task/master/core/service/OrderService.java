@@ -138,4 +138,13 @@ public interface OrderService<T> extends BaseService<T> {
      */
     public int updateDidStatus(OrderModel model);
 
+    /**
+     * @Description: 根据用户ID查询目前时间到前30分钟的订单数据
+     * @param model - 查询条件
+     * @return
+     * @author yoko
+     * @date 2020/7/23 17:41
+     */
+    public OrderModel getOrderByDidAndTime(OrderModel model);
+
 }

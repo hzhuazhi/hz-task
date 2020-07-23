@@ -503,4 +503,22 @@
         and a.yn = 0
     </update>
 
+    <!-- 根据用户ID查询目前时间到前30分钟的订单数据-->
+    <select id="getOrderByDidAndTime" parameterType="Object" resultType="com.hz.task.master.core.model.order.OrderModel">
+        select
+            a.id,a.did,a.order_no,a.order_money,a.collection_account_id,a.collection_type,a.qr_code_id,
+            a.qr_code,a.wx_nickname,a.wx_id,a.out_trade_no,a.notify_url,a.order_status,a.invalid_time,
+            a.user_id,a.zfb_ac_num,
+            a.curday,a.curhour,a.curminute,a.run_num,a.run_status,
+            a.create_time,a.update_time,a.yn
+        from tb_fn_order a
+        where 1=1
+        and a.did = #{did}
+        and a.collection_account_id = #{collectionAccountId}
+        and a.create_time >= #{createTime} and a.create_time &lt;= now()
+        and a.yn = 0
+        order by a.create_time desc
+        limit 1
+    </select>
+
 </mapper>

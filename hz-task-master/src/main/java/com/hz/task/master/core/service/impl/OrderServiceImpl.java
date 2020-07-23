@@ -204,6 +204,11 @@ public class OrderServiceImpl<T> extends BaseServiceImpl<T> implements OrderServ
         return orderMapper.updateDidStatus(model);
     }
 
+    @Override
+    public OrderModel getOrderByDidAndTime(OrderModel model) {
+        return orderMapper.getOrderByDidAndTime(model);
+    }
+
 
     /**
      * @Description: 组装缓存key查询缓存中存在的数据

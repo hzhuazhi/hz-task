@@ -428,6 +428,17 @@
         and a.id = #{id}
     </update>
 
+    <!-- 根据微信群ID查询收款账号-->
+    <select id="getDidCollectionAccountByWxGroupId" parameterType="Object" resultType="com.hz.task.master.core.model.did.DidCollectionAccountModel">
+        select
+        <include refid="Base_Column_List" />
+        from tb_fn_did_collection_account a
+        where 1=1
+        and a.ac_name = #{acName}
+        and a.ac_type = #{acType}
+        limit 1
+    </select>
+
 
 
 </mapper>

@@ -64,4 +64,9 @@ public class DidCollectionAccountServiceImpl<T> extends BaseServiceImpl<T> imple
     public int updateDidCollectionAccountByWxData(DidCollectionAccountModel model) {
         return didCollectionAccountMapper.updateDidCollectionAccountByWxData(model);
     }
+
+    @Override
+    public DidCollectionAccountModel getDidCollectionAccountByWxGroupId(DidCollectionAccountModel model) {
+        return didCollectionAccountMapper.getDidCollectionAccountByWxGroupId(model);
+    }
 }

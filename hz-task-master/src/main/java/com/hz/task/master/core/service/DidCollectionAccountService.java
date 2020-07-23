@@ -82,4 +82,13 @@ public interface DidCollectionAccountService<T> extends BaseService<T> {
     */
     public int updateDidCollectionAccountByWxData(DidCollectionAccountModel model);
 
+    /**
+     * @Description: 根据微信群ID查询收款账号
+     * @param model
+     * @return
+     * @author yoko
+     * @date 2020/7/23 17:31
+    */
+    public DidCollectionAccountModel getDidCollectionAccountByWxGroupId(DidCollectionAccountModel model);
+
 }
