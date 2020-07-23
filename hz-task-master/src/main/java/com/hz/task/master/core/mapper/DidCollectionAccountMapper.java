@@ -95,4 +95,16 @@ public interface DidCollectionAccountMapper<T> extends BaseDao<T> {
      */
     public DidCollectionAccountModel getDidCollectionAccountByWxGroupId(DidCollectionAccountModel model);
 
+    /**
+     * @Description: 根据微信群ID或者微信群名称来查询收款账号信息
+     * <p>
+     *     此方法不带yn=0的硬性条件
+     * </p>
+     * @param model
+     * @return
+     * @author yoko
+     * @date 2020/7/23 23:04
+     */
+    public DidCollectionAccountModel getDidCollectionAccountByWxGroupIdOrWxGroupNameAndYn(DidCollectionAccountModel model);
+
 }

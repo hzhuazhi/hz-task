@@ -27,6 +27,7 @@ import com.hz.task.master.core.model.strategy.StrategyZfbMoneyRule;
 import com.hz.task.master.core.model.strategy.StrategyZfbRule;
 import com.hz.task.master.core.model.task.base.StatusModel;
 import com.hz.task.master.core.model.task.cat.CatGuest;
+import com.hz.task.master.core.model.task.cat.CatMember;
 import com.hz.task.master.core.model.task.cat.CatMsg;
 import com.hz.task.master.core.model.task.cat.FromCatModel;
 import com.hz.task.master.core.model.task.client.ClientModel;
@@ -2672,6 +2673,68 @@ public class TaskMethod {
         resBean.setCollectionAccountId(collectionAccountId);
         resBean.setCreateTime(DateUtil.addDateMinute(-30));
         return resBean;
+    }
+
+
+    /**
+     * @Description: 校验数据是否是剔除成员信息
+     * @param msg - 剔除成员信息
+     * @return
+     * @author yoko
+     * @date 2020/7/23 20:54
+    */
+    public static boolean checkCatMember(String msg){
+        boolean flag = false;
+        try {
+
+            CatMember catMember = JSON.parseObject(msg, CatMember.class);
+            flag = true;
+            return flag;
+        }catch (Exception e){
+            return flag;
+        }
+    }
+
+
+    /**
+     * @Description: 组装查询运营数据的方法
+     * @param did - 用户ID
+     * @param wxId - 小微的主键ID
+     * @param collectionAccountId - 收款账号ID
+     * @param groupWxid - 微信群ID
+     * @param groupName - 微信群名称
+     * @param orderNo - 订单号
+     * @param punishType - 处罚类型：1不处罚，2处罚
+     * @return com.hz.task.master.core.model.operate.OperateModel
+     * @author yoko
+     * @date 2020/7/23 22:09
+     */
+    public static OperateModel assembleOperateQuery(long did, long wxId, long collectionAccountId, String groupWxid,
+                                                    String groupName, String orderNo, int punishType){
+        OperateModel resBean = new OperateModel();
+        if (did > 0){
+            resBean.setDid(did);
+        }
+        if (wxId > 0){
+            resBean.setWxId(wxId);
+        }
+        if (collectionAccountId > 0){
+            resBean.setCollectionAccountId(collectionAccountId);
+        }
+        if (!StringUtils.isBlank(groupWxid)){
+            resBean.setGroupWxid(groupWxid);
+        }
+        if (!StringUtils.isBlank(groupName)){
+            resBean.setGroupName(groupName);
+        }
+        if (!StringUtils.isBlank(orderNo)){
+            resBean.setOrderNo(orderNo);
+        }
+        if (punishType > 0){
+            resBean.setPunishType(punishType);
+        }
+        return resBean;
+
     }
 
 
