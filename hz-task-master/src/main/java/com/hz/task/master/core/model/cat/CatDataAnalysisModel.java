@@ -39,6 +39,11 @@ public class CatDataAnalysisModel extends BasePage implements Serializable {
     private String orderMoney;
 
     /**
+     * 订单状态：1初始化，2超时/失败，3有质疑，4成功
+     */
+    private Integer orderStatus;
+
+    /**
      * 可爱猫的final_from_wxid
      */
     private String finalFromWxid;
@@ -421,5 +426,13 @@ public class CatDataAnalysisModel extends BasePage implements Serializable {
 
     public void setMemberNickname(String memberNickname) {
         this.memberNickname = memberNickname;
+    }
+
+    public Integer getOrderStatus() {
+        return orderStatus;
+    }
+
+    public void setOrderStatus(Integer orderStatus) {
+        this.orderStatus = orderStatus;
     }
 }

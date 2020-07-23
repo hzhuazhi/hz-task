@@ -7,7 +7,7 @@
 
     <!-- 定义数据库基本列,只适用代替单表的*-->
     <sql id="Base_Column_List">
-        a.id,a.all_id,a.wx_id,a.order_no,a.order_money,a.final_from_wxid,a.from_name,
+        a.id,a.all_id,a.wx_id,a.order_no,a.order_money,a.order_status,a.final_from_wxid,a.from_name,
         a.final_from_name,a.from_wxid,a.msg,a.msg_type,a.robot_wxid,a.type,a.group_wxid,
         a.group_name,a.guest,a.member_wxid,a.member_nickname,a.data_type,a.is_matching,
         a.curday,a.curhour,a.curminute,a.work_type,a.remark,a.run_num,a.run_status,
@@ -32,6 +32,9 @@
             </if>
             <if test="orderMoney != null and orderMoney != '' " >
                 and a.order_money = #{orderMoney}
+            </if>
+            <if test="orderStatus != null and orderStatus != '' " >
+                and a.order_status = #{orderStatus}
             </if>
             <if test="finalFromWxid != null and finalFromWxid != '' " >
                 and a.final_from_wxid = #{finalFromWxid}
@@ -155,6 +158,9 @@
             <if test="orderMoney != null and orderMoney != '' " >
                 order_money,
             </if>
+            <if test="orderStatus != null and orderStatus != '' " >
+                order_status,
+            </if>
             <if test="finalFromWxid != null and finalFromWxid != '' " >
                 final_from_wxid,
             </if>
@@ -227,6 +233,9 @@
             </if>
             <if test="orderMoney != null and orderMoney != '' " >
                 <![CDATA[  #{orderMoney}, ]]>
+            </if>
+            <if test="orderStatus != null and orderStatus != '' " >
+                <![CDATA[  #{orderStatus}, ]]>
             </if>
             <if test="finalFromWxid != null and finalFromWxid != '' " >
                 <![CDATA[  #{finalFromWxid}, ]]>
@@ -304,6 +313,9 @@
             </if>
             <if test="orderMoney != null and orderMoney != '' " >
                 a.order_money = #{orderMoney},
+            </if>
+            <if test="orderStatus != null and orderStatus != '' " >
+                a.order_status = #{orderStatus}
             </if>
             <if test="finalFromWxid != null and finalFromWxid != '' " >
                 a.final_from_wxid = #{finalFromWxid},

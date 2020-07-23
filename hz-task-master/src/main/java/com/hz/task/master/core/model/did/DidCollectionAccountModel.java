@@ -23,6 +23,8 @@ public class DidCollectionAccountModel extends BasePage implements Serializable 
      */
     private Long did;
 
+
+
     /**
      * 收款账户名称：用户备注使用
      */

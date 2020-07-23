@@ -25,6 +25,7 @@ import com.hz.task.master.core.model.strategy.StrategyModel;
 import com.hz.task.master.core.model.strategy.StrategyZfbMoneyRule;
 import com.hz.task.master.core.model.strategy.StrategyZfbRule;
 import com.hz.task.master.core.model.task.base.StatusModel;
+import com.hz.task.master.core.model.task.cat.CatGuest;
 import com.hz.task.master.core.model.task.cat.CatMsg;
 import com.hz.task.master.core.model.task.cat.FromCatModel;
 import com.hz.task.master.core.model.task.client.ClientModel;
@@ -1526,6 +1527,20 @@ public class TaskMethod {
         return resBean;
     }
 
+    /**
+     * @Description: 修改用户收款账号的审核信息
+     * @param collectionAccountId - 用户收款账号的ID
+     * @return
+     * @author yoko
+     * @date 2020/6/12 23:08
+     */
+    public static DidCollectionAccountModel assembleDidCollectionAccountUpdateCheckDataInfo(long collectionAccountId, String checkInfo){
+        DidCollectionAccountModel resBean = new DidCollectionAccountModel();
+        resBean.setId(collectionAccountId);
+        resBean.setCheckStatus(1);
+        resBean.setCheckInfo(checkInfo);
+        return resBean;
+    }
 
     /**
      * @Description: 组装要修改订单状态的数据
@@ -2474,6 +2489,50 @@ public class TaskMethod {
         }
         return resBean;
 
+    }
+
+    /**
+     * @Description: 校验数据加群数据的正确性
+     * @param guest
+     * @return
+     * @author yoko
+     * @date 2020/7/23 10:47
+    */
+    public static boolean checkCatGuest(String guest){
+        boolean flag = false;
+        if (!StringUtils.isBlank(guest)){
+            try {
+                CatGuest catGuest = JSON.parseObject(guest, CatGuest.class);
+                flag = true;
+                return flag;
+            }catch (Exception e){
+                return flag;
+            }
+        }
+        return flag;
+
+    }
+
+
+    /**
+     * @Description: 组装查询微信群收款账号的查询条件
+     * @param acName - 微信群ID
+     * @param payee - 微信群名称
+     * @param acType - 账号类型：微信群
+     * @return com.hz.task.master.core.model.did.DidCollectionAccountModel
+     * @author yoko
+     * @date 2020/7/23 11:10
+     */
+    public static DidCollectionAccountModel assembleDidCollectionAccountQueryByAcNameAndPayee(String acName, String payee, int acType){
+        DidCollectionAccountModel resBean = new DidCollectionAccountModel();
+        if (!StringUtils.isBlank(acName)){
+            resBean.setAcName(acName);
+        }
+        if (!StringUtils.isBlank(payee)){
+            resBean.setPayee(payee);
+        }
+        resBean.setAcType(acType);
+        return resBean;
     }
 
 

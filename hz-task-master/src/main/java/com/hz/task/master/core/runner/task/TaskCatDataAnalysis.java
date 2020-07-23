@@ -1,5 +1,6 @@
 package com.hz.task.master.core.runner.task;
 
+import com.alibaba.fastjson.JSON;
 import com.hz.task.master.core.common.utils.StringUtil;
 import com.hz.task.master.core.common.utils.constant.CachedKeyUtils;
 import com.hz.task.master.core.common.utils.constant.ServerConstant;
@@ -9,6 +10,8 @@ import com.hz.task.master.core.model.cat.CatDataModel;
 import com.hz.task.master.core.model.did.DidCollectionAccountModel;
 import com.hz.task.master.core.model.order.OrderModel;
 import com.hz.task.master.core.model.task.base.StatusModel;
+import com.hz.task.master.core.model.task.cat.CatGuest;
+import com.hz.task.master.core.model.wx.WxClerkModel;
 import com.hz.task.master.core.model.wx.WxModel;
 import com.hz.task.master.util.ComponentUtil;
 import com.hz.task.master.util.TaskMethod;
@@ -101,6 +104,68 @@ public class TaskCatDataAnalysis {
                             StatusModel statusModel = TaskMethod.assembleUpdateStatusByWorkType(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "根据微信群名称没有找到对应的收款账号");
                             ComponentUtil.taskCatDataAnalysisService.updateCatDataAnalysisStatus(statusModel);
                         }
+                    }else if(data.getDataType() == 4){
+                        // 加群信息
+
+                        // 校验加群信息
+                        boolean flag_guest = TaskMethod.checkCatGuest(data.getGuest());
+                        if (flag_guest){
+                            // 校验加群信息的成员是否是我方小微
+                            CatGuest catGuest = JSON.parseObject(data.getGuest(), CatGuest.class);
+                            WxModel wxQuery = TaskMethod.assembleWxModel(catGuest.wxid);
+                            WxModel wxModel = (WxModel) ComponentUtil.wxService.findByObject(wxQuery);
+                            if (wxModel == null || wxModel.getId() <= 0){
+                                // 不属于我方小微
+
+                                // 根据微信群群名称查询
+                                DidCollectionAccountModel didCollectionAccountByPayeeQuery = TaskMethod.assembleDidCollectionAccountQueryByAcNameAndPayee("", data.getFromName(), 3);
+                                DidCollectionAccountModel didCollectionAccountByPayeeModel = (DidCollectionAccountModel) ComponentUtil.didCollectionAccountService.findByObject(didCollectionAccountByPayeeQuery);
+                                if (didCollectionAccountByPayeeModel != null && didCollectionAccountByPayeeModel.getId() > 0){
+                                    // 能匹配此收款账号
+
+                                    // 判断此收款账号是否有订单正在进行中
+
+                                }else {
+                                    // 说明监控的微信群修改了微信群名称
+                                    // 需要根据微信群ID找出对应的微信群收款账号
+                                    DidCollectionAccountModel didCollectionAccountByAcNameQuery = TaskMethod.assembleDidCollectionAccountQueryByAcNameAndPayee(data.getFromWxid(), "", 3);
+                                    DidCollectionAccountModel didCollectionAccountByAcNameModel = (DidCollectionAccountModel) ComponentUtil.didCollectionAccountService.findByObject(didCollectionAccountByAcNameQuery);
+                                    if (didCollectionAccountByAcNameModel != null && didCollectionAccountByAcNameModel.getId() > 0){
+                                        // 根据找到的微信群收款账号，更新此收款账号的审核状态，更新成审核初始化
+                                        DidCollectionAccountModel didCollectionAccountUpdate = TaskMethod.assembleDidCollectionAccountUpdateCheckDataInfo(didCollectionAccountByAcNameModel.getId(), "检测：微信群名称被修改");
+                                        ComponentUtil.didCollectionAccountService.updateDidCollectionAccountCheckData(didCollectionAccountUpdate);
+
+                                        // 删除小微旗下店员的关联关系
+                                        WxModel wxByWxIdQuery = TaskMethod.assembleWxModel(data.getRobotWxid());
+                                        WxModel wxByWxIdModel = (WxModel) ComponentUtil.wxService.findByObject(wxByWxIdQuery);
+
+                                        WxClerkModel wxClerkUpdate = TaskMethod.assembleWxClerkUpdate(wxByWxIdModel.getId(), didCollectionAccountByAcNameModel.getId());
+                                        ComponentUtil.wxClerkService.updateWxClerkIsYn(wxClerkUpdate);
+
+                                        // 更新此次task的状态：更新成失败-微信群名称被修改
+                                        StatusModel statusModel = TaskMethod.assembleUpdateStatusByWorkType(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "微信群名称被修改");
+                                        ComponentUtil.taskCatDataAnalysisService.updateCatDataAnalysisStatus(statusModel);
+
+                                    }else {
+                                        // 更新此次task的状态：更新成失败-根据微信群、微信ID都没有找到收款账号的相关信息
+                                        StatusModel statusModel = TaskMethod.assembleUpdateStatusByWorkType(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "根据微信群、微信ID都没有找到收款账号的相关信息");
+                                        ComponentUtil.taskCatDataAnalysisService.updateCatDataAnalysisStatus(statusModel);
+                                    }
+                                }
+
+
+                            }else {
+                                // 属于我方小微
+                                // 更新此次task的状态：更新成失败-微信加群信息解析后属于我方小微加群信息
+                                StatusModel statusModel = TaskMethod.assembleUpdateStatusByWorkType(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "微信加群信息解析后属于我方小微加群信息");
+                                ComponentUtil.taskCatDataAnalysisService.updateCatDataAnalysisStatus(statusModel);
+                            }
+                        }else {
+                            // 更新此次task的状态：更新成失败-微信加群信息的内容不符规格
+                            StatusModel statusModel = TaskMethod.assembleUpdateStatusByWorkType(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "微信加群信息的内容不符规格");
+                            ComponentUtil.taskCatDataAnalysisService.updateCatDataAnalysisStatus(statusModel);
+                        }
+
                     }
                     // 解锁
                     ComponentUtil.redisIdService.delLock(lockKey);
