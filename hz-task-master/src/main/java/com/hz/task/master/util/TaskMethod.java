@@ -19,6 +19,7 @@ import com.hz.task.master.core.model.client.ClientDataModel;
 import com.hz.task.master.core.model.did.*;
 import com.hz.task.master.core.model.mobilecard.MobileCardDataModel;
 import com.hz.task.master.core.model.mobilecard.MobileCardModel;
+import com.hz.task.master.core.model.operate.OperateModel;
 import com.hz.task.master.core.model.order.OrderModel;
 import com.hz.task.master.core.model.strategy.StrategyData;
 import com.hz.task.master.core.model.strategy.StrategyModel;
@@ -2502,7 +2503,8 @@ public class TaskMethod {
         boolean flag = false;
         if (!StringUtils.isBlank(guest)){
             try {
-                CatGuest catGuest = JSON.parseObject(guest, CatGuest.class);
+//                CatGuest catGuest = JSON.parseObject(guest, CatGuest.class);
+                List<CatGuest> catGuest = JSON.parseArray(guest, CatGuest.class);
                 flag = true;
                 return flag;
             }catch (Exception e){
@@ -2534,6 +2536,130 @@ public class TaskMethod {
         resBean.setAcType(acType);
         return resBean;
     }
+
+    /**
+     * @Description: 根据用户ID，收款账号ID，支付类型查询用户最新的第一个订单
+     * @param did - 用户ID
+     * @param collectionAccountId - 收款账号ID
+     * @param collectionType - 支付类型：3微信群支付
+     * @return com.hz.task.master.core.model.order.OrderModel
+     * @author yoko
+     * @date 2020/7/23 14:52
+     */
+    public static OrderModel assembleOrderByNewestQuery(long did, long collectionAccountId, int collectionType){
+        OrderModel resBean = new OrderModel();
+        resBean.setDid(did);
+        resBean.setCollectionAccountId(collectionAccountId);
+        resBean.setCollectionType(collectionType);
+        return resBean;
+    }
+
+
+    /**
+     * @Description: 组装运营数据的方法
+     * @param analysisId - 可爱猫数据解析表的主键ID
+     * @param didCollectionAccountModel - 用户收款账号信息
+     * @param orderModel - 订单信息
+     * @param punishType - 处罚类型：1不处罚，2处罚
+     * @param punishMoney - 处罚金额
+     * @param dataType - 数据类型：1初始化，2其它，3加群
+     * @param dataExplain - 数据说明
+     * @param remark - 备注
+     * @param endType - 是否需要操作完毕才能派单类型：1需要处理完毕，2不需要处理完毕；此数据需要处理成功，才能给此用户进行派单
+     * @param wxId - 我放小微的主键ID
+     * @return com.hz.task.master.core.model.operate.OperateModel
+     * @author yoko
+     * @date 2020/7/23 15:07
+     */
+    public static OperateModel assembleOperateData(long analysisId, DidCollectionAccountModel didCollectionAccountModel, OrderModel orderModel,
+                                                  int punishType, String punishMoney, int dataType, String dataExplain, String remark, int endType, long wxId){
+        OperateModel resBean = new OperateModel();
+        resBean.setAnalysisId(analysisId);
+        if (didCollectionAccountModel != null && didCollectionAccountModel.getId() > 0){
+            resBean.setDid(didCollectionAccountModel.getDid());
+            if (didCollectionAccountModel.getWxId() > 0){
+                resBean.setWxId(didCollectionAccountModel.getWxId());
+            }
+            resBean.setCollectionAccountId(didCollectionAccountModel.getId());
+            if (!StringUtils.isBlank(didCollectionAccountModel.getAcName())){
+                resBean.setGroupWxid(didCollectionAccountModel.getAcName());
+            }
+            if (!StringUtils.isBlank(didCollectionAccountModel.getPayee())){
+                resBean.setGroupName(didCollectionAccountModel.getPayee());
+            }
+            if (!StringUtils.isBlank(didCollectionAccountModel.getUserId())){
+                resBean.setUserId(didCollectionAccountModel.getUserId());
+            }
+        }
+        if (wxId > 0){
+            resBean.setWxId(wxId);
+        }
+        if (orderModel != null && orderModel.getId() > 0){
+            resBean.setOrderNo(orderModel.getOrderNo());
+            resBean.setOrderMoney(orderModel.getOrderMoney());
+            resBean.setOrderStatus(orderModel.getOrderStatus());
+        }
+        if (punishType != 0){
+            resBean.setPunishType(punishType);
+        }
+        if (!StringUtils.isBlank(punishMoney)){
+            resBean.setPunishMoney(punishMoney);
+        }
+        if (dataType != 0){
+            resBean.setDataType(dataType);
+        }
+        if (!StringUtils.isBlank(dataExplain)){
+            resBean.setDataExplain(dataExplain);
+        }
+        if (!StringUtils.isBlank(remark)){
+            resBean.setRemark(remark);
+        }
+        if (endType != 0){
+            resBean.setEndType(endType);
+        }
+        return resBean;
+    }
+
+    /**
+     * @Description: 组装填充可爱猫解析的订单信息的方法
+     * @param id - 主键ID
+     * @param orderModel - 订单信息
+     * @return com.hz.task.master.core.model.cat.CatDataAnalysisModel
+     * @author yoko
+     * @date 2020/7/23 15:36
+     */
+    public static CatDataAnalysisModel assembleCatDataAnalysisUpdate(long id, OrderModel orderModel){
+        CatDataAnalysisModel resBean = new CatDataAnalysisModel();
+        resBean.setId(id);
+        resBean.setOrderNo(orderModel.getOrderNo());
+        resBean.setOrderMoney(orderModel.getOrderMoney());
+        resBean.setOrderStatus(orderModel.getOrderStatus());
+        return resBean;
+    }
+
+    /**
+     * @Description: 组装修改订单号的操作状态
+     * @param id - 订单号的主键ID
+     * @param didStatus - 1初始化，2用户加群，3用户发红包，4剔除成员，5收款失败，6收款部分（跟订单金额不相同），7收款成功
+     * @param eliminateType - 剔除成员类型：1初始化，2需要剔除成员，3已剔除支付用户成员
+     * @return com.hz.task.master.core.model.order.OrderModel
+     * @author yoko
+     * @date 2020/7/23 16:00
+     */
+    public static OrderModel assembleOrderUpdateDidStatus(long id, int didStatus, int eliminateType, String remark){
+        OrderModel resBean = new OrderModel();
+        resBean.setId(id);
+        resBean.setDidStatus(didStatus);
+        if (eliminateType != 0){
+            resBean.setEliminateType(eliminateType);
+        }
+        if (!StringUtils.isBlank(remark)){
+            resBean.setRemark(remark);
+        }
+        return resBean;
+    }
+
+
 
 
 

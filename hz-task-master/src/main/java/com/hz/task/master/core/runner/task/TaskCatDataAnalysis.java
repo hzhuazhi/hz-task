@@ -8,6 +8,7 @@ import com.hz.task.master.core.common.utils.constant.TkCacheKey;
 import com.hz.task.master.core.model.cat.CatDataAnalysisModel;
 import com.hz.task.master.core.model.cat.CatDataModel;
 import com.hz.task.master.core.model.did.DidCollectionAccountModel;
+import com.hz.task.master.core.model.operate.OperateModel;
 import com.hz.task.master.core.model.order.OrderModel;
 import com.hz.task.master.core.model.task.base.StatusModel;
 import com.hz.task.master.core.model.task.cat.CatGuest;
@@ -15,6 +16,7 @@ import com.hz.task.master.core.model.wx.WxClerkModel;
 import com.hz.task.master.core.model.wx.WxModel;
 import com.hz.task.master.util.ComponentUtil;
 import com.hz.task.master.util.TaskMethod;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -111,7 +113,8 @@ public class TaskCatDataAnalysis {
                         boolean flag_guest = TaskMethod.checkCatGuest(data.getGuest());
                         if (flag_guest){
                             // 校验加群信息的成员是否是我方小微
-                            CatGuest catGuest = JSON.parseObject(data.getGuest(), CatGuest.class);
+                            List<CatGuest> catGuestList = JSON.parseArray(data.getGuest(), CatGuest.class);
+                            CatGuest catGuest = catGuestList.get(0);
                             WxModel wxQuery = TaskMethod.assembleWxModel(catGuest.wxid);
                             WxModel wxModel = (WxModel) ComponentUtil.wxService.findByObject(wxQuery);
                             if (wxModel == null || wxModel.getId() <= 0){
@@ -124,6 +127,63 @@ public class TaskCatDataAnalysis {
                                     // 能匹配此收款账号
 
                                     // 判断此收款账号是否有订单正在进行中
+                                    OrderModel orderQuery = TaskMethod.assembleOrderByNewestQuery(didCollectionAccountByPayeeModel.getDid(), didCollectionAccountByPayeeModel.getId(), 3);
+                                    OrderModel orderModel = ComponentUtil.orderService.getNewestOrder(orderQuery);
+                                    if (orderModel != null && orderModel.getId() > 0){
+                                        if (orderModel.getOrderStatus() == 1){
+                                            // 订单是初始化状态
+
+                                            // 更新订单的操作状态
+                                            OrderModel orderUpdate = TaskMethod.assembleOrderUpdateDidStatus(orderModel.getId(), 2, 2, "");
+                                            ComponentUtil.orderService.updateDidStatus(orderUpdate);
+
+                                            // 填充可爱猫解析数据：填充对应的订单信息
+                                            CatDataAnalysisModel catDataAnalysisModel = TaskMethod.assembleCatDataAnalysisUpdate(data.getId(), orderModel);
+                                            ComponentUtil.catDataAnalysisService.update(catDataAnalysisModel);
+
+                                            // 更新此次task的状态：更新成成功
+                                            StatusModel statusModel = TaskMethod.assembleUpdateStatusByWorkType(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE, "");
+                                            ComponentUtil.taskCatDataAnalysisService.updateCatDataAnalysisStatus(statusModel);
+
+                                        }else {
+                                            // 订单不是初始化状态，加群已是无效
+
+
+                                            // 订单不是初始化状态，加群已是无效
+                                            String remark = "";
+                                            if (!StringUtils.isBlank(catGuest.getNickname())){
+                                                remark = "闲杂人微信昵称：" + catGuest.getNickname();
+                                            }
+                                            OperateModel operateModel = TaskMethod.assembleOperateData(data.getId(), didCollectionAccountByPayeeModel, null, 0, null, 3,
+                                                    "订单不是初始化状态，加群已是无效", remark , 1, 0);
+                                            ComponentUtil.operateService.add(operateModel);
+
+
+                                            // 填充可爱猫解析数据：填充对应的订单信息
+                                            CatDataAnalysisModel catDataAnalysisModel = TaskMethod.assembleCatDataAnalysisUpdate(data.getId(), orderModel);
+                                            ComponentUtil.catDataAnalysisService.update(catDataAnalysisModel);
+
+                                            // 更新此次task的状态：更新成失败-订单不是初始化状态，加群已是无效
+                                            StatusModel statusModel = TaskMethod.assembleUpdateStatusByWorkType(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "订单不是初始化状态，加群已是无效");
+                                            ComponentUtil.taskCatDataAnalysisService.updateCatDataAnalysisStatus(statusModel);
+
+                                        }
+
+                                    }else {
+                                        // 没有订单在进行中：加群又不属于我方小微且没有指派订单，属于闲杂人加群；需让用户剔除此成员
+                                        String remark = "";
+                                        if (!StringUtils.isBlank(catGuest.getNickname())){
+                                            remark = "闲杂人微信昵称：" + catGuest.getNickname();
+                                        }
+                                        OperateModel operateModel = TaskMethod.assembleOperateData(data.getId(), didCollectionAccountByPayeeModel, null, 0, null, 3,
+                                                "加群又不属于我方小微且没有指派订单，属于闲杂人加群；需让用户剔除此成员", remark , 1, 0);
+                                        ComponentUtil.operateService.add(operateModel);
+
+                                        // 更新此次task的状态：更新成失败-加群又不属于我方小微且没有指派订单，属于闲杂人加群
+                                        StatusModel statusModel = TaskMethod.assembleUpdateStatusByWorkType(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "加群又不属于我方小微且没有指派订单，属于闲杂人加群");
+                                        ComponentUtil.taskCatDataAnalysisService.updateCatDataAnalysisStatus(statusModel);
+                                    }
+
 
                                 }else {
                                     // 说明监控的微信群修改了微信群名称
@@ -142,17 +202,35 @@ public class TaskCatDataAnalysis {
                                         WxClerkModel wxClerkUpdate = TaskMethod.assembleWxClerkUpdate(wxByWxIdModel.getId(), didCollectionAccountByAcNameModel.getId());
                                         ComponentUtil.wxClerkService.updateWxClerkIsYn(wxClerkUpdate);
 
+
+                                        // 说明监控的微信群修改了微信群名称：监控微信群已修改了群名称
+                                        String remark = "我方小微：" + wxByWxIdModel.getWxName() + "需退出群：" + data.getFromName();
+                                        OperateModel operateModel = TaskMethod.assembleOperateData(data.getId(), didCollectionAccountByPayeeModel, null, 0, null, 3,
+                                                "监控微信群已修改了群名称：原群名称《" + didCollectionAccountByAcNameModel.getPayee() + "》，现群名称：《" + data.getFromName()+ "》", remark , 1, wxByWxIdModel.getId());
+                                        ComponentUtil.operateService.add(operateModel);
+
                                         // 更新此次task的状态：更新成失败-微信群名称被修改
                                         StatusModel statusModel = TaskMethod.assembleUpdateStatusByWorkType(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "微信群名称被修改");
                                         ComponentUtil.taskCatDataAnalysisService.updateCatDataAnalysisStatus(statusModel);
 
                                     }else {
+                                        // 说明监控的跑分用户已经删除微信群（服务数据），但是我方小微没有退出微信群
+                                        // 查询我方小微信息
+                                        WxModel wxByWxIdQuery = TaskMethod.assembleWxModel(data.getRobotWxid());
+                                        WxModel wxByWxIdModel = (WxModel) ComponentUtil.wxService.findByObject(wxByWxIdQuery);
+
+                                        // 说明监控的微信群修改了微信群名称：监控微信群已修改了群名称
+                                        String remark = "我方小微：" + wxByWxIdModel.getWxName() + "，需退出群：" + data.getFromName();
+                                        OperateModel operateModel = TaskMethod.assembleOperateData(data.getId(), didCollectionAccountByPayeeModel, null, 0, null, 3,
+                                                "跑分用户已经删除微信群（服务数据），但是我方小微没有退出微信群", remark , 1, wxByWxIdModel.getId());
+                                        ComponentUtil.operateService.add(operateModel);
+
+
                                         // 更新此次task的状态：更新成失败-根据微信群、微信ID都没有找到收款账号的相关信息
                                         StatusModel statusModel = TaskMethod.assembleUpdateStatusByWorkType(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "根据微信群、微信ID都没有找到收款账号的相关信息");
                                         ComponentUtil.taskCatDataAnalysisService.updateCatDataAnalysisStatus(statusModel);
                                     }
                                 }
-
 
                             }else {
                                 // 属于我方小微

@@ -110,4 +110,22 @@ public interface OrderMapper<T> extends BaseDao<T> {
      */
     public String directAllSumMoney(OrderModel model);
 
+    /**
+     * @Description: 根据用户ID加收款账号ID获取最新的一条订单数据
+     * @param model
+     * @return
+     * @author yoko
+     * @date 2020/7/23 14:41
+    */
+    public OrderModel getNewestOrder(OrderModel model);
+
+    /**
+     * @Description: 更新用户操作状态
+     * @param model
+     * @return
+     * @author yoko
+     * @date 2020/7/23 15:44
+    */
+    public int updateDidStatus(OrderModel model);
+
 }

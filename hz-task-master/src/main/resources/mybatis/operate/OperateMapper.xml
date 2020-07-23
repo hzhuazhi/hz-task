@@ -9,7 +9,7 @@
     <sql id="Base_Column_List">
         a.id,a.analysis_id,a.did,a.wx_id,a.collection_account_id,a.group_wxid,a.group_name,a.user_id,
         a.order_no,a.order_money,a.order_status,a.punish_type,a.punish_money,
-        a.data_type,a.data_explain,a.is_ok,a.remark,
+        a.data_type,a.data_explain,a.is_ok,a.end_type,a.remark,
         a.run_num,a.run_status,
         a.create_time,a.update_time,a.yn
     </sql>
@@ -50,6 +50,9 @@
             </if>
             <if test="isOk != null and isOk != '' " >
                 and a.is_ok = #{isOk}
+            </if>
+            <if test="endType != null and endType != '' " >
+                and a.end_type = #{endType}
             </if>
             and a.yn = 0
         </trim>
@@ -179,6 +182,9 @@
             <if test="isOk != null and isOk != '' " >
                 is_ok,
             </if>
+            <if test="endType != null and endType != '' " >
+                end_type,
+            </if>
             <if test="remark != null and remark != '' " >
                 remark,
             </if>
@@ -230,6 +236,9 @@
             </if>
             <if test="isOk != null and isOk != '' " >
                 <![CDATA[  #{isOk}, ]]>
+            </if>
+            <if test="endType != null and endType != '' " >
+                <![CDATA[  #{endType}, ]]>
             </if>
             <if test="remark != null and remark != '' " >
                 <![CDATA[  #{remark}, ]]>
@@ -286,6 +295,9 @@
             </if>
             <if test="isOk != null and isOk != '' " >
                 a.is_ok = #{isOk},
+            </if>
+            <if test="endType != null and endType != '' " >
+                a.end_type = #{endType},
             </if>
             <if test="remark != null and remark != '' " >
                 a.remark = #{remark},

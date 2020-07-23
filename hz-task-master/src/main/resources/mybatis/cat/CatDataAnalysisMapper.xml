@@ -75,7 +75,7 @@
             <if test="id != null and id != '' " >
                 and a.id = #{id}
             </if>
-            and a.yn =  0
+            and a.yn = 0
         </trim>
     </sql>
 
@@ -315,7 +315,7 @@
                 a.order_money = #{orderMoney},
             </if>
             <if test="orderStatus != null and orderStatus != '' " >
-                a.order_status = #{orderStatus}
+                a.order_status = #{orderStatus},
             </if>
             <if test="finalFromWxid != null and finalFromWxid != '' " >
                 a.final_from_wxid = #{finalFromWxid},

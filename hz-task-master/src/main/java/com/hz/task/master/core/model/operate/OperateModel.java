@@ -92,6 +92,12 @@ public class OperateModel extends BasePage implements Serializable {
      * 数据处理状态：1初始化，2处理中，3处理失败，4处理成功
      */
     private Integer isOk;
+
+    /**
+     * 是否需要操作完毕才能派单类型：1需要处理完毕，2不需要处理完毕；此数据需要处理成功，才能给此用户进行派单
+     */
+    private Integer endType;
+
     /**
      * 备注
      */
@@ -296,5 +302,13 @@ public class OperateModel extends BasePage implements Serializable {
 
     public void setYn(Integer yn) {
         this.yn = yn;
+    }
+
+    public Integer getEndType() {
+        return endType;
+    }
+
+    public void setEndType(Integer endType) {
+        this.endType = endType;
     }
 }

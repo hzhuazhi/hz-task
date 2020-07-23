@@ -194,6 +194,16 @@ public class OrderServiceImpl<T> extends BaseServiceImpl<T> implements OrderServ
         return orderMapper.directAllSumMoney(model);
     }
 
+    @Override
+    public OrderModel getNewestOrder(OrderModel model) {
+        return orderMapper.getNewestOrder(model);
+    }
+
+    @Override
+    public int updateDidStatus(OrderModel model) {
+        return orderMapper.updateDidStatus(model);
+    }
+
 
     /**
      * @Description: 组装缓存key查询缓存中存在的数据

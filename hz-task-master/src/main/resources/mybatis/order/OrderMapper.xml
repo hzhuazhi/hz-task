@@ -61,6 +61,50 @@
     </sql>
 
 
+    <!-- 查询条件-two -->
+    <sql id="Example_Where_Clause_Two">
+        where 1=1
+        <trim  suffixOverrides="," >
+            <if test="id != null and id != '' " >
+                and a.id = #{id}
+            </if>
+            <if test="did != null and did != '' " >
+                and a.did = #{did}
+            </if>
+            <if test="orderNo != null and orderNo != '' " >
+                and a.order_no = #{orderNo}
+            </if>
+            <if test="orderMoney != null and orderMoney != '' " >
+                and a.order_money = #{orderMoney}
+            </if>
+            <if test="collectionAccountId != null and collectionAccountId != '' " >
+                and a.collection_account_id = #{collectionAccountId}
+            </if>
+            <if test="collectionType != null and collectionType != '' " >
+                and a.collection_type = #{collectionType}
+            </if>
+            <if test="wxNickname != null and wxNickname != '' " >
+                and a.wx_nickname = #{wxNickname}
+            </if>
+            <if test="wxId != null and wxId != '' " >
+                and a.wx_id = #{wxId}
+            </if>
+            <if test="userId != null and userId != '' " >
+                and a.user_id = #{userId}
+            </if>
+            <if test="orderStatus != null and orderStatus != '' " >
+                and a.order_status = #{orderStatus}
+            </if>
+            <if test="curday != null and curday != '' " >
+                and a.curday = #{curday}
+            </if>
+            <if test="curdayStart != null and curdayStart != '' and curdayEnd != null and curdayEnd != '' " >
+                and a.curday >= #{curdayStart} and a.curday &lt;= #{curdayEnd}
+            </if>
+            and a.yn = 0
+        </trim>
+    </sql>
+
     <!-- 查询条件_id -->
     <sql id="Example_Where_Clause_id">
         where 1=1
@@ -426,5 +470,37 @@
         and a.collection_type = 2
         and a.yn = 0
     </select>
+
+    <!-- 根据用户ID加收款账号ID获取最新的一条订单数据-->
+    <select id="getNewestOrder" parameterType="Object" resultType="com.hz.task.master.core.model.order.OrderModel">
+        select
+        <include refid="Base_Column_List" />
+        from tb_fn_order a left join tb_fn_did_collection_account b on a.collection_account_id = b.id
+        <include refid="Example_Where_Clause_Two"/>
+        <include refid="Example_Order_By"/>
+        limit 1
+    </select>
+
+
+
+    <!-- 更新用户操作状态 -->
+    <update id="updateDidStatus" parameterType="com.hz.task.master.core.model.order.OrderModel">
+        UPDATE tb_fn_order a
+        <trim prefix="set" suffixOverrides=",">
+            <if test="didStatus != null and didStatus != '' " >
+                a.did_status = #{didStatus},
+            </if>
+            <if test="eliminateType != null and eliminateType != '' " >
+                a.eliminate_type = #{eliminateType},
+            </if>
+            <if test="remark != null and remark != '' " >
+                a.remark = #{remark},
+            </if>
+            a.update_time = NOW(),
+        </trim>
+        where 1=1
+        and a.id = #{id}
+        and a.yn = 0
+    </update>
 
 </mapper>
