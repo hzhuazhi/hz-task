@@ -60,7 +60,7 @@ public class TaskCatDataAnalysis {
      * @date 2019/12/6 20:25
      */
 //    @Scheduled(cron = "5 * * * * ?")
-    @Scheduled(fixedDelay = 1000) // 每秒执行
+//    @Scheduled(fixedDelay = 1000) // 每秒执行
     public void catDataAnalysisWorkType() throws Exception{
 //        log.info("----------------------------------TaskCatDataAnalysis.catDataAnalysisWorkType()----start");
 

@@ -2390,14 +2390,27 @@ public class TaskMethod {
      * @param dataType - 数据类型：1初始化，2其它，3发送固定指令3表示审核使用，4加群信息，5发红包，6剔除成员，7成功收款，8收款失败
      * @param allId - 可爱猫原始数据
      * @param wxId - 小微的主键ID
+     * @param did - 用户ID
+     * @param collectionAccountId - 收款账号ID
+     * @param collectionAccountType - 收款账号状态：1初始化，2没找到对应的收款账号，3账号被删除，4账号名称被修改，5正常状态的账号
      * @return com.hz.task.master.core.model.cat.CatDataAnalysisModel
      * @author yoko
      * @date 2020/7/22 16:45
      */
-    public static CatDataAnalysisModel assembleCatDataAnalysisData(FromCatModel fromCatModel, int dataType, long allId, long wxId){
+    public static CatDataAnalysisModel assembleCatDataAnalysisData(FromCatModel fromCatModel, int dataType, long allId, long wxId,
+                                                                   long did, long collectionAccountId, int collectionAccountType){
         CatDataAnalysisModel resBean = new CatDataAnalysisModel();
         resBean.setAllId(allId);
         resBean.setWxId(wxId);
+        if (did > 0){
+            resBean.setDid(did);
+        }
+        if (collectionAccountId > 0){
+            resBean.setCollectionAccountId(collectionAccountId);
+        }
+        if (collectionAccountType > 0){
+            resBean.setCollectionAccountType(collectionAccountType);
+        }
         if (!StringUtils.isBlank(fromCatModel.getFinal_from_wxid())){
             resBean.setFinalFromWxid(fromCatModel.getFinal_from_wxid());
         }
@@ -2449,6 +2462,40 @@ public class TaskMethod {
 
         return resBean;
 
+    }
+
+    /**
+     * @Description: 解析可爱猫数据获得详细数据-加群信息
+     * @param msg
+     * @return
+     * @author yoko
+     * @date 2020/7/25 18:03
+    */
+    public static CatMsg getCatMstData(String msg){
+        CatMsg catMsg = new CatMsg();
+        try{
+            catMsg = JSON.parseObject(msg, CatMsg.class);
+        }catch (Exception e){
+            catMsg = null;
+        }
+        return catMsg;
+    }
+
+    /**
+     * @Description: 解析可爱猫数据获得详细数据-移出群信息
+     * @param msg
+     * @return
+     * @author yoko
+     * @date 2020/7/25 18:03
+     */
+    public static CatMember getCatMemberData(String msg){
+        CatMember catMember = new CatMember();
+        try{
+            catMember = JSON.parseObject(msg, CatMember.class);
+        }catch (Exception e){
+            catMember = null;
+        }
+        return catMember;
     }
 
 
