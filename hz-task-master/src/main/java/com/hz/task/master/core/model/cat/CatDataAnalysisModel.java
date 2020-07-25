@@ -29,6 +29,21 @@ public class CatDataAnalysisModel extends BasePage implements Serializable {
     private Long wxId;
 
     /**
+     * 归属用户ID：对应表tb_fn_did的主键ID
+     */
+    private Long did;
+
+    /**
+     * 用户收款账号ID：对应表tb_fn_did_collection_account的主键ID
+     */
+    private Long collectionAccountId;
+
+    /**
+     * 收款账号状态：1初始化，2没找到对应的收款账号，3账号被删除，4账号名称被修改，5正常状态的账号
+     */
+    private Integer collectionAccountType;
+
+    /**
      * 订单号：订单状态如果成功，则把相对应的订单号录入更新进来
      */
     private String orderNo;
@@ -47,6 +62,26 @@ public class CatDataAnalysisModel extends BasePage implements Serializable {
      * 用户成功收款上报的金额
      */
     private String money;
+
+    /**
+     * 订单超时时间_失效时间
+     */
+    private String invalidTime;
+
+    /**
+     * 支付用户发红包是否超时：1初始化，2已超时，3未超时
+     */
+    private Integer redPackInvalidType;
+
+    /**
+     * 金额是否与上报金额一致：1初始化，2少了，3多了，4一致
+     */
+    private Integer moneyFitType;
+
+    /**
+     * 回复成功or失败是否超时：1初始化，2已超时，3未超时
+     */
+    private Integer replyInvalidType;
 
     /**
      * 可爱猫的final_from_wxid
@@ -447,5 +482,61 @@ public class CatDataAnalysisModel extends BasePage implements Serializable {
 
     public void setMoney(String money) {
         this.money = money;
+    }
+
+    public Long getDid() {
+        return did;
+    }
+
+    public void setDid(Long did) {
+        this.did = did;
+    }
+
+    public Long getCollectionAccountId() {
+        return collectionAccountId;
+    }
+
+    public void setCollectionAccountId(Long collectionAccountId) {
+        this.collectionAccountId = collectionAccountId;
+    }
+
+    public Integer getCollectionAccountType() {
+        return collectionAccountType;
+    }
+
+    public void setCollectionAccountType(Integer collectionAccountType) {
+        this.collectionAccountType = collectionAccountType;
+    }
+
+    public String getInvalidTime() {
+        return invalidTime;
+    }
+
+    public void setInvalidTime(String invalidTime) {
+        this.invalidTime = invalidTime;
+    }
+
+    public Integer getRedPackInvalidType() {
+        return redPackInvalidType;
+    }
+
+    public void setRedPackInvalidType(Integer redPackInvalidType) {
+        this.redPackInvalidType = redPackInvalidType;
+    }
+
+    public Integer getMoneyFitType() {
+        return moneyFitType;
+    }
+
+    public void setMoneyFitType(Integer moneyFitType) {
+        this.moneyFitType = moneyFitType;
+    }
+
+    public Integer getReplyInvalidType() {
+        return replyInvalidType;
+    }
+
+    public void setReplyInvalidType(Integer replyInvalidType) {
+        this.replyInvalidType = replyInvalidType;
     }
 }
