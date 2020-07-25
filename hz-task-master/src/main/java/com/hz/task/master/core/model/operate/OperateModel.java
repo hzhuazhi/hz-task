@@ -69,6 +69,11 @@ public class OperateModel extends BasePage implements Serializable {
     private Integer orderStatus;
 
     /**
+     * 用户成功收款上报的金额
+     */
+    private String money;
+
+    /**
      * 处罚类型：1不处罚，2处罚
      */
     private Integer punishType;
@@ -310,5 +315,13 @@ public class OperateModel extends BasePage implements Serializable {
 
     public void setEndType(Integer endType) {
         this.endType = endType;
+    }
+
+    public String getMoney() {
+        return money;
+    }
+
+    public void setMoney(String money) {
+        this.money = money;
     }
 }

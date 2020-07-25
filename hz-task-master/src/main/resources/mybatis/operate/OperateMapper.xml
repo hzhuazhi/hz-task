@@ -8,7 +8,7 @@
     <!-- 定义数据库基本列,只适用代替单表的*-->
     <sql id="Base_Column_List">
         a.id,a.analysis_id,a.did,a.wx_id,a.collection_account_id,a.group_wxid,a.group_name,a.user_id,
-        a.order_no,a.order_money,a.order_status,a.punish_type,a.punish_money,
+        a.order_no,a.order_money,a.order_status,a.money,a.punish_type,a.punish_money,
         a.data_type,a.data_explain,a.is_ok,a.end_type,a.remark,
         a.run_num,a.run_status,
         a.create_time,a.update_time,a.yn
@@ -167,6 +167,9 @@
             <if test="orderStatus != null and orderStatus != '' " >
                 order_status,
             </if>
+            <if test="money != null and money != '' " >
+                money,
+            </if>
             <if test="punishType != null and punishType != '' " >
                 punish_type,
             </if>
@@ -221,6 +224,9 @@
             </if>
             <if test="orderStatus != null and orderStatus != '' " >
                 <![CDATA[  #{orderStatus}, ]]>
+            </if>
+            <if test="money != null and money != '' " >
+                <![CDATA[  #{money}, ]]>
             </if>
             <if test="punishType != null and punishType != '' " >
                 <![CDATA[  #{punishType}, ]]>
@@ -280,6 +286,9 @@
             </if>
             <if test="orderStatus != null and orderStatus != '' " >
                 a.order_status = #{orderStatus}
+            </if>
+            <if test="money != null and money != '' " >
+                a.money = #{money}
             </if>
             <if test="punishType != null and punishType != '' " >
                 a.punish_type = #{punishType},

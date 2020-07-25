@@ -2322,10 +2322,33 @@ public class TaskMethod {
             num = 8;
         }else if (msg.equals("收到红包，请在手机上查看")){
             num = 5;
-        }else if(msg.substring(0,2).equals("你被") && msg.substring(msg.length() - 4, msg.length()).equals("移出群聊")){
-            num = 6;
-        }else if(msg.indexOf("1#") > -1){
-            num = 7;
+        }
+//        else if(msg.substring(0,2).equals("你被") && msg.substring(msg.length() - 4, msg.length()).equals("移出群聊")){
+//            num = 6;
+//        }
+        else if(msg.indexOf("1#") > -1){
+            String [] fg_msg = msg.split("#");
+            if (fg_msg.length == 2){
+                String money = fg_msg[1];
+                // 金额是否有效
+                if (money.indexOf(".") > -1){
+                    boolean flag = StringUtil.isNumberByMoney(money);
+                    if (flag){
+                        num = 7;
+                    }else {
+                        num = 2;
+                    }
+                }else {
+                    boolean flag = StringUtil.isNumer(money);
+                    if (flag){
+                        num = 7;
+                    }else {
+                        num = 2;
+                    }
+                }
+            }else {
+                num = 2;
+            }
         }else{
             num = 2;
         }
@@ -2568,12 +2591,13 @@ public class TaskMethod {
      * @param remark - 备注
      * @param endType - 是否需要操作完毕才能派单类型：1需要处理完毕，2不需要处理完毕；此数据需要处理成功，才能给此用户进行派单
      * @param wxId - 我放小微的主键ID
+     * @param money - 用户上报的成功金额
      * @return com.hz.task.master.core.model.operate.OperateModel
      * @author yoko
      * @date 2020/7/23 15:07
      */
     public static OperateModel assembleOperateData(long analysisId, DidCollectionAccountModel didCollectionAccountModel, OrderModel orderModel,
-                                                  int punishType, String punishMoney, int dataType, String dataExplain, String remark, int endType, long wxId){
+                                                  int punishType, String punishMoney, int dataType, String dataExplain, String remark, int endType, long wxId, String money){
         OperateModel resBean = new OperateModel();
         resBean.setAnalysisId(analysisId);
         if (didCollectionAccountModel != null && didCollectionAccountModel.getId() > 0){
@@ -2618,6 +2642,9 @@ public class TaskMethod {
         if (endType != 0){
             resBean.setEndType(endType);
         }
+        if (!StringUtils.isBlank(money)){
+            resBean.setMoney(money);
+        }
         return resBean;
     }
 
@@ -2625,16 +2652,20 @@ public class TaskMethod {
      * @Description: 组装填充可爱猫解析的订单信息的方法
      * @param id - 主键ID
      * @param orderModel - 订单信息
+     * @param money - 用户上报的成功金额
      * @return com.hz.task.master.core.model.cat.CatDataAnalysisModel
      * @author yoko
      * @date 2020/7/23 15:36
      */
-    public static CatDataAnalysisModel assembleCatDataAnalysisUpdate(long id, OrderModel orderModel){
+    public static CatDataAnalysisModel assembleCatDataAnalysisUpdate(long id, OrderModel orderModel, String money){
         CatDataAnalysisModel resBean = new CatDataAnalysisModel();
         resBean.setId(id);
         resBean.setOrderNo(orderModel.getOrderNo());
         resBean.setOrderMoney(orderModel.getOrderMoney());
         resBean.setOrderStatus(orderModel.getOrderStatus());
+        if (!StringUtils.isBlank(money)){
+            resBean.setMoney(money);
+        }
         return resBean;
     }
 

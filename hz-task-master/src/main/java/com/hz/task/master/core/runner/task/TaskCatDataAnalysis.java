@@ -139,7 +139,7 @@ public class TaskCatDataAnalysis {
                                             ComponentUtil.orderService.updateDidStatus(orderUpdate);
 
                                             // 填充可爱猫解析数据：填充对应的订单信息
-                                            CatDataAnalysisModel catDataAnalysisModel = TaskMethod.assembleCatDataAnalysisUpdate(data.getId(), orderModel);
+                                            CatDataAnalysisModel catDataAnalysisModel = TaskMethod.assembleCatDataAnalysisUpdate(data.getId(), orderModel, null);
                                             ComponentUtil.catDataAnalysisService.update(catDataAnalysisModel);
 
                                             // 更新此次task的状态：更新成成功
@@ -156,12 +156,12 @@ public class TaskCatDataAnalysis {
                                                 remark = "闲杂人微信昵称：" + catGuest.getNickname();
                                             }
                                             OperateModel operateModel = TaskMethod.assembleOperateData(data.getId(), didCollectionAccountByPayeeModel, null, 0, null, 3,
-                                                    "订单不是初始化状态，加群已是无效", remark , 1, 0);
+                                                    "订单不是初始化状态，加群已是无效", remark , 1, 0, null);
                                             ComponentUtil.operateService.add(operateModel);
 
 
                                             // 填充可爱猫解析数据：填充对应的订单信息
-                                            CatDataAnalysisModel catDataAnalysisModel = TaskMethod.assembleCatDataAnalysisUpdate(data.getId(), orderModel);
+                                            CatDataAnalysisModel catDataAnalysisModel = TaskMethod.assembleCatDataAnalysisUpdate(data.getId(), orderModel, null);
                                             ComponentUtil.catDataAnalysisService.update(catDataAnalysisModel);
 
                                             // 更新此次task的状态：更新成失败-订单不是初始化状态，加群已是无效
@@ -177,7 +177,7 @@ public class TaskCatDataAnalysis {
                                             remark = "闲杂人微信昵称：" + catGuest.getNickname();
                                         }
                                         OperateModel operateModel = TaskMethod.assembleOperateData(data.getId(), didCollectionAccountByPayeeModel, null, 0, null, 3,
-                                                "加群又不属于我方小微且没有指派订单，属于闲杂人加群；需让用户剔除此成员", remark , 1, 0);
+                                                "加群又不属于我方小微且没有指派订单，属于闲杂人加群；需让用户剔除此成员", remark , 1, 0, null);
                                         ComponentUtil.operateService.add(operateModel);
 
                                         // 更新此次task的状态：更新成失败-加群又不属于我方小微且没有指派订单，属于闲杂人加群
@@ -207,7 +207,7 @@ public class TaskCatDataAnalysis {
                                         // 说明监控的微信群修改了微信群名称：监控微信群已修改了群名称
                                         String remark = "我方小微：" + wxByWxIdModel.getWxName() + "需退出群：" + data.getFromName();
                                         OperateModel operateModel = TaskMethod.assembleOperateData(data.getId(), didCollectionAccountByPayeeModel, null, 0, null, 3,
-                                                "监控微信群已修改了群名称：原群名称《" + didCollectionAccountByAcNameModel.getPayee() + "》，现群名称：《" + data.getFromName()+ "》", remark , 2, wxByWxIdModel.getId());
+                                                "监控微信群已修改了群名称：原群名称《" + didCollectionAccountByAcNameModel.getPayee() + "》，现群名称：《" + data.getFromName()+ "》", remark , 2, wxByWxIdModel.getId(),null);
                                         ComponentUtil.operateService.add(operateModel);
 
                                         // 更新此次task的状态：更新成失败-微信群名称被修改
@@ -223,7 +223,7 @@ public class TaskCatDataAnalysis {
                                         // 说明监控的微信群修改了微信群名称：监控微信群已修改了群名称
                                         String remark = "我方小微：" + wxByWxIdModel.getWxName() + "，需退出群：" + data.getFromName();
                                         OperateModel operateModel = TaskMethod.assembleOperateData(data.getId(), didCollectionAccountByPayeeModel, null, 0, null, 3,
-                                                "跑分用户已经删除微信群（服务数据），但是我方小微没有退出微信群", remark , 2, wxByWxIdModel.getId());
+                                                "跑分用户已经删除微信群（服务数据），但是我方小微没有退出微信群", remark , 2, wxByWxIdModel.getId(),null);
                                         ComponentUtil.operateService.add(operateModel);
 
 
@@ -263,7 +263,7 @@ public class TaskCatDataAnalysis {
                                     ComponentUtil.orderService.updateDidStatus(orderUpdate);
 
                                     // 填充可爱猫解析数据：填充对应的订单信息
-                                    CatDataAnalysisModel catDataAnalysisModel = TaskMethod.assembleCatDataAnalysisUpdate(data.getId(), orderModel);
+                                    CatDataAnalysisModel catDataAnalysisModel = TaskMethod.assembleCatDataAnalysisUpdate(data.getId(), orderModel, null);
                                     ComponentUtil.catDataAnalysisService.update(catDataAnalysisModel);
 
                                     // 更新此次task的状态：更新成成功状态
@@ -277,7 +277,7 @@ public class TaskCatDataAnalysis {
                                     ComponentUtil.orderService.updateDidStatus(orderUpdate);
 
                                     // 填充可爱猫解析数据：填充对应的订单信息
-                                    CatDataAnalysisModel catDataAnalysisModel = TaskMethod.assembleCatDataAnalysisUpdate(data.getId(), orderModel);
+                                    CatDataAnalysisModel catDataAnalysisModel = TaskMethod.assembleCatDataAnalysisUpdate(data.getId(), orderModel, null);
                                     ComponentUtil.catDataAnalysisService.update(catDataAnalysisModel);
 
                                     // 更新此次task的状态：更新成失败-订单超时之后才发的红包
@@ -319,11 +319,11 @@ public class TaskCatDataAnalysis {
                                     if (orderByTimeData.getOrderStatus() <= 2){
                                         // 在30分钟之内有超时订单，直接罚款此用户
                                         OperateModel operateModel = TaskMethod.assembleOperateData(data.getId(), didCollectionAccountByPayeeModel, orderByTimeData, 2, orderByTimeData.getOrderMoney(), 4,
-                                                "微信群名称被修改，但是在30分钟之内有初始化或超时订单，直接罚款此用户", null , 1, wxByWxIdModel.getId());
+                                                "微信群名称被修改，但是在30分钟之内有初始化或超时订单，直接罚款此用户", null , 1, wxByWxIdModel.getId(),null);
                                         ComponentUtil.operateService.add(operateModel);
 
                                         // 填充可爱猫解析数据：填充对应的订单信息
-                                        CatDataAnalysisModel catDataAnalysisModel = TaskMethod.assembleCatDataAnalysisUpdate(data.getId(), orderByTimeData);
+                                        CatDataAnalysisModel catDataAnalysisModel = TaskMethod.assembleCatDataAnalysisUpdate(data.getId(), orderByTimeData, null);
                                         ComponentUtil.catDataAnalysisService.update(catDataAnalysisModel);
                                     }
                                 }
@@ -333,7 +333,7 @@ public class TaskCatDataAnalysis {
                                 // 发红包-说明监控的微信群修改了微信群名称：监控微信群已修改了群名称
                                 String remark = "我方小微：" + wxByWxIdModel.getWxName() + "需退出群：" + data.getFromName();
                                 OperateModel operateModel = TaskMethod.assembleOperateData(data.getId(), didCollectionAccountByPayeeModel, null, 0, null, 4,
-                                        "监控微信群已修改了群名称：原群名称《" + didCollectionAccountByAcNameModel.getPayee() + "》，现群名称：《" + data.getFromName()+ "》", remark , 2, wxByWxIdModel.getId());
+                                        "监控微信群已修改了群名称：原群名称《" + didCollectionAccountByAcNameModel.getPayee() + "》，现群名称：《" + data.getFromName()+ "》", remark , 2, wxByWxIdModel.getId(),null);
                                 ComponentUtil.operateService.add(operateModel);
 
                                 // 更新此次task的状态：更新成失败-微信群名称被修改
@@ -358,11 +358,11 @@ public class TaskCatDataAnalysis {
                                         if (orderByTimeData.getOrderStatus() <= 2){
                                             // 在30分钟之内有超时订单，直接罚款此用户
                                             OperateModel operateModel = TaskMethod.assembleOperateData(data.getId(), didCollectionAccountByPayeeModel, orderByTimeData, 2, orderByTimeData.getOrderMoney(), 4,
-                                                    "跑分用户已经删除微信群（服务数据），但是在30分钟之内有初始化或超时订单，直接罚款此用户", null , 1, wxByWxIdModel.getId());
+                                                    "跑分用户已经删除微信群（服务数据），但是在30分钟之内有初始化或超时订单，直接罚款此用户", null , 1, wxByWxIdModel.getId(),null);
                                             ComponentUtil.operateService.add(operateModel);
 
                                             // 填充可爱猫解析数据：填充对应的订单信息
-                                            CatDataAnalysisModel catDataAnalysisModel = TaskMethod.assembleCatDataAnalysisUpdate(data.getId(), orderByTimeData);
+                                            CatDataAnalysisModel catDataAnalysisModel = TaskMethod.assembleCatDataAnalysisUpdate(data.getId(), orderByTimeData, null);
                                             ComponentUtil.catDataAnalysisService.update(catDataAnalysisModel);
                                         }
                                     }
@@ -372,7 +372,7 @@ public class TaskCatDataAnalysis {
                                 // 发红包-说明监控的微信群修改了微信群名称：监控微信群已修改了群名称
                                 String remark = "我方小微：" + wxByWxIdModel.getWxName() + "，需退出群：" + data.getFromName() +"；另外需要人工查看此时用户是否有挂单，如果有挂单，需强制修改订单状态！";
                                 OperateModel operateModel = TaskMethod.assembleOperateData(data.getId(), didCollectionAccountByPayeeModel, null, 0, null, 4,
-                                        "跑分用户已经删除微信群（服务数据），但是我方小微没有退出微信群", remark , 2, wxByWxIdModel.getId());
+                                        "跑分用户已经删除微信群（服务数据），但是我方小微没有退出微信群", remark , 2, wxByWxIdModel.getId(),null);
                                 ComponentUtil.operateService.add(operateModel);
 
 
@@ -420,7 +420,7 @@ public class TaskCatDataAnalysis {
                                                         ComponentUtil.orderService.updateDidStatus(orderUpdate);
 
                                                         // 填充可爱猫解析数据：填充对应的订单信息
-                                                        CatDataAnalysisModel catDataAnalysisModel = TaskMethod.assembleCatDataAnalysisUpdate(data.getId(), orderModel);
+                                                        CatDataAnalysisModel catDataAnalysisModel = TaskMethod.assembleCatDataAnalysisUpdate(data.getId(), orderModel, null);
                                                         ComponentUtil.catDataAnalysisService.update(catDataAnalysisModel);
 
                                                         // 更新此次task的状态：更新成成功状态
@@ -429,12 +429,12 @@ public class TaskCatDataAnalysis {
                                                     }else if(orderModel.getOrderStatus() == 2){
                                                         // 订单已超时
 
-                                                        // 更新订单的操作状态-修改成发红包状态
+                                                        // 更新订单的操作状态-修改成剔除成员状态
                                                         OrderModel orderUpdate = TaskMethod.assembleOrderUpdateDidStatus(orderModel.getId(), 4, 3, "订单超时，支付用户被剔除");
                                                         ComponentUtil.orderService.updateDidStatus(orderUpdate);
 
                                                         // 填充可爱猫解析数据：填充对应的订单信息
-                                                        CatDataAnalysisModel catDataAnalysisModel = TaskMethod.assembleCatDataAnalysisUpdate(data.getId(), orderModel);
+                                                        CatDataAnalysisModel catDataAnalysisModel = TaskMethod.assembleCatDataAnalysisUpdate(data.getId(), orderModel, null);
                                                         ComponentUtil.catDataAnalysisService.update(catDataAnalysisModel);
 
                                                         // 更新此次task的状态：更新成失败-订单超时之后才剔除支付用户的
@@ -442,7 +442,7 @@ public class TaskCatDataAnalysis {
                                                         ComponentUtil.taskCatDataAnalysisService.updateCatDataAnalysisStatus(statusModel);
                                                     }else{
                                                         // 更新订单的操作状态-修改成剔除成员状态
-                                                        OrderModel orderUpdate = TaskMethod.assembleOrderUpdateDidStatus(orderModel.getId(), 4, 3, "订单超时，支付用户被剔除");
+                                                        OrderModel orderUpdate = TaskMethod.assembleOrderUpdateDidStatus(orderModel.getId(), 4, 3, "订单成功状态时，支付用户被剔除");
                                                         ComponentUtil.orderService.updateDidStatus(orderUpdate);
 
                                                         // 更新此次task的状态：更新成失败-脏数据：订单有质疑或者订单成功了，才踢除支付用户
@@ -480,12 +480,12 @@ public class TaskCatDataAnalysis {
                                                             // 没有被处罚过
                                                             // 在30分钟之内有超时订单，直接罚款此用户
                                                             OperateModel operateModel = TaskMethod.assembleOperateData(data.getId(), didCollectionAccountByWxGroupIdOrWxGroupNameAndYnModel, orderByTimeData, 2, orderByTimeData.getOrderMoney(), 6,
-                                                                    "微信群名称被修改，但是在30分钟之内有初始化或超时订单，直接罚款此用户", null , 1, myWxModel.getId());
+                                                                    "微信群名称被修改，但是在30分钟之内有初始化或超时订单，直接罚款此用户", null , 1, myWxModel.getId(),null);
                                                             ComponentUtil.operateService.add(operateModel);
                                                         }
 
                                                         // 填充可爱猫解析数据：填充对应的订单信息
-                                                        CatDataAnalysisModel catDataAnalysisModel = TaskMethod.assembleCatDataAnalysisUpdate(data.getId(), orderByTimeData);
+                                                        CatDataAnalysisModel catDataAnalysisModel = TaskMethod.assembleCatDataAnalysisUpdate(data.getId(), orderByTimeData, null);
                                                         ComponentUtil.catDataAnalysisService.update(catDataAnalysisModel);
                                                     }
                                                 }
@@ -493,7 +493,7 @@ public class TaskCatDataAnalysis {
                                                 // 删除成员-说明监控的微信群修改了微信群名称：监控微信群已修改了群名称
                                                 String remark = "我方小微：" + myWxModel.getWxName() + "需退出群：" + data.getFromName();
                                                 OperateModel operateModel = TaskMethod.assembleOperateData(data.getId(), didCollectionAccountByWxGroupIdOrWxGroupNameAndYnModel, null, 0, null, 6,
-                                                        "监控微信群已修改了群名称：原群名称《" + didCollectionAccountByWxGroupIdOrWxGroupNameAndYnModel.getPayee() + "》，现群名称：《" + data.getFromName()+ "》", remark , 2, myWxModel.getId());
+                                                        "监控微信群已修改了群名称：原群名称《" + didCollectionAccountByWxGroupIdOrWxGroupNameAndYnModel.getPayee() + "》，现群名称：《" + data.getFromName()+ "》", remark , 2, myWxModel.getId(),null);
                                                 ComponentUtil.operateService.add(operateModel);
 
                                                 // 更新此次task的状态：更新成失败-微信群名称被修改
@@ -515,12 +515,12 @@ public class TaskCatDataAnalysis {
                                                         // 没有被处罚过
                                                         // 在30分钟之内有超时订单，直接罚款此用户
                                                         OperateModel operateModel = TaskMethod.assembleOperateData(data.getId(), didCollectionAccountByWxGroupIdOrWxGroupNameAndYnModel, orderByTimeData, 2, orderByTimeData.getOrderMoney(), 6,
-                                                                "踢出微信支付用户时，并且删除微信群（服务数据），并且此订单有支付用户进入，而且在30分钟之内有初始化或超时订单，直接罚款此用户", null , 1, myWxModel.getId());
+                                                                "踢出微信支付用户时，并且删除微信群（服务数据），并且此订单有支付用户进入，而且在30分钟之内有初始化或超时订单，直接罚款此用户", null , 1, myWxModel.getId(),null);
                                                         ComponentUtil.operateService.add(operateModel);
                                                     }
 
                                                     // 填充可爱猫解析数据：填充对应的订单信息
-                                                    CatDataAnalysisModel catDataAnalysisModel = TaskMethod.assembleCatDataAnalysisUpdate(data.getId(), orderByTimeData);
+                                                    CatDataAnalysisModel catDataAnalysisModel = TaskMethod.assembleCatDataAnalysisUpdate(data.getId(), orderByTimeData, null);
                                                     ComponentUtil.catDataAnalysisService.update(catDataAnalysisModel);
                                                 }
                                             }
@@ -534,7 +534,7 @@ public class TaskCatDataAnalysis {
                                         // 剔除成员-说明小微错误加错群：因为根据微信群名称or微信群ID以及去掉yn没有查到对应的收款账号
                                         String remark = "我方小微：" + myWxModel.getWxName() + "，需退出群：" + data.getFromName() ;
                                         OperateModel operateModel = TaskMethod.assembleOperateData(data.getId(), didCollectionAccountByWxGroupIdOrWxGroupNameAndYnModel, null, 0, null, 6,
-                                                "说明小微错误加错群：因为根据微信群名称or微信群ID以及去掉yn没有查到对应的收款账号", remark , 2, myWxModel.getId());
+                                                "说明小微错误加错群：因为根据微信群名称or微信群ID以及去掉yn没有查到对应的收款账号", remark , 2, myWxModel.getId(),null);
                                         ComponentUtil.operateService.add(operateModel);
 
                                         // 更新此次task的状态：更新成失败-剔除成员：根据微信群名称or微信群ID查询收款账号-没有找到对应的收款账号
@@ -577,12 +577,12 @@ public class TaskCatDataAnalysis {
                                                 // 没有被处罚过
                                                 // 在30分钟之内有超时订单，直接罚款此用户
                                                 OperateModel operateModel = TaskMethod.assembleOperateData(data.getId(), didCollectionAccountByPayeeModel, orderByTimeData, 2, orderByTimeData.getOrderMoney(), 5,
-                                                        "删除我方小微，并且此订单有支付用户进入，而且在30分钟之内有初始化或超时订单，直接罚款此用户", null , 1, wxModel.getId());
+                                                        "删除我方小微，并且此订单有支付用户进入，而且在30分钟之内有初始化或超时订单，直接罚款此用户", null , 1, wxModel.getId(),null);
                                                 ComponentUtil.operateService.add(operateModel);
                                             }
                                         }
                                         // 填充可爱猫解析数据：填充对应的订单信息
-                                        CatDataAnalysisModel catDataAnalysisModel = TaskMethod.assembleCatDataAnalysisUpdate(data.getId(), orderByTimeData);
+                                        CatDataAnalysisModel catDataAnalysisModel = TaskMethod.assembleCatDataAnalysisUpdate(data.getId(), orderByTimeData, null);
                                         ComponentUtil.catDataAnalysisService.update(catDataAnalysisModel);
                                     }
                                     // 更新此次task的状态：更新成失败状态：我方小微被剔除微信群
@@ -614,12 +614,12 @@ public class TaskCatDataAnalysis {
                                                     // 没有被处罚过
                                                     // 在30分钟之内有超时订单，直接罚款此用户
                                                     OperateModel operateModel = TaskMethod.assembleOperateData(data.getId(), didCollectionAccountByPayeeModel, orderByTimeData, 2, orderByTimeData.getOrderMoney(), 5,
-                                                            "删除我方小微，并且修改微信群名称，并且此订单有支付用户进入，而且在30分钟之内有初始化或超时订单，直接罚款此用户", null , 1, wxModel.getId());
+                                                            "删除我方小微，并且修改微信群名称，并且此订单有支付用户进入，而且在30分钟之内有初始化或超时订单，直接罚款此用户", null , 1, wxModel.getId(),null);
                                                     ComponentUtil.operateService.add(operateModel);
                                                 }
                                             }
                                             // 填充可爱猫解析数据：填充对应的订单信息
-                                            CatDataAnalysisModel catDataAnalysisModel = TaskMethod.assembleCatDataAnalysisUpdate(data.getId(), orderByTimeData);
+                                            CatDataAnalysisModel catDataAnalysisModel = TaskMethod.assembleCatDataAnalysisUpdate(data.getId(), orderByTimeData, null);
                                             ComponentUtil.catDataAnalysisService.update(catDataAnalysisModel);
                                         }
                                         // 更新此次task的状态：更新成失败状态：我方小微被剔除微信群，并且微信群名称被修改
@@ -643,12 +643,12 @@ public class TaskCatDataAnalysis {
                                                         // 没有被处罚过
                                                         // 在30分钟之内有超时订单，直接罚款此用户
                                                         OperateModel operateModel = TaskMethod.assembleOperateData(data.getId(), didCollectionAccountByPayeeModel, orderByTimeData, 2, orderByTimeData.getOrderMoney(), 5,
-                                                                "删除我方小微，并且删除微信群（服务数据），并且此订单有支付用户进入，而且在30分钟之内有初始化或超时订单，直接罚款此用户", null , 1, wxModel.getId());
+                                                                "删除我方小微，并且删除微信群（服务数据），并且此订单有支付用户进入，而且在30分钟之内有初始化或超时订单，直接罚款此用户", null , 1, wxModel.getId(),null);
                                                         ComponentUtil.operateService.add(operateModel);
                                                     }
 
                                                     // 填充可爱猫解析数据：填充对应的订单信息
-                                                    CatDataAnalysisModel catDataAnalysisModel = TaskMethod.assembleCatDataAnalysisUpdate(data.getId(), orderByTimeData);
+                                                    CatDataAnalysisModel catDataAnalysisModel = TaskMethod.assembleCatDataAnalysisUpdate(data.getId(), orderByTimeData, null);
                                                     ComponentUtil.catDataAnalysisService.update(catDataAnalysisModel);
                                                 }
                                             }
@@ -673,6 +673,172 @@ public class TaskCatDataAnalysis {
 
                         }
 
+                    }else if(data.getDataType() == 7){
+                        // 成功收款
+                        // 根据监控robot_wxid找出我方小微
+                        WxModel wxQueryByRobotWxid = TaskMethod.assembleWxModel(data.getRobotWxid());
+                        WxModel myWxModel = (WxModel) ComponentUtil.wxService.findByObject(wxQueryByRobotWxid);
+                        if (myWxModel != null && myWxModel.getId() > 0){
+                            int actionType = 0; // 1表示收款账号正常，2表示收款账号名称被更改，3收款账号被删除（服务数据），4没找到对应的收款账号
+                            // 成功收款-根据微信群名称or微信群ID查询收款账号
+                            DidCollectionAccountModel didCollectionAccountByWxGroupIdOrWxGroupNameAndYnQuery = TaskMethod.assembleDidCollectionAccountQueryByAcNameAndPayee(data.getFromWxid(), data.getFromName(), 3);
+                            DidCollectionAccountModel didCollectionAccountByWxGroupIdOrWxGroupNameAndYnModel = ComponentUtil.didCollectionAccountService.getDidCollectionAccountByWxGroupIdOrWxGroupNameAndYn(didCollectionAccountByWxGroupIdOrWxGroupNameAndYnQuery);
+                            if (didCollectionAccountByWxGroupIdOrWxGroupNameAndYnModel != null && didCollectionAccountByWxGroupIdOrWxGroupNameAndYnModel.getId() > 0){
+                                if (didCollectionAccountByWxGroupIdOrWxGroupNameAndYnModel.getYn() == null || didCollectionAccountByWxGroupIdOrWxGroupNameAndYnModel.getYn() == 0){
+                                    if (data.getFromName().equals(didCollectionAccountByWxGroupIdOrWxGroupNameAndYnModel.getPayee())){
+                                        // 1表示收款账号正常
+                                        actionType = 1;
+                                    }else{
+                                        // 2表示收款账号名称被更改
+                                        actionType = 2;
+                                    }
+                                }else {
+                                    // 3收款账号被删除（服务数据）
+                                    actionType = 3;
+                                }
+                            }else{
+                                // 4没找到对应的收款账号
+                                actionType = 4;
+                            }
+                            int workType = 0; // task的补充结果状态
+                            String workRemark = "";// task的补充的备注
+                            OperateModel operateModel = null;
+                            if (actionType == 1){
+                                String [] fg_msg = data.getMsg().split("#");
+                                String sucMoney = fg_msg[1];// 用户上报的成功金额
+
+                                // 查询此账号最新订单数据
+                                OrderModel orderQuery = TaskMethod.assembleOrderByNewestQuery(didCollectionAccountByWxGroupIdOrWxGroupNameAndYnModel.getDid(), didCollectionAccountByWxGroupIdOrWxGroupNameAndYnModel.getId(), 3);
+                                OrderModel orderModel = ComponentUtil.orderService.getNewestOrder(orderQuery);
+                                if (orderModel != null && orderModel.getId() > 0){
+                                    if (orderModel.getOrderStatus() == 1){
+                                        // 比较金额是否一致
+                                        String result = StringUtil.getBigDecimalSubtractByStr(sucMoney, orderModel.getOrderMoney());
+                                        if (result.equals("0")){
+                                            // 金额一致
+                                            // 修改订单操作状态修改：收款成功状态
+                                            OrderModel orderUpdate = TaskMethod.assembleOrderUpdateDidStatus(orderModel.getId(), 7, 0, null);
+                                            ComponentUtil.orderService.updateDidStatus(orderUpdate);
+
+                                            // 填充可爱猫解析数据：填充对应的订单信息
+                                            CatDataAnalysisModel catDataAnalysisModel = TaskMethod.assembleCatDataAnalysisUpdate(data.getId(), orderModel, sucMoney);
+                                            ComponentUtil.catDataAnalysisService.update(catDataAnalysisModel);
+
+                                            workType = ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE;
+                                        }else {
+                                            // 金额不一致
+                                            // 修改订单操作状态修改：收款部分（跟订单金额不相同）
+                                            OrderModel orderUpdate = TaskMethod.assembleOrderUpdateDidStatus(orderModel.getId(), 6, 0, sucMoney);
+                                            ComponentUtil.orderService.updateDidStatus(orderUpdate);
+
+                                            // 填充可爱猫解析数据：填充对应的订单信息
+                                            CatDataAnalysisModel catDataAnalysisModel = TaskMethod.assembleCatDataAnalysisUpdate(data.getId(), orderModel, sucMoney);
+                                            ComponentUtil.catDataAnalysisService.update(catDataAnalysisModel);
+
+                                            // 定义补充状态
+                                            workType = ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO;
+                                            workRemark = "收款部分（跟订单金额不相同），具体金额：" + sucMoney;
+
+                                            // 定义惩罚数据
+                                            operateModel = new OperateModel();
+                                            String remark = "";
+                                            operateModel = TaskMethod.assembleOperateData(data.getId(), didCollectionAccountByWxGroupIdOrWxGroupNameAndYnModel, orderModel, 2, sucMoney, 7,
+                                                    "上报金额与订单金额不匹配：支付用户金额支付错误", remark , 2, myWxModel.getId(),sucMoney);
+                                        }
+
+                                    }else if (orderModel.getOrderStatus() == 2){
+                                        // 订单超时才进行成功数据上报
+                                        // 比较金额是否一致
+                                        String result = StringUtil.getBigDecimalSubtractByStr(sucMoney, orderModel.getOrderMoney());
+                                        if (result.equals("0")){
+                                            // 金额一致
+                                            // 修改订单操作状态修改：收款成功状态
+                                            OrderModel orderUpdate = TaskMethod.assembleOrderUpdateDidStatus(orderModel.getId(), 7, 0, null);
+                                            ComponentUtil.orderService.updateDidStatus(orderUpdate);
+
+                                            // 填充可爱猫解析数据：填充对应的订单信息
+                                            CatDataAnalysisModel catDataAnalysisModel = TaskMethod.assembleCatDataAnalysisUpdate(data.getId(), orderModel, sucMoney);
+                                            ComponentUtil.catDataAnalysisService.update(catDataAnalysisModel);
+
+                                            workType = ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE;
+                                        }else {
+                                            // 金额不一致
+                                            // 修改订单操作状态修改：收款部分（跟订单金额不相同）
+                                            OrderModel orderUpdate = TaskMethod.assembleOrderUpdateDidStatus(orderModel.getId(), 6, 0, sucMoney);
+                                            ComponentUtil.orderService.updateDidStatus(orderUpdate);
+
+                                            // 填充可爱猫解析数据：填充对应的订单信息
+                                            CatDataAnalysisModel catDataAnalysisModel = TaskMethod.assembleCatDataAnalysisUpdate(data.getId(), orderModel, sucMoney);
+                                            ComponentUtil.catDataAnalysisService.update(catDataAnalysisModel);
+
+                                            // 定义补充状态
+                                            workType = ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO;
+                                            workRemark = "收款部分（跟订单金额不相同），具体金额：" + sucMoney;
+
+                                            // 定义惩罚数据
+                                            operateModel = new OperateModel();
+                                            String remark = "";
+                                            operateModel = TaskMethod.assembleOperateData(data.getId(), didCollectionAccountByWxGroupIdOrWxGroupNameAndYnModel, orderModel, 2, sucMoney, 7,
+                                                    "上报金额与订单金额不匹配：支付用户金额支付错误", remark , 2, myWxModel.getId(),sucMoney);
+                                        }
+
+
+
+                                    }else {
+
+                                    }
+                                }
+
+
+                            }else if (actionType == 2){
+
+                            }else if (actionType == 3){
+                                // 根据用户ID查询加目前时间前三十分钟查询订单信息
+                                OrderModel orderByTimeQuery = TaskMethod.assembleOrderByCreateTime(didCollectionAccountByWxGroupIdOrWxGroupNameAndYnModel.getDid(), didCollectionAccountByWxGroupIdOrWxGroupNameAndYnModel.getId());
+                                OrderModel orderByTimeData = ComponentUtil.orderService.getOrderByDidAndTime(orderByTimeQuery);
+                                if (orderByTimeData != null && orderByTimeData.getId() > 0){
+                                    if (orderByTimeData.getOrderStatus() <= 2 && orderByTimeData.getDidStatus() > 1){
+                                        // 查询此订单是否被罚过
+                                        OperateModel operateQuery = TaskMethod.assembleOperateQuery(0,0,0,null,null, orderByTimeData.getOrderNo(), 2);
+                                        OperateModel operateData = (OperateModel) ComponentUtil.operateService.findByObject(operateQuery);
+                                        if (operateData == null || operateData.getId() <= 0){
+                                            // 没有被处罚过
+                                            // 在30分钟之内有超时订单，直接罚款此用户
+                                            operateModel = new OperateModel();
+                                            operateModel = TaskMethod.assembleOperateData(data.getId(), didCollectionAccountByWxGroupIdOrWxGroupNameAndYnModel, orderByTimeData, 2, orderByTimeData.getOrderMoney(), 7,
+                                                    "用户收款成功时，并且删除微信群（服务数据），并且此订单有支付用户进入，而且在30分钟之内有初始化或超时订单，直接罚款此用户", null , 1, myWxModel.getId(),null);
+                                        }
+
+                                        // 填充可爱猫解析数据：填充对应的订单信息
+                                        CatDataAnalysisModel catDataAnalysisModel = TaskMethod.assembleCatDataAnalysisUpdate(data.getId(), orderByTimeData, null);
+                                        ComponentUtil.catDataAnalysisService.update(catDataAnalysisModel);
+                                    }
+                                }
+                                // 补充写数据
+                            }else if (actionType == 4){
+                                // 成功收款-说明小微错误加错群：因为根据微信群名称or微信群ID以及去掉yn没有查到对应的收款账号
+                                operateModel = new OperateModel();
+                                String remark = "我方小微：" + myWxModel.getWxName() + "，需退出群：" + data.getFromName() ;
+                                operateModel = TaskMethod.assembleOperateData(data.getId(), didCollectionAccountByWxGroupIdOrWxGroupNameAndYnModel, null, 0, null, 7,
+                                        "说明小微错误加错群：因为根据微信群名称or微信群ID以及去掉yn没有查到对应的收款账号", remark , 2, myWxModel.getId(),null);
+
+                                workType = ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO;
+                                workRemark = "收款成功：根据微信群名称or微信群ID查询收款账号-没有找到对应的收款账号";
+                            }
+
+                            // 添加运营数据
+                            if (operateModel != null){
+                                ComponentUtil.operateService.add(operateModel);
+                            }
+                            // 更新此次task的状态
+                            StatusModel statusModel = TaskMethod.assembleUpdateStatusByWorkType(data.getId(), workType, workRemark);
+                            ComponentUtil.taskCatDataAnalysisService.updateCatDataAnalysisStatus(statusModel);
+                        }else {
+                            // 此信息不属于我方小微的数据，异常脏数据
+                            // 更新此次task的状态：更新成失败状态：脏数据：此信息不属于我方小微上报的数据
+                            StatusModel statusModel = TaskMethod.assembleUpdateStatusByWorkType(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "脏数据：此信息不属于我方小微上报的数据");
+                            ComponentUtil.taskCatDataAnalysisService.updateCatDataAnalysisStatus(statusModel);
+                        }
                     }
                     // 解锁
                     ComponentUtil.redisIdService.delLock(lockKey);
@@ -688,6 +854,8 @@ public class TaskCatDataAnalysis {
             }
         }
     }
+
+
 
 
 
