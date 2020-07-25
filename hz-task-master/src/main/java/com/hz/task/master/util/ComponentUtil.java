@@ -48,7 +48,7 @@ public class ComponentUtil {
     public static CatDataAnalysisService catDataAnalysisService;
     public static OperateService operateService;
     public static CatDataAnalysisUnusualService catDataAnalysisUnusualService;
-
+    public static OrderStepService orderStepService;
 
 
 

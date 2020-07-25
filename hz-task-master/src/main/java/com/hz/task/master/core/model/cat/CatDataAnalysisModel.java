@@ -216,6 +216,9 @@ public class CatDataAnalysisModel extends BasePage implements Serializable {
     private Integer curdayStart;
     private Integer curdayEnd;
 
+    private String invalidTimeBig;
+    private String invalidTimeSmall;
+
 
     public Long getId() {
         return id;
@@ -551,5 +554,21 @@ public class CatDataAnalysisModel extends BasePage implements Serializable {
 
     public void setDataExplain(String dataExplain) {
         this.dataExplain = dataExplain;
+    }
+
+    public String getInvalidTimeBig() {
+        return invalidTimeBig;
+    }
+
+    public void setInvalidTimeBig(String invalidTimeBig) {
+        this.invalidTimeBig = invalidTimeBig;
+    }
+
+    public String getInvalidTimeSmall() {
+        return invalidTimeSmall;
+    }
+
+    public void setInvalidTimeSmall(String invalidTimeSmall) {
+        this.invalidTimeSmall = invalidTimeSmall;
     }
 }

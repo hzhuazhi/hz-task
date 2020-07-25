@@ -137,6 +137,9 @@ public class AutowireRunner implements ApplicationRunner {
     @Autowired
     private CatDataAnalysisUnusualService catDataAnalysisUnusualService;
 
+    @Autowired
+    private OrderStepService orderStepService;
+
 
 
 
@@ -239,6 +242,7 @@ public class AutowireRunner implements ApplicationRunner {
         ComponentUtil.catDataAnalysisService = catDataAnalysisService;
         ComponentUtil.operateService = operateService;
         ComponentUtil.catDataAnalysisUnusualService = catDataAnalysisUnusualService;
+        ComponentUtil.orderStepService = orderStepService;
 
 
         ComponentUtil.taskMobileCardService = taskMobileCardService;
