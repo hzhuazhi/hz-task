@@ -5,12 +5,12 @@ import com.hz.task.master.core.protocol.page.BasePage;
 import java.io.Serializable;
 
 /**
- * @Description 可爱猫数据解析的实体属性Bean
+ * @Description 可爱猫数据解析异常的实体属性Bean
  * @Author yoko
- * @Date 2020/7/21 19:14
+ * @Date 2020/7/25 15:19
  * @Version 1.0
  */
-public class CatDataAnalysisModel extends BasePage implements Serializable {
+public class CatDataAnalysisUnusualModel extends BasePage implements Serializable {
     private static final long   serialVersionUID = 1203223201139L;
 
     /**
@@ -158,6 +158,7 @@ public class CatDataAnalysisModel extends BasePage implements Serializable {
      */
     private String dataExplain;
 
+
     /**
      * 是否能匹配到数据关系：1初始化，2匹配不成功，3匹配成功；根据我方wx_id加上微信群名匹配关联关系
      */
@@ -216,7 +217,6 @@ public class CatDataAnalysisModel extends BasePage implements Serializable {
     private Integer curdayStart;
     private Integer curdayEnd;
 
-
     public Long getId() {
         return id;
     }
@@ -241,6 +241,30 @@ public class CatDataAnalysisModel extends BasePage implements Serializable {
         this.wxId = wxId;
     }
 
+    public Long getDid() {
+        return did;
+    }
+
+    public void setDid(Long did) {
+        this.did = did;
+    }
+
+    public Long getCollectionAccountId() {
+        return collectionAccountId;
+    }
+
+    public void setCollectionAccountId(Long collectionAccountId) {
+        this.collectionAccountId = collectionAccountId;
+    }
+
+    public Integer getCollectionAccountType() {
+        return collectionAccountType;
+    }
+
+    public void setCollectionAccountType(Integer collectionAccountType) {
+        this.collectionAccountType = collectionAccountType;
+    }
+
     public String getOrderNo() {
         return orderNo;
     }
@@ -255,6 +279,54 @@ public class CatDataAnalysisModel extends BasePage implements Serializable {
 
     public void setOrderMoney(String orderMoney) {
         this.orderMoney = orderMoney;
+    }
+
+    public Integer getOrderStatus() {
+        return orderStatus;
+    }
+
+    public void setOrderStatus(Integer orderStatus) {
+        this.orderStatus = orderStatus;
+    }
+
+    public String getMoney() {
+        return money;
+    }
+
+    public void setMoney(String money) {
+        this.money = money;
+    }
+
+    public String getInvalidTime() {
+        return invalidTime;
+    }
+
+    public void setInvalidTime(String invalidTime) {
+        this.invalidTime = invalidTime;
+    }
+
+    public Integer getRedPackInvalidType() {
+        return redPackInvalidType;
+    }
+
+    public void setRedPackInvalidType(Integer redPackInvalidType) {
+        this.redPackInvalidType = redPackInvalidType;
+    }
+
+    public Integer getMoneyFitType() {
+        return moneyFitType;
+    }
+
+    public void setMoneyFitType(Integer moneyFitType) {
+        this.moneyFitType = moneyFitType;
+    }
+
+    public Integer getReplyInvalidType() {
+        return replyInvalidType;
+    }
+
+    public void setReplyInvalidType(Integer replyInvalidType) {
+        this.replyInvalidType = replyInvalidType;
     }
 
     public String getFinalFromWxid() {
@@ -345,12 +417,36 @@ public class CatDataAnalysisModel extends BasePage implements Serializable {
         this.guest = guest;
     }
 
+    public String getMemberWxid() {
+        return memberWxid;
+    }
+
+    public void setMemberWxid(String memberWxid) {
+        this.memberWxid = memberWxid;
+    }
+
+    public String getMemberNickname() {
+        return memberNickname;
+    }
+
+    public void setMemberNickname(String memberNickname) {
+        this.memberNickname = memberNickname;
+    }
+
     public Integer getDataType() {
         return dataType;
     }
 
     public void setDataType(Integer dataType) {
         this.dataType = dataType;
+    }
+
+    public String getDataExplain() {
+        return dataExplain;
+    }
+
+    public void setDataExplain(String dataExplain) {
+        this.dataExplain = dataExplain;
     }
 
     public Integer getIsMatching() {
@@ -455,101 +551,5 @@ public class CatDataAnalysisModel extends BasePage implements Serializable {
 
     public void setCurdayEnd(Integer curdayEnd) {
         this.curdayEnd = curdayEnd;
-    }
-
-    public String getMemberWxid() {
-        return memberWxid;
-    }
-
-    public void setMemberWxid(String memberWxid) {
-        this.memberWxid = memberWxid;
-    }
-
-    public String getMemberNickname() {
-        return memberNickname;
-    }
-
-    public void setMemberNickname(String memberNickname) {
-        this.memberNickname = memberNickname;
-    }
-
-    public Integer getOrderStatus() {
-        return orderStatus;
-    }
-
-    public void setOrderStatus(Integer orderStatus) {
-        this.orderStatus = orderStatus;
-    }
-
-    public String getMoney() {
-        return money;
-    }
-
-    public void setMoney(String money) {
-        this.money = money;
-    }
-
-    public Long getDid() {
-        return did;
-    }
-
-    public void setDid(Long did) {
-        this.did = did;
-    }
-
-    public Long getCollectionAccountId() {
-        return collectionAccountId;
-    }
-
-    public void setCollectionAccountId(Long collectionAccountId) {
-        this.collectionAccountId = collectionAccountId;
-    }
-
-    public Integer getCollectionAccountType() {
-        return collectionAccountType;
-    }
-
-    public void setCollectionAccountType(Integer collectionAccountType) {
-        this.collectionAccountType = collectionAccountType;
-    }
-
-    public String getInvalidTime() {
-        return invalidTime;
-    }
-
-    public void setInvalidTime(String invalidTime) {
-        this.invalidTime = invalidTime;
-    }
-
-    public Integer getRedPackInvalidType() {
-        return redPackInvalidType;
-    }
-
-    public void setRedPackInvalidType(Integer redPackInvalidType) {
-        this.redPackInvalidType = redPackInvalidType;
-    }
-
-    public Integer getMoneyFitType() {
-        return moneyFitType;
-    }
-
-    public void setMoneyFitType(Integer moneyFitType) {
-        this.moneyFitType = moneyFitType;
-    }
-
-    public Integer getReplyInvalidType() {
-        return replyInvalidType;
-    }
-
-    public void setReplyInvalidType(Integer replyInvalidType) {
-        this.replyInvalidType = replyInvalidType;
-    }
-
-    public String getDataExplain() {
-        return dataExplain;
-    }
-
-    public void setDataExplain(String dataExplain) {
-        this.dataExplain = dataExplain;
     }
 }
