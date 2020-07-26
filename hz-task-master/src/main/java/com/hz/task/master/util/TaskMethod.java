@@ -2916,6 +2916,37 @@ public class TaskMethod {
         }
         return resBean;
     }
+    
+    
+    /**
+     * @Description: 组装查询订单初始化，但是超过有效期的订单的查询条件
+     * @param orderStatus - 订单状态
+     * @return 
+     * @author yoko
+     * @date 2020/7/26 14:24 
+    */
+    public static StatusModel assembleStatusModelQueryByInvalidTime(int limitNum, int orderStatus){
+        StatusModel resBean = new StatusModel();
+        resBean.setOrderStatus(orderStatus);
+        resBean.setInvalidTime("1");
+        resBean.setLimitNum(limitNum);
+        return resBean;
+    }
+
+    /**
+     * @Description: 组装修改订单的状态的方法
+     * @param id - 订单主键ID
+     * @param orderStatus - 订单状态
+     * @return com.hz.task.master.core.model.order.OrderModel
+     * @author yoko
+     * @date 2020/7/26 14:43
+     */
+    public static OrderModel assembleOrderUpdateStatus(long id, int orderStatus){
+        OrderModel resBean = new OrderModel();
+        resBean.setId(id);
+        resBean.setOrderStatus(orderStatus);
+        return resBean;
+    }
 
 
 

@@ -168,4 +168,10 @@ public interface TkCacheKey {
      */
     String LOCK_CAT_DATA_ANALYSIS_WORK_TYPE = "-27";
 
+    /**
+     * 锁：失效订单的流水:正要执行- 派单数据
+     * 锁住
+     */
+    String LOCK_ORDER_INVALID_START = "-28";
+
 }

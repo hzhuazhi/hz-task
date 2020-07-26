@@ -65,9 +65,34 @@ public class TaskOrder {
     public void orderByInvalidTime() throws Exception{
 //        log.info("----------------------------------TaskOrder.orderByInvalidTime()----start");
         try{
-            OrderModel orderModel = new OrderModel();
-            orderModel.setOrderStatus(2);
-            ComponentUtil.orderService.updateOrderStatusByInvalidTime(orderModel);
+//            OrderModel orderModel = new OrderModel();
+//            orderModel.setOrderStatus(2);
+//            ComponentUtil.orderService.updateOrderStatusByInvalidTime(orderModel);
+
+            // 获取订单为初始化状态，并且失效时间已经小于当前时间的订单
+            StatusModel statusQuery = TaskMethod.assembleStatusModelQueryByInvalidTime(limitNum, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ONE);
+            List<OrderModel> synchroList = ComponentUtil.taskOrderService.getOrderList(statusQuery);
+            for (OrderModel data : synchroList){
+                // 锁住这个数据流水
+                String lockKey = CachedKeyUtils.getCacheKeyTask(TkCacheKey.LOCK_ORDER_INVALID_START, data.getId());
+                boolean flagLock = ComponentUtil.redisIdService.lock(lockKey);
+                if (flagLock){
+                    OrderModel orderUpdate = TaskMethod.assembleOrderUpdateStatus(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO);
+                    if (data.getCollectionType() == 1){
+                        ComponentUtil.orderService.updateOrderStatus(orderUpdate);
+                    }else if (data.getCollectionType() == 2){
+                        if (data.getDidStatus() == 2){
+                            ComponentUtil.orderService.updateOrderStatus(orderUpdate);
+                        }
+                    }else if (data.getCollectionType() == 3){
+                        ComponentUtil.orderService.updateOrderStatus(orderUpdate);
+                    }
+                    // 解锁
+                    ComponentUtil.redisIdService.delLock(lockKey);
+                }
+            }
+
+
         }catch (Exception e){
             log.error(String.format("this TaskOrder.orderByInvalidTime() is error "));
             e.printStackTrace();
@@ -141,6 +166,32 @@ public class TaskOrder {
                             StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "更新的影响行为0");
                             ComponentUtil.taskOrderService.updateOrderStatus(statusModel);
                         }
+                    }else if(data.getCollectionType() == 3){
+                        // 微信群处理
+                        int orderStatus = 0;
+                        if (data.getDidStatus() == 5 || data.getDidStatus() == 6){
+                            // 收款失败，或者收款部分，则锁定8小时
+                            orderStatus = 5;
+
+                        }else{
+                            orderStatus = 2;
+                        }
+                        DidBalanceDeductModel didBalanceDeductUpdate = TaskMethod.assembleDidBalanceDeductUpdate(data.getOrderNo(), orderStatus);
+                        num = ComponentUtil.didBalanceDeductService.updateOrderStatus(didBalanceDeductUpdate);
+
+                        int runStatus = 0;
+                        String info = "";
+                        if (num > 0){
+                            // 更新此次task的状态：更新成成功
+                            runStatus = ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE;
+                        }else{
+                            // 更新此次task的状态：更新成失败
+                            runStatus = ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO;
+                            info = "更新的影响行为0";
+                        }
+                        StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), runStatus, info);
+                        ComponentUtil.taskOrderService.updateOrderStatus(statusModel);
+
                     }
 
                     // 解锁
