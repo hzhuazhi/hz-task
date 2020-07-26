@@ -21,6 +21,7 @@ import com.hz.task.master.core.model.mobilecard.MobileCardDataModel;
 import com.hz.task.master.core.model.mobilecard.MobileCardModel;
 import com.hz.task.master.core.model.operate.OperateModel;
 import com.hz.task.master.core.model.order.OrderModel;
+import com.hz.task.master.core.model.order.OrderStepModel;
 import com.hz.task.master.core.model.strategy.StrategyData;
 import com.hz.task.master.core.model.strategy.StrategyModel;
 import com.hz.task.master.core.model.strategy.StrategyZfbMoneyRule;
@@ -2813,6 +2814,107 @@ public class TaskMethod {
         }
         return resBean;
 
+    }
+
+    /**
+     * @Description: 组装根据收款账号ID查询的方法
+     * @param id - 收款账号ID
+     * @return
+     * @author yoko
+     * @date 2020/7/25 19:58
+    */
+    public static DidCollectionAccountModel assembleDidCollectionAccountByIdQuery(long id){
+        DidCollectionAccountModel resBean = new DidCollectionAccountModel();
+        resBean.setId(id);
+        return resBean;
+    }
+
+
+    /**
+     * @Description: 组装订单步骤详情的数据
+     * @param id - 主键ID
+     * @param did - 用户ID
+     * @param orderModel - 订单信息
+     * @param collectionAccountId - 收款账号ID
+     * @param isOkCollectionAccount - 收款账号是否正常：1正常，2异常（修改名称，被删除）
+     * @param money - 用户成功收款上报的金额
+     * @param redPackInvalidType - 支付用户发红包是否超时：1初始化，2已超时，3未超时
+     * @param moneyFitType - 金额是否与上报金额一致：1初始化，2少了，3多了，4一致
+     * @param replyInvalidType - 回复成功or失败是否超时：1初始化，2已超时，3未超时
+     * @param eliminateType - 剔除成员类型：1初始化，2需要剔除成员，3已剔除支付用户成员
+     * @param redPackTime - 发红包的时间
+     * @return com.hz.task.master.core.model.order.OrderStepModel
+     * @author yoko
+     * @date 2020/7/25 21:07
+     */
+    public static OrderStepModel assembleOrderStepData(long id, long did, OrderModel orderModel, long collectionAccountId, int isOkCollectionAccount, String money, int redPackInvalidType,
+                                                          int moneyFitType, int replyInvalidType, int eliminateType, String redPackTime) throws Exception{
+        OrderStepModel resBean = new OrderStepModel();
+        if (id > 0){
+            resBean.setId(id);
+        }
+        if (did > 0){
+            resBean.setDid(did);
+        }
+        if (orderModel != null && orderModel.getId() > 0){
+            if (!StringUtils.isBlank(orderModel.getOrderNo())){
+                resBean.setOrderNo(orderModel.getOrderNo());
+            }
+            if (!StringUtils.isBlank(orderModel.getOrderMoney())){
+                resBean.setOrderMoney(orderModel.getOrderMoney());
+            }
+            if (orderModel.getOrderStatus() != null && orderModel.getOrderStatus() > 0){
+                resBean.setOrderStatus(orderModel.getOrderStatus());
+            }
+            if (!StringUtils.isBlank(orderModel.getInvalidTime())){
+                resBean.setInvalidTime(orderModel.getInvalidTime());
+            }
+        }
+        if (collectionAccountId > 0){
+            resBean.setCollectionAccountId(collectionAccountId);
+        }
+        if (isOkCollectionAccount > 0){
+            resBean.setIsOkCollectionAccount(2);
+        }
+        if (!StringUtils.isBlank(money)){
+            resBean.setMoney(money);
+        }
+        if (redPackInvalidType > 0){
+            resBean.setRedPackInvalidType(redPackInvalidType);
+        }
+        if (moneyFitType > 0){
+            resBean.setMoneyFitType(moneyFitType);
+        }
+        if (replyInvalidType > 0){
+            resBean.setReplyInvalidType(replyInvalidType);
+        }
+        if (eliminateType > 0){
+            resBean.setEliminateType(eliminateType);
+        }
+        if (!StringUtils.isBlank(redPackTime)){
+            resBean.setRedPackTime(redPackTime);
+        }
+        return resBean;
+    }
+
+
+    /**
+     * @Description: 组装根据主键ID或者订单号查询订单步骤的方法
+     * @param id - 主键ID
+     * @param orderNo - 订单号
+     * @return com.hz.task.master.core.model.order.OrderStepModel
+     * @author yoko
+     * @date 2020/7/25 21:23
+     */
+    public static OrderStepModel assembleOrderStepByIdOrOrderNoQuery(long id, String orderNo){
+        OrderStepModel resBean = new OrderStepModel();
+        if (id > 0){
+            resBean.setId(id);
+        }
+        if (!StringUtils.isBlank(orderNo)){
+            resBean.setOrderNo(orderNo);
+        }
+        return resBean;
     }
 
 
