@@ -103,6 +103,13 @@ public class ServerConstant {
         TEAM_REWARD_LIST(23,""),
         TEAM_CONSUME_REWARD(24,""),
         SPARE_ADDRESS_LIST(25,""),
+        DELIVERY_ORDER_INVALID_TIME(26,""),
+        LOCK_MONEY_TIME(27,""),
+        REPORT_PHONE(28,""),
+        QR_CODE_SWITCH(29,""),
+        WX_GROUP_CONSUME_MONEY_LIST(30,""),
+        TEAM_CONSUME_REWARD_WX_GROUP(31,""),
+        WX_GROUP_REPLY_INSTRUCT(32,""),
 
         ;
         private int stgType;

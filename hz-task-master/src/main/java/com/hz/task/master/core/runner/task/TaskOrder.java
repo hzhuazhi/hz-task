@@ -289,7 +289,13 @@ public class TaskOrder {
         // 查询策略里面的团队长奖励固定比例数据
         StrategyModel strategyQuery = HodgepodgeMethod.assembleStrategyQuery(ServerConstant.StrategyEnum.TEAM_CONSUME_REWARD.getStgType());
         StrategyModel strategyModel = ComponentUtil.strategyService.getStrategyModel(strategyQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
+
+        // 查询策略里面的团队长奖励固定比例数据-微信群
+        StrategyModel strategy_Wx_Query = HodgepodgeMethod.assembleStrategyQuery(ServerConstant.StrategyEnum.TEAM_CONSUME_REWARD_WX_GROUP.getStgType());
+        StrategyModel strategy_Wx_Model = ComponentUtil.strategyService.getStrategyModel(strategy_Wx_Query, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
+
         String ratioReward = strategyModel.getStgValue();// 团队长奖励固定比例数据
+        String ratio_Wx_Reward = strategy_Wx_Model.getStgValue();// 团队长奖励固定比例数据-微信群
         // 获取已成功的订单数据
         StatusModel statusQuery = TaskMethod.assembleTaskByOrderDidStatusQuery(limitNum, 3);
         List<OrderModel> synchroList = ComponentUtil.taskOrderService.getOrderList(statusQuery);
@@ -375,6 +381,53 @@ public class TaskOrder {
                             ComponentUtil.taskOrderService.updateOrderStatus(statusModel);
                         }
 
+                    }else if(data.getCollectionType() == 3){
+                        // 微信群支付处理逻辑
+                        DidBalanceDeductModel didBalanceDeductUpdate = TaskMethod.assembleDidBalanceDeductUpdate(data.getOrderNo(), data.getOrderStatus());
+                        num = ComponentUtil.didBalanceDeductService.updateOrderStatus(didBalanceDeductUpdate);
+
+                        // 删除此用户名下的挂单
+                        String strKeyCache_lock_did_order_ing = CachedKeyUtils.getCacheKey(CacheKey.LOCK_DID_ORDER_ING, data.getDid());
+                        ComponentUtil.redisService.remove(strKeyCache_lock_did_order_ing);
+                        if (num > 0){
+                            // 更新此次task的状态：更新成成功
+                            StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE, "");
+                            ComponentUtil.taskOrderService.updateOrderStatus(statusModel);
+
+                            // 用户自己奖励
+                            DidRewardModel didRewardMyModel = TaskMethod.assembleTeamDirectConsumeProfit(6, data.getDid(), data.getProfit(), data);
+                            ComponentUtil.didRewardService.add(didRewardMyModel);
+
+
+                            // 添加团队长奖励数据-start
+                            // 获取此用户的上级用户ID
+                            DidLevelModel didLevelQuery = TaskMethod.assembleDidSuperiorQuery(data.getDid(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ONE);
+                            DidLevelModel didLevelModel = (DidLevelModel) ComponentUtil.didLevelService.findByObject(didLevelQuery);
+                            if (didLevelModel != null && didLevelModel.getId() > 0){
+                                // 根据用户ID查询此用户是否属于团队长
+                                DidModel didByIdQuery = TaskMethod.assembleDidQueryByDid(didLevelModel.getLevelDid());
+                                DidModel didModel = (DidModel) ComponentUtil.didService.findByObject(didByIdQuery);
+                                if (didModel.getIsTeam() == 2){
+                                    // 属于团队长属性:计算需要给与每单的奖励的金额 = 订单金额 * 奖励比例
+                                    String moneyReward = StringUtil.getMultiply(data.getOrderMoney(), ratio_Wx_Reward);
+                                    log.info("");
+                                    if (!StringUtils.isBlank(moneyReward) && !moneyReward.equals("0.00")){
+                                        DidRewardModel didRewardModel = TaskMethod.assembleTeamDirectConsumeProfit(10, didModel.getId(), moneyReward, data);
+                                        ComponentUtil.didRewardService.add(didRewardModel);
+                                    }
+
+                                }
+                            }
+                            // 添加团队长奖励数据-end
+
+
+
+                        }else{
+                            // 更新此次task的状态：更新成失败
+                            StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "更新的影响行为0");
+                            log.info("");
+                            ComponentUtil.taskOrderService.updateOrderStatus(statusModel);
+                        }
                     }
 
                     // 解锁
