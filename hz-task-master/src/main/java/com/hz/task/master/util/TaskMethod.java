@@ -2948,6 +2948,21 @@ public class TaskMethod {
         return resBean;
     }
 
+    /**
+     * @Description: 组装更新订单状态的条件
+     * @param orderNo - 订单号
+     * @param orderStatus - 订单状态
+     * @return com.hz.task.master.core.model.order.OrderModel
+     * @author yoko
+     * @date 2020/7/26 16:56
+     */
+    public static OrderModel assembleOrderUpdateStatusByOrderNo(String orderNo, int orderStatus){
+        OrderModel resBean = new OrderModel();
+        resBean.setOrderNo(orderNo);
+        resBean.setOrderStatus(orderStatus);
+        return resBean;
+    }
+
 
 
 

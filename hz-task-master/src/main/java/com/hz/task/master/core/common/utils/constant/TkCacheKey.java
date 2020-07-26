@@ -174,4 +174,10 @@ public interface TkCacheKey {
      */
     String LOCK_ORDER_INVALID_START = "-28";
 
+    /**
+     * 锁：可爱猫数据解析-补充成功数据的流水
+     * 锁住
+     */
+    String LOCK_CAT_DATA_ANALYSIS_WORK_TYPE_SUC = "-29";
+
 }
