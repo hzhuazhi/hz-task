@@ -3072,6 +3072,43 @@ public class DateUtil {
 		return flag;
 	}
 
+	/**
+	 * @Description: 比较两日期大小
+	 * <p>
+	 *     startTime >= endTime = false
+	 *     startTime < endTime = true
+	 * </p>
+	 * @param startTime - 开始日期
+	 * @param endTime - 结束日期
+	 * @return
+	 * @author yoko
+	 * @date 2020/7/27 23:35
+	*/
+	public static boolean beforeData(String startTime, String endTime) throws Exception{
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		Date sd1 = df.parse(startTime);
+		Date sd2 = df.parse(endTime);
+		return sd1.before(sd2);
+	}
+
+	/**
+	 * @Description: 计算两时间相差多少秒
+	 * @param startTime
+	 * @param endTime
+	 * @return
+	 * @author yoko
+	 * @date 2020/7/2 15:29
+	 */
+	public static int differSecond(String startTime, String endTime) throws Exception{
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		Date startDate = format.parse(startTime);
+		Date endDate = format.parse(endTime);
+		long a = startDate.getTime();
+		long b = endDate.getTime();
+		int c = (int)((a - b) / 1000);
+		return c;
+	}
+
 
 
 	public static void main(String[] args) throws Exception{
@@ -3104,6 +3141,10 @@ public class DateUtil {
 		int max = getMaxMonthDate();
 		System.out.println(min);
 		System.out.println(max);
+		String startTime = "2020-07-27 23:56:56";
+		String endTime = "2020-07-27 23:56:57";
+		boolean sb1_flag = beforeData(startTime, endTime);
+		System.out.println("sb1_flag:" + sb1_flag);
 	}
 
 	/**

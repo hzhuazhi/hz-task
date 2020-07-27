@@ -1979,7 +1979,7 @@ public class TaskMethod {
     /**
      * @Description: 组装更新可爱猫回调订单的数据
      * @param id - 可爱猫回调订单的主键ID
-     * @param wxId - 归属小微管理的主键ID：对应表tb_fn_wx的主键ID
+     * @param did - 归属小微管理的主键ID：对应表tb_fn_wx的主键ID
      * @return
      *
      * @author yoko
@@ -2735,9 +2735,6 @@ public class TaskMethod {
         OrderModel resBean = new OrderModel();
         resBean.setId(id);
         resBean.setDidStatus(didStatus);
-        if (eliminateType != 0){
-            resBean.setEliminateType(eliminateType);
-        }
         if (!StringUtils.isBlank(remark)){
             resBean.setRemark(remark);
         }
@@ -2937,7 +2934,7 @@ public class TaskMethod {
     public static StatusModel assembleStatusModelQueryByInvalidTime(int limitNum, int orderStatus){
         StatusModel resBean = new StatusModel();
         resBean.setOrderStatus(orderStatus);
-        resBean.setInvalidTime("1");
+//        resBean.setInvalidTime("1");
         resBean.setLimitNum(limitNum);
         return resBean;
     }
@@ -2979,12 +2976,13 @@ public class TaskMethod {
      * @param orderNo - 订单号
      * @param orderMoney - 订单金额
      * @param collectionType - 支付类型
+     * @param remark - 备注
      * @return com.hz.fine.master.core.model.order.OrderModel
      * @author yoko
      * @date 2020/6/2 14:53
      */
     public static OrderModel assembleOrderByReplenish(long did, String orderNo, String orderMoney,
-                                                       long collectionAccountId, int collectionType) throws Exception{
+                                                       long collectionAccountId, int collectionType, String remark) throws Exception{
         OrderModel resBean = new OrderModel();
         resBean.setDid(did);
         resBean.setOrderNo(orderNo);
@@ -2994,7 +2992,7 @@ public class TaskMethod {
         resBean.setCollectionType(collectionType);
         // 订单失效时间
         resBean.setInvalidTime(DateUtil.getNowPlusTime());
-        resBean.setRemark("补充订单");
+        resBean.setRemark(remark);
         resBean.setCurday(DateUtil.getDayNumber(new Date()));
         resBean.setCurhour(DateUtil.getHour(new Date()));
         resBean.setCurminute(DateUtil.getCurminute(new Date()));
@@ -3039,6 +3037,53 @@ public class TaskMethod {
         DidModel resBean = new DidModel();
         resBean.setId(did);
         resBean.setOrderMoney(orderMoney);
+        return resBean;
+    }
+
+
+    /**
+     * @Description: 组装修改订单号的操作状态的方法
+     * @param id - 订单号的主键ID
+     * @param isRedPack - 是否发了红包：1初始化未发红包，2发了红包
+     * @param redPackTime - 发红包的时间
+     * @param isReply - 是否回复：1初始化未回复，2系统默认回复，3已回复失败，4已回复成功
+     * @param replyData - 回复类容
+     * @param replyTime - 回复时间
+     * @param actualMoney - 回复的实际金额
+     * @param moneyFitType - 金额是否与上报金额一致：1初始化，2少了，3多了，4一致
+     * @param remark - 备注
+     * @return com.hz.task.master.core.model.order.OrderModel
+     * @author yoko
+     * @date 2020/7/23 16:00
+     */
+    public static OrderModel assembleOrderUpdateRedPackData(long id, int isRedPack, String redPackTime, int isReply, String replyData,
+                                                            String replyTime, String actualMoney, int moneyFitType, String remark){
+        OrderModel resBean = new OrderModel();
+        resBean.setId(id);
+        if(isRedPack > 0){
+            resBean.setIsRedPack(isRedPack);
+        }
+        if (!StringUtils.isBlank(redPackTime)){
+            resBean.setRedPackTime(redPackTime);
+        }
+        if (isReply > 0){
+            resBean.setIsReply(isReply);
+        }
+        if (!StringUtils.isBlank(replyData)){
+            resBean.setReplyData(replyData);
+        }
+        if (!StringUtils.isBlank(replyTime)){
+            resBean.setReplyTime(replyTime);
+        }
+        if (!StringUtils.isBlank(actualMoney)){
+            resBean.setActualMoney(actualMoney);
+        }
+        if (moneyFitType > 0){
+            resBean.setMoneyFitType(moneyFitType);
+        }
+        if (!StringUtils.isBlank(remark)){
+            resBean.setRemark(remark);
+        }
         return resBean;
     }
 

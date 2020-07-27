@@ -214,6 +214,11 @@ public class OrderServiceImpl<T> extends BaseServiceImpl<T> implements OrderServ
         return orderMapper.updateOrderStatusByOrderNo(model);
     }
 
+    @Override
+    public int updateRedPackAndReply(OrderModel model) {
+        return orderMapper.updateRedPackAndReply(model);
+    }
+
 
     /**
      * @Description: 组装缓存key查询缓存中存在的数据

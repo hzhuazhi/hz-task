@@ -179,7 +179,7 @@ public class OrderModel extends BasePage implements Serializable {
     private String redPackTime;
 
     /**
-     * 是否回复：1初始化未回复，2系统默认回复，3已回复
+     * 是否回复：1初始化未回复，2系统默认回复，3已回复失败，4已回复成功
      */
     private Integer isReply;
 

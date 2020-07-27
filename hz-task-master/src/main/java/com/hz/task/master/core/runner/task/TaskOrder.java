@@ -1,6 +1,7 @@
 package com.hz.task.master.core.runner.task;
 
 import com.alibaba.fastjson.JSON;
+import com.hz.task.master.core.common.utils.DateUtil;
 import com.hz.task.master.core.common.utils.HttpSendUtils;
 import com.hz.task.master.core.common.utils.StringUtil;
 import com.hz.task.master.core.common.utils.constant.CacheKey;
@@ -8,6 +9,7 @@ import com.hz.task.master.core.common.utils.constant.CachedKeyUtils;
 import com.hz.task.master.core.common.utils.constant.ServerConstant;
 import com.hz.task.master.core.common.utils.constant.TkCacheKey;
 import com.hz.task.master.core.model.did.*;
+import com.hz.task.master.core.model.operate.OperateModel;
 import com.hz.task.master.core.model.order.OrderModel;
 import com.hz.task.master.core.model.strategy.StrategyModel;
 import com.hz.task.master.core.model.task.base.StatusModel;
@@ -69,6 +71,10 @@ public class TaskOrder {
 //            orderModel.setOrderStatus(2);
 //            ComponentUtil.orderService.updateOrderStatusByInvalidTime(orderModel);
 
+            // 查询策略里面的用户收到红包的规定回复时间
+            StrategyModel strategyQuery = HodgepodgeMethod.assembleStrategyQuery(ServerConstant.StrategyEnum.REPLY_TIME.getStgType());
+            StrategyModel strategyModel = ComponentUtil.strategyService.getStrategyModel(strategyQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
+
             // 获取订单为初始化状态，并且失效时间已经小于当前时间的订单
             StatusModel statusQuery = TaskMethod.assembleStatusModelQueryByInvalidTime(limitNum, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ONE);
             List<OrderModel> synchroList = ComponentUtil.taskOrderService.getOrderList(statusQuery);
@@ -79,13 +85,155 @@ public class TaskOrder {
                 if (flagLock){
                     OrderModel orderUpdate = TaskMethod.assembleOrderUpdateStatus(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO);
                     if (data.getCollectionType() == 1){
-                        ComponentUtil.orderService.updateOrderStatus(orderUpdate);
-                    }else if (data.getCollectionType() == 2){
-                        if (data.getDidStatus() == 2){
+                        String startTime = data.getInvalidTime();
+                        String endTime = DateUtil.getNowPlusTime();
+                        boolean flag = DateUtil.beforeData(startTime, endTime);
+                        if (flag){
                             ComponentUtil.orderService.updateOrderStatus(orderUpdate);
                         }
+                    }else if (data.getCollectionType() == 2){
+                        String startTime = data.getInvalidTime();
+                        String endTime = DateUtil.getNowPlusTime();
+                        boolean flag = DateUtil.beforeData(startTime, endTime);
+                        if (flag){
+                            if (data.getDidStatus() == 2){
+                                ComponentUtil.orderService.updateOrderStatus(orderUpdate);
+                            }
+                        }
+
                     }else if (data.getCollectionType() == 3){
-                        ComponentUtil.orderService.updateOrderStatus(orderUpdate);
+                        if (data.getIsRedPack() == 1){
+                            // 没发红包
+                            String startTime = data.getInvalidTime();
+                            String endTime = DateUtil.getNowPlusTime();
+                            boolean flag = DateUtil.beforeData(startTime, endTime);
+                            if (flag){
+                                // 当前时间 > 订单失效时间：则修改订单状态修改成超时状态
+                                ComponentUtil.orderService.updateOrderStatus(orderUpdate);
+                            }
+                        }else{
+                            // 发了红包
+
+                            // 判断订单是否已回复
+                            if (data.getIsReply() != 1){
+                                // 已回复
+                                // 判断回复时间是否超过了策略规定时间
+                                int differSecond = DateUtil.differSecond(data.getReplyTime(), data.getRedPackTime());
+                                if (differSecond >= strategyModel.getStgNumValue()){
+                                    // 已经超过回复的规定时间：不管回复什么派单的订单状态修改成 orderStatus = 3
+                                    // 1.修改订单状态 orderStatus = 3（有质疑的订单状态）
+                                    OrderModel orderUpdateStatus = TaskMethod.assembleOrderUpdateStatus(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE);
+                                    ComponentUtil.orderService.updateOrderStatus(orderUpdateStatus);
+                                    log.info("");
+                                    // 2.修改此订单字段 is_reply = 2 （系统默认回复）
+                                    OrderModel orderUpdateReply = TaskMethod.assembleOrderUpdateRedPackData(data.getId(), 0, null,
+                                            2, null, null, null, 0, "系统默认成功");
+                                    ComponentUtil.orderService.updateRedPackAndReply(orderUpdateReply);
+
+//                                    // 3.修改用户扣款流水表《tb_fn_did_balance_deduct》的 orderStatus = 3
+//                                    DidBalanceDeductModel didBalanceDeductUpdate = TaskMethod.assembleDidBalanceDeductUpdate(data.getOrderNo(), 3);
+//                                    ComponentUtil.didBalanceDeductService.updateOrderStatus(didBalanceDeductUpdate);
+                                }else{
+                                    // 未超过回复的规定时间
+                                    if (data.getIsReply() == 3){
+                                        // 回复失败：在跑超时订单时需要判断 is_reply = 3 ,如果等于3，则用户扣款流水的的订单状态字段值需要修改成 orderStatus = 5
+                                        ComponentUtil.orderService.updateOrderStatus(orderUpdate);
+                                    }else{
+                                        // 回复成功
+
+                                        // 判断回复金额是否一致
+                                        if (data.getMoneyFitType() == 4){
+                                            // 订单金额一致
+                                            // 订单直接修改成成功状态
+                                            OrderModel orderUpdateStatus = TaskMethod.assembleOrderUpdateStatus(data.getId(), 4);
+                                            ComponentUtil.orderService.updateOrderStatus(orderUpdateStatus);
+                                        }else{
+                                            // 订单金额不一致
+                                            if (data.getMoneyFitType() == 2){
+                                                // 订单金额少了
+                                                // 1.补一个新的派单，金额等于实际上报金额
+                                                String sgid = ComponentUtil.redisIdService.getNewFineId();
+                                                // 组装派发订单的数据
+                                                OrderModel orderAdd = TaskMethod.assembleOrderByReplenish(data.getDid(), sgid, data.getActualMoney(), data.getCollectionAccountId(), 3,
+                                                        "系统补单：依据原订单号：" + data.getOrderNo() +"，上报金额少了" );
+                                                ComponentUtil.orderService.add(orderAdd);
+                                                // 组装用户扣除余额流水的数据
+                                                DidBalanceDeductModel didBalanceDeductModel = TaskMethod.assembleDidBalanceDeductAdd(data.getDid(), sgid, data.getActualMoney(), 30);
+                                                ComponentUtil.didBalanceDeductService.add(didBalanceDeductModel);
+                                                // 组装扣除用户余额
+                                                DidModel updateBalance = TaskMethod.assembleUpdateDidBalance(data.getDid(), data.getActualMoney());
+                                                // 锁定这个用户
+                                                String lockKey_did_money = CachedKeyUtils.getCacheKey(CacheKey.LOCK_DID_MONEY, data.getDid());
+                                                boolean flagLock_did_money = ComponentUtil.redisIdService.lock(lockKey_did_money);
+                                                if (flagLock_did_money){
+                                                    ComponentUtil.didService.updateDidDeductBalance(updateBalance);
+                                                    // 解锁
+                                                    ComponentUtil.redisIdService.delLock(lockKey_did_money);
+                                                }
+
+                                                // 2.原订单修改成 orderStatus = 2，但是订单金额要锁8小时
+                                                ComponentUtil.orderService.updateOrderStatus(orderUpdate);
+                                            }else if(data.getMoneyFitType() == 3){
+                                                // 订单金额多了
+
+                                                // 判断上报金额是否超过200
+                                                boolean flag_money = StringUtil.getBigDecimalSubtract("200", data.getActualMoney());
+                                                if (!flag_money){
+                                                    // 上报金额超过200
+                                                    // 定义惩罚数据
+                                                    OperateModel operateModel = new OperateModel();
+                                                    String remark = "";
+                                                    operateModel = TaskMethod.assembleOperateData(0, null, data, 0, null, 7,
+                                                            "上报金额超过200", remark , 2, 0, data.getActualMoney());
+                                                    ComponentUtil.operateService.add(operateModel);
+                                                }
+                                                // 1.补一个新的派单，金额等于实际上报金额 - 订单金额
+                                                String sgid = ComponentUtil.redisIdService.getNewFineId();
+                                                String money = StringUtil.getBigDecimalSubtractByStr(data.getActualMoney(), data.getOrderMoney());
+                                                // 组装派发订单的数据
+                                                OrderModel orderAdd = TaskMethod.assembleOrderByReplenish(data.getDid(), sgid, money, data.getCollectionAccountId(), 3,
+                                                        "系统补单：依据原订单号：" + data.getOrderNo() +"，上报金额多了" );
+                                                ComponentUtil.orderService.add(orderAdd);
+                                                // 组装用户扣除余额流水的数据
+                                                DidBalanceDeductModel didBalanceDeductModel = TaskMethod.assembleDidBalanceDeductAdd(data.getDid(), sgid, money, 30);
+                                                ComponentUtil.didBalanceDeductService.add(didBalanceDeductModel);
+                                                // 组装扣除用户余额
+                                                DidModel updateBalance = TaskMethod.assembleUpdateDidBalance(data.getDid(), money);
+                                                // 锁定这个用户
+                                                String lockKey_did_money = CachedKeyUtils.getCacheKey(CacheKey.LOCK_DID_MONEY, data.getDid());
+                                                boolean flagLock_did_money = ComponentUtil.redisIdService.lock(lockKey_did_money);
+                                                if (flagLock_did_money){
+                                                    ComponentUtil.didService.updateDidDeductBalance(updateBalance);
+                                                    // 解锁
+                                                    ComponentUtil.redisIdService.delLock(lockKey_did_money);
+                                                }
+
+                                                // 2.原订单修改成 orderStatus = 4
+                                                OrderModel orderUpdateStatus = TaskMethod.assembleOrderUpdateStatus(data.getId(), 4);
+                                                ComponentUtil.orderService.updateOrderStatus(orderUpdateStatus);
+                                            }
+                                        }
+
+                                    }
+                                }
+
+                            }else{
+                                // 未回复
+                                // 判断未回复时间是否超过了策略规定时间
+                                int differSecond = DateUtil.differSecond(DateUtil.getNowPlusTime(), data.getRedPackTime());
+                                if (differSecond >= strategyModel.getStgNumValue()){
+                                    // 已经超过规定时间
+                                    // 1.修改订单状态 orderStatus = 3（有质疑的订单状态）
+                                    OrderModel orderUpdateStatus = TaskMethod.assembleOrderUpdateStatus(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE);
+                                    ComponentUtil.orderService.updateOrderStatus(orderUpdateStatus);
+                                    // 2.修改此订单字段 is_reply = 2 （系统默认回复）
+                                    OrderModel orderUpdateReply = TaskMethod.assembleOrderUpdateRedPackData(data.getId(), 0, null,
+                                            2, null, null, null, 0, "系统默认成功");
+                                    ComponentUtil.orderService.updateRedPackAndReply(orderUpdateReply);
+                                }
+                            }
+
+                        }
                     }
                     // 解锁
                     ComponentUtil.redisIdService.delLock(lockKey);
@@ -167,14 +315,22 @@ public class TaskOrder {
                             ComponentUtil.taskOrderService.updateOrderStatus(statusModel);
                         }
                     }else if(data.getCollectionType() == 3){
-                        // 微信群处理
                         int orderStatus = 0;
-                        if (data.getDidStatus() == 5 || data.getDidStatus() == 6){
-                            // 收款失败，或者收款部分，则锁定8小时
-                            orderStatus = 5;
-
-                        }else{
+                        if (data.getIsRedPack() == 1){
+                            // 未发红包，并且订单已超时
                             orderStatus = 2;
+                        }else{
+                            // 发了红包
+                            if(data.getIsReply() == 3){
+                                // 未超过回复的规定时间，并且回复失败
+                                // 回复失败：在跑超时订单时需要判断 is_reply = 3 ,如果等于3，则用户扣款流水的的订单状态字段值需要修改成 orderStatus = 5
+                                orderStatus = 5;
+                            }else if(data.getIsReply() == 4){
+                                if (data.getMoneyFitType() == 2){
+                                    // 回复的金额少了，原订单需要锁8小时
+                                    orderStatus = 5;
+                                }
+                            }
                         }
                         DidBalanceDeductModel didBalanceDeductUpdate = TaskMethod.assembleDidBalanceDeductUpdate(data.getOrderNo(), orderStatus);
                         num = ComponentUtil.didBalanceDeductService.updateOrderStatus(didBalanceDeductUpdate);
@@ -215,7 +371,7 @@ public class TaskOrder {
      * @Description: task：执行已经超过有失效时间的订单，并且用户操作状态属于初始化状态的逻辑
      * <p>
      *     每1每秒运行一次
-     *     支付宝订单：
+     *     固定支付宝订单：
      *      1.查询出已超过失效时间，并且用户操作状态属于初始化状态的订单数据。
      *      2.修改此订单在《用户扣减余额流水表》中的订单状态，修改成order_status=5
      *
@@ -395,30 +551,33 @@ public class TaskOrder {
                             ComponentUtil.taskOrderService.updateOrderStatus(statusModel);
 
                             // 用户自己奖励
-                            DidRewardModel didRewardMyModel = TaskMethod.assembleTeamDirectConsumeProfit(6, data.getDid(), data.getProfit(), data);
-                            ComponentUtil.didRewardService.add(didRewardMyModel);
+                            if (!StringUtils.isBlank(data.getProfit()) && data.getOrderStatus() != 3){
+                                DidRewardModel didRewardMyModel = TaskMethod.assembleTeamDirectConsumeProfit(6, data.getDid(), data.getProfit(), data);
+                                ComponentUtil.didRewardService.add(didRewardMyModel);
 
 
-                            // 添加团队长奖励数据-start
-                            // 获取此用户的上级用户ID
-                            DidLevelModel didLevelQuery = TaskMethod.assembleDidSuperiorQuery(data.getDid(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ONE);
-                            DidLevelModel didLevelModel = (DidLevelModel) ComponentUtil.didLevelService.findByObject(didLevelQuery);
-                            if (didLevelModel != null && didLevelModel.getId() > 0){
-                                // 根据用户ID查询此用户是否属于团队长
-                                DidModel didByIdQuery = TaskMethod.assembleDidQueryByDid(didLevelModel.getLevelDid());
-                                DidModel didModel = (DidModel) ComponentUtil.didService.findByObject(didByIdQuery);
-                                if (didModel.getIsTeam() == 2){
-                                    // 属于团队长属性:计算需要给与每单的奖励的金额 = 订单金额 * 奖励比例
-                                    String moneyReward = StringUtil.getMultiply(data.getOrderMoney(), ratio_Wx_Reward);
-                                    log.info("");
-                                    if (!StringUtils.isBlank(moneyReward) && !moneyReward.equals("0.00")){
-                                        DidRewardModel didRewardModel = TaskMethod.assembleTeamDirectConsumeProfit(10, didModel.getId(), moneyReward, data);
-                                        ComponentUtil.didRewardService.add(didRewardModel);
+                                // 添加团队长奖励数据-start
+                                // 获取此用户的上级用户ID
+                                DidLevelModel didLevelQuery = TaskMethod.assembleDidSuperiorQuery(data.getDid(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ONE);
+                                DidLevelModel didLevelModel = (DidLevelModel) ComponentUtil.didLevelService.findByObject(didLevelQuery);
+                                if (didLevelModel != null && didLevelModel.getId() > 0){
+                                    // 根据用户ID查询此用户是否属于团队长
+                                    DidModel didByIdQuery = TaskMethod.assembleDidQueryByDid(didLevelModel.getLevelDid());
+                                    DidModel didModel = (DidModel) ComponentUtil.didService.findByObject(didByIdQuery);
+                                    if (didModel.getIsTeam() == 2){
+                                        // 属于团队长属性:计算需要给与每单的奖励的金额 = 订单金额 * 奖励比例
+                                        String moneyReward = StringUtil.getMultiply(data.getOrderMoney(), ratio_Wx_Reward);
+                                        log.info("");
+                                        if (!StringUtils.isBlank(moneyReward) && !moneyReward.equals("0.00")){
+                                            DidRewardModel didRewardModel = TaskMethod.assembleTeamDirectConsumeProfit(10, didModel.getId(), moneyReward, data);
+                                            ComponentUtil.didRewardService.add(didRewardModel);
+                                        }
+
                                     }
-
                                 }
+                                // 添加团队长奖励数据-end
                             }
-                            // 添加团队长奖励数据-end
+
 
 
 

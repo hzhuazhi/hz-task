@@ -27,7 +27,7 @@
                 and a.order_status = #{orderStatus}
             </if>
             <if test="didStatus != null and didStatus != '' " >
-                and (a.order_status = 4 OR a.did_status >= #{didStatus})
+                and (a.order_status >= 3 OR a.did_status >= #{didStatus})
             </if>
             <if test="curday != null and curday != '' " >
                 and a.curday = #{curday}
