@@ -129,6 +129,12 @@
             <if test="orderStatus != null and orderStatus != '' " >
                 order_status,
             </if>
+            <if test="delayTime != null and delayTime != '' " >
+                delay_time,
+            </if>
+            <if test="lockTime != null and lockTime != '' " >
+                lock_time,
+            </if>
             <if test="remark != null and remark != '' " >
                 remark,
             </if>
@@ -156,6 +162,12 @@
             </if>
             <if test="orderStatus != null and orderStatus != '' " >
                 <![CDATA[  #{orderStatus}, ]]>
+            </if>
+            <if test="delayTime != null and delayTime != '' " >
+                <![CDATA[  #{delayTime}, ]]>
+            </if>
+            <if test="lockTime != null and lockTime != '' " >
+                <![CDATA[  #{lockTime}, ]]>
             </if>
             <if test="remark != null and remark != '' " >
                 <![CDATA[  #{remark}, ]]>

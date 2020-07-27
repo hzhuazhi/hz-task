@@ -491,5 +491,20 @@
     </select>
 
 
+    <!-- 扣减用户余额 -->
+    <update id="updateDidDeductBalance" parameterType="com.hz.task.master.core.model.did.DidModel">
+        UPDATE tb_fn_did a
+        <trim prefix="set" suffixOverrides=",">
+            <if test="orderMoney != null and orderMoney != '' " >
+                a.balance = a.balance - #{orderMoney},
+            </if>
+            a.update_time = NOW(),
+        </trim>
+        where 1=1
+        and a.id = #{id}
+        and a.yn = 0
+    </update>
+
+
 
 </mapper>

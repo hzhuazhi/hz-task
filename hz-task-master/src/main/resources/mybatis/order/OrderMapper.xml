@@ -9,7 +9,8 @@
     <sql id="Base_Column_List">
         a.id,a.did,a.order_no,a.order_money,a.collection_account_id,a.collection_type,a.qr_code_id,
         a.qr_code,a.wx_nickname,a.wx_id,a.out_trade_no,a.notify_url,a.order_status,a.invalid_time,
-        a.user_id,a.zfb_ac_num,
+        a.user_id,a.zfb_ac_num,a.program_time,a.did_status,a.profit,a.is_red_pack,a.red_pack_time,
+        a.is_reply,a.reply_data,a.reply_time,a.actual_money,a.money_fit_type,
         a.curday,a.curhour,a.curminute,a.run_num,a.run_status,
         a.create_time,a.update_time,a.yn,
         b.ac_name,b.ac_num
@@ -219,6 +220,9 @@
             <if test="invalidTime != null and invalidTime != '' " >
                 invalid_time,
             </if>
+            <if test="remark != null and remark != '' " >
+                remark,
+            </if>
             <if test="curday != null and curday != '' " >
                 curday,
             </if>
@@ -267,6 +271,9 @@
             </if>
             <if test="invalidTime != null and invalidTime != '' " >
                 <![CDATA[  #{invalidTime}, ]]>
+            </if>
+            <if test="remark != null and remark != '' " >
+                <![CDATA[  #{remark}, ]]>
             </if>
             <if test="curday != null and curday != '' " >
                 <![CDATA[  #{curday}, ]]>
@@ -507,8 +514,10 @@
     <select id="getOrderByDidAndTime" parameterType="Object" resultType="com.hz.task.master.core.model.order.OrderModel">
         select
             a.id,a.did,a.order_no,a.order_money,a.collection_account_id,a.collection_type,a.qr_code_id,
-            a.qr_code,a.wx_nickname,a.wx_id,a.out_trade_no,a.notify_url,a.order_status,a.invalid_time,a.did_status,
+            a.qr_code,a.wx_nickname,a.wx_id,a.out_trade_no,a.notify_url,a.order_status,a.invalid_time,
             a.user_id,a.zfb_ac_num,
+            a.program_time,a.did_status,a.profit,a.is_red_pack,a.red_pack_time,
+            a.is_reply,a.reply_data,a.reply_time,a.actual_money,a.money_fit_type,
             a.curday,a.curhour,a.curminute,a.run_num,a.run_status,
             a.create_time,a.update_time,a.yn
         from tb_fn_order a

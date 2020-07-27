@@ -66,4 +66,9 @@ public class DidServiceImpl<T> extends BaseServiceImpl<T> implements DidService<
     public List<Long> getIsTeamDidList(DidModel model) {
         return didMapper.getIsTeamDidList(model);
     }
+
+    @Override
+    public int updateDidDeductBalance(DidModel model) {
+        return didMapper.updateDidDeductBalance(model);
+    }
 }

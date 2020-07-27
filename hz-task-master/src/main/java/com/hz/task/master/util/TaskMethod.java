@@ -2848,12 +2848,13 @@ public class TaskMethod {
      * @param replyInvalidType - 回复成功or失败是否超时：1初始化，2已超时，3未超时
      * @param eliminateType - 剔除成员类型：1初始化，2需要剔除成员，3已剔除支付用户成员
      * @param redPackTime - 发红包的时间
+     * @param replyTime - 回复时间
      * @return com.hz.task.master.core.model.order.OrderStepModel
      * @author yoko
      * @date 2020/7/25 21:07
      */
     public static OrderStepModel assembleOrderStepData(long id, long did, OrderModel orderModel, long collectionAccountId, int isOkCollectionAccount, String money, int redPackInvalidType,
-                                                          int moneyFitType, int replyInvalidType, int eliminateType, String redPackTime) throws Exception{
+                                                          int moneyFitType, int replyInvalidType, int eliminateType, String redPackTime, String replyTime) throws Exception{
         OrderStepModel resBean = new OrderStepModel();
         if (id > 0){
             resBean.setId(id);
@@ -2898,6 +2899,9 @@ public class TaskMethod {
         }
         if (!StringUtils.isBlank(redPackTime)){
             resBean.setRedPackTime(redPackTime);
+        }
+        if (!StringUtils.isBlank(replyTime)){
+            resBean.setReplyTime(replyTime);
         }
         return resBean;
     }
@@ -2965,6 +2969,76 @@ public class TaskMethod {
         OrderModel resBean = new OrderModel();
         resBean.setOrderNo(orderNo);
         resBean.setOrderStatus(orderStatus);
+        return resBean;
+    }
+
+
+    /**
+     * @Description: 组装添加派单数据的方法-微信群-补充订单
+     * @param did -  用户ID
+     * @param orderNo - 订单号
+     * @param orderMoney - 订单金额
+     * @param collectionType - 支付类型
+     * @return com.hz.fine.master.core.model.order.OrderModel
+     * @author yoko
+     * @date 2020/6/2 14:53
+     */
+    public static OrderModel assembleOrderByReplenish(long did, String orderNo, String orderMoney,
+                                                       long collectionAccountId, int collectionType) throws Exception{
+        OrderModel resBean = new OrderModel();
+        resBean.setDid(did);
+        resBean.setOrderNo(orderNo);
+        resBean.setOrderMoney(orderMoney);
+        resBean.setOrderStatus(3);
+        resBean.setCollectionAccountId(collectionAccountId);
+        resBean.setCollectionType(collectionType);
+        // 订单失效时间
+        resBean.setInvalidTime(DateUtil.getNowPlusTime());
+        resBean.setRemark("补充订单");
+        resBean.setCurday(DateUtil.getDayNumber(new Date()));
+        resBean.setCurhour(DateUtil.getHour(new Date()));
+        resBean.setCurminute(DateUtil.getCurminute(new Date()));
+        return resBean;
+    }
+
+
+    /**
+     * @Description: 组装扣除用户余额流水的数据的方法
+     * @param did - 用户ID
+     * @param orderNo - 订单号
+     * @param money - 订单金额
+     * @param lockTime - 锁定时间
+     * @return com.hz.fine.master.core.model.did.DidBalanceDeductModel
+     * @author yoko
+     * @date 2020/7/2 14:52
+     */
+    public static DidBalanceDeductModel assembleDidBalanceDeductAdd(long did, String orderNo, String money, int lockTime){
+        DidBalanceDeductModel resBean = new DidBalanceDeductModel();
+        resBean.setDid(did);
+        resBean.setOrderNo(orderNo);
+        resBean.setMoney(money);
+        String delayTime = DateUtil.addDateMinute(30);
+        resBean.setDelayTime(delayTime);
+        resBean.setLockTime(DateUtil.addDateMinute(lockTime));
+        resBean.setRemark("补充订单");
+        resBean.setCurday(DateUtil.getDayNumber(new Date()));
+        resBean.setCurhour(DateUtil.getHour(new Date()));
+        resBean.setCurminute(DateUtil.getCurminute(new Date()));
+        return resBean;
+    }
+
+    /**
+     * @Description: 组装更新用户金额的方法
+     * @param did - 用户ID
+     * @param orderMoney - 派单的具体金额
+     * @return com.hz.fine.master.core.model.did.DidModel
+     * @author yoko
+     * @date 2020/6/9 10:47
+     */
+    public static DidModel assembleUpdateDidBalance(long did, String orderMoney){
+        DidModel resBean = new DidModel();
+        resBean.setId(did);
+        resBean.setOrderMoney(orderMoney);
         return resBean;
     }
 

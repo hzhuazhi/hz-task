@@ -161,6 +161,26 @@ public class RedisIdService {
         return formatDate+df.format(incr);
     }
 
+    /**
+     * @Description: 获取唯一值：新版本
+     * @return String
+     * @author yoko
+     * @date 2019/12/27 17:36
+     */
+    public String getNewFineId()  throws Exception{
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+        Date date = new Date();
+        String formatDate=sdf.format(date);
+        String key="fineKey" + formatDate;
+        Long incr = getIncr(key, getCurrent2TodayEndMillisTime());
+        if(incr==0) {
+            incr = getIncr(key, getCurrent2TodayEndMillisTime());//从001开始
+        }
+//        DecimalFormat df=new DecimalFormat("000");//三位序列号
+        DecimalFormat df=new DecimalFormat("0000000");//七位序列号
+        return formatDate+df.format(incr);
+    }
+
     //现在到今天结束的毫秒数
     public Long getCurrent2TodayEndMillisTime() {
         Calendar todayEnd = Calendar.getInstance();

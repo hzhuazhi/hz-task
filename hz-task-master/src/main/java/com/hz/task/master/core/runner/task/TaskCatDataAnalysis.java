@@ -3,11 +3,14 @@ package com.hz.task.master.core.runner.task;
 import com.alibaba.fastjson.JSON;
 import com.hz.task.master.core.common.utils.DateUtil;
 import com.hz.task.master.core.common.utils.StringUtil;
+import com.hz.task.master.core.common.utils.constant.CacheKey;
 import com.hz.task.master.core.common.utils.constant.CachedKeyUtils;
 import com.hz.task.master.core.common.utils.constant.ServerConstant;
 import com.hz.task.master.core.common.utils.constant.TkCacheKey;
 import com.hz.task.master.core.model.cat.CatDataAnalysisModel;
+import com.hz.task.master.core.model.did.DidBalanceDeductModel;
 import com.hz.task.master.core.model.did.DidCollectionAccountModel;
+import com.hz.task.master.core.model.did.DidModel;
 import com.hz.task.master.core.model.operate.OperateModel;
 import com.hz.task.master.core.model.order.OrderModel;
 import com.hz.task.master.core.model.order.OrderStepModel;
@@ -130,7 +133,7 @@ public class TaskCatDataAnalysis {
                                         isOkCollectionAccount = 2;
                                     }
                                     OrderStepModel orderStepModel = TaskMethod.assembleOrderStepData(0, data.getDid(), orderModel, data.getCollectionAccountId(), isOkCollectionAccount,
-                                            null,0,0,0,2,null);
+                                            null,0,0,0,2,null, null);
                                     ComponentUtil.orderStepService.addOrderStep(orderStepModel);
 
                                     // 更新此次task的状态：更新成成功
@@ -208,7 +211,7 @@ public class TaskCatDataAnalysis {
                                             isOkCollectionAccount = 2;
                                         }
                                         OrderStepModel orderStepModel = TaskMethod.assembleOrderStepData(orderStepData.getId(), 0, null, 0, isOkCollectionAccount,
-                                                null,3,0,0,0, DateUtil.getNowPlusTime());
+                                                null,3,0,0,0, DateUtil.getNowPlusTime(), null);
                                         ComponentUtil.orderStepService.update(orderStepModel);
                                     }
 
@@ -236,7 +239,7 @@ public class TaskCatDataAnalysis {
                                             isOkCollectionAccount = 2;
                                         }
                                         OrderStepModel orderStepModel = TaskMethod.assembleOrderStepData(orderStepData.getId(), 0, null, 0, isOkCollectionAccount,
-                                                null,2,0,0,0, DateUtil.getNowPlusTime());
+                                                null,2,0,0,0, DateUtil.getNowPlusTime(), null);
                                         ComponentUtil.orderStepService.update(orderStepModel);
                                     }
 
@@ -315,7 +318,7 @@ public class TaskCatDataAnalysis {
                                         isOkCollectionAccount = 2;
                                     }
                                     OrderStepModel orderStepModel = TaskMethod.assembleOrderStepData(orderStepData.getId(), 0, null, 0, isOkCollectionAccount,
-                                            null,0,0,0,3, null);
+                                            null,0,0,0,3, null, null);
                                     ComponentUtil.orderStepService.update(orderStepModel);
                                 }
 
@@ -367,7 +370,7 @@ public class TaskCatDataAnalysis {
                                                 isOkCollectionAccount = 2;
                                             }
                                             OrderStepModel orderStepModel = TaskMethod.assembleOrderStepData(orderStepData.getId(), 0, null, 0, isOkCollectionAccount,
-                                                    sucMoney,0,4,3,0, null);
+                                                    sucMoney,0,4,3,0, null, DateUtil.getNowPlusTime());
                                             ComponentUtil.orderStepService.update(orderStepModel);
                                         }
 
@@ -402,7 +405,7 @@ public class TaskCatDataAnalysis {
                                                 isOkCollectionAccount = 2;
                                             }
                                             OrderStepModel orderStepModel = TaskMethod.assembleOrderStepData(orderStepData.getId(), 0, null, 0, isOkCollectionAccount,
-                                                    sucMoney,0,moneyFitType,3,0, null);
+                                                    sucMoney,0,moneyFitType,3,0, null, DateUtil.getNowPlusTime());
                                             ComponentUtil.orderStepService.update(orderStepModel);
                                         }
 
@@ -440,7 +443,7 @@ public class TaskCatDataAnalysis {
                                                 isOkCollectionAccount = 2;
                                             }
                                             OrderStepModel orderStepModel = TaskMethod.assembleOrderStepData(orderStepData.getId(), 0, null, 0, isOkCollectionAccount,
-                                                    sucMoney,0,4,2,0, null);
+                                                    sucMoney,0,4,2,0, null, DateUtil.getNowPlusTime());
                                             ComponentUtil.orderStepService.update(orderStepModel);
                                         }
 
@@ -475,7 +478,7 @@ public class TaskCatDataAnalysis {
                                                 isOkCollectionAccount = 2;
                                             }
                                             OrderStepModel orderStepModel = TaskMethod.assembleOrderStepData(orderStepData.getId(), 0, null, 0, isOkCollectionAccount,
-                                                    sucMoney,0,moneyFitType,2,0, null);
+                                                    sucMoney,0,moneyFitType,2,0, null, DateUtil.getNowPlusTime());
                                             ComponentUtil.orderStepService.update(orderStepModel);
                                         }
 
@@ -489,7 +492,31 @@ public class TaskCatDataAnalysis {
                                         operateModel = TaskMethod.assembleOperateData(data.getId(), didCollectionAccountModel, orderModel, 2, sucMoney, 7,
                                                 "上报金额与订单金额不匹配：支付用户金额支付错误", remark , 2, data.getWxId(),sucMoney);
                                     }
+                                }else{
+
                                 }
+                            }else{
+                                // 没有找到对应订单：添加补充的扣款订单
+                                String sgid = ComponentUtil.redisIdService.getNewFineId();
+                                // 组装派发订单的数据
+                                OrderModel orderAdd = TaskMethod.assembleOrderByReplenish(data.getDid(), sgid, sucMoney, data.getCollectionAccountId(), 3);
+                                ComponentUtil.orderService.add(orderAdd);
+                                // 组装用户扣除余额流水的数据
+                                DidBalanceDeductModel didBalanceDeductModel = TaskMethod.assembleDidBalanceDeductAdd(data.getDid(), sgid, sucMoney, 30);
+                                ComponentUtil.didBalanceDeductService.add(didBalanceDeductModel);
+                                // 组装扣除用户余额
+                                DidModel updateBalance = TaskMethod.assembleUpdateDidBalance(data.getDid(), sucMoney);
+                                // 锁定这个用户
+                                String lockKey_did_money = CachedKeyUtils.getCacheKey(CacheKey.LOCK_DID_MONEY, data.getDid());
+                                boolean flagLock_did_money = ComponentUtil.redisIdService.lock(lockKey_did_money);
+                                if (flagLock_did_money){
+                                    ComponentUtil.didService.updateDidDeductBalance(updateBalance);
+                                    // 解锁
+                                    ComponentUtil.redisIdService.delLock(lockKey_did_money);
+                                }
+
+
+
                             }
 
 
