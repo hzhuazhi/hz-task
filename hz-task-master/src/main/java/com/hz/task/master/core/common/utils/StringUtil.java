@@ -1548,6 +1548,7 @@ public class StringUtil {
 	 */
 	public static boolean isNumberByMoney(String str){
 		Pattern pattern=Pattern.compile("^(([1-9]{1}\\d*)|([0]{1}))(\\.(\\d){2})?$"); // 判断小数点后2位的数字的正则表达式
+//		Pattern pattern=Pattern.compile("^(([1-9]{1}\\d*)|([0]{1}))(\\.(\\d){2})$"); // 判断小数点后2位的数字的正则表达式
 		Matcher match=pattern.matcher(str);
 		return match.matches();
 	}
@@ -1590,6 +1591,9 @@ public class StringUtil {
 		System.out.println("sb:" + sb);
 		String sb2 = getMultiply("1000","0.008");
 		System.out.println("sb2:" + sb2);
+
+		boolean flag_ = isNumberByMoney("0.5");
+		System.out.println("flag_:" + flag_);
 
 	}
 

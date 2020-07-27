@@ -2333,8 +2333,11 @@ public class TaskMethod {
                 String money = fg_msg[1];
                 // 金额是否有效
                 if (money.indexOf(".") > -1){
-                    boolean flag = StringUtil.isNumberByMoney(money);
-                    if (flag){
+                    String[] fg_money = money.split("\\.");
+                    boolean flag1 = StringUtil.isNumer(fg_money[0]);
+                    boolean flag2 = StringUtil.isNumer(fg_money[1]);
+//                    boolean flag = StringUtil.isNumberByMoney(money);
+                    if (flag1 && flag2){
                         num = 7;
                     }else {
                         num = 2;
@@ -2460,7 +2463,9 @@ public class TaskMethod {
             }
         }
         resBean.setDataType(dataType);
-
+        resBean.setCurday(DateUtil.getDayNumber(new Date()));
+        resBean.setCurhour(DateUtil.getHour(new Date()));
+        resBean.setCurminute(DateUtil.getCurminute(new Date()));
         return resBean;
 
     }
