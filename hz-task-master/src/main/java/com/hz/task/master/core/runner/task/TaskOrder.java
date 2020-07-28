@@ -190,12 +190,12 @@ public class TaskOrder {
                                                 // 1.补一个新的派单，金额等于实际上报金额 - 订单金额
                                                 String sgid = ComponentUtil.redisIdService.getNewFineId();
                                                 String money = StringUtil.getBigDecimalSubtractByStr(data.getActualMoney(), data.getOrderMoney());
-                                                // 组装派发订单的数据
-                                                OrderModel orderAdd = TaskMethod.assembleOrderByReplenish(data.getDid(), sgid, money, data.getCollectionAccountId(), 3,
-                                                        "系统补单：依据原订单号：" + data.getOrderNo() +"，上报金额多了", 2);
-                                                ComponentUtil.orderService.add(orderAdd);
+//                                                // 组装派发订单的数据
+//                                                OrderModel orderAdd = TaskMethod.assembleOrderByReplenish(data.getDid(), sgid, money, data.getCollectionAccountId(), 3,
+//                                                        "系统补单：依据原订单号：" + data.getOrderNo() +"，上报金额多了", 2);
+//                                                ComponentUtil.orderService.add(orderAdd);
                                                 // 组装用户扣除余额流水的数据
-                                                DidBalanceDeductModel didBalanceDeductModel = TaskMethod.assembleDidBalanceDeductAdd(data.getDid(), sgid, money, 30);
+                                                DidBalanceDeductModel didBalanceDeductModel = TaskMethod.assembleDidBalanceDeductAddByManyMoney(data.getDid(), sgid, money, 30, "补充订单：订单上报金额多了，原订单号：" + data.getOrderNo());
                                                 ComponentUtil.didBalanceDeductService.add(didBalanceDeductModel);
                                                 // 组装扣除用户余额
                                                 DidModel updateBalance = TaskMethod.assembleUpdateDidBalance(data.getDid(), money);

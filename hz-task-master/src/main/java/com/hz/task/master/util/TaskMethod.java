@@ -3029,6 +3029,33 @@ public class TaskMethod {
         return resBean;
     }
 
+
+    /**
+     * @Description: 组装扣除用户余额流水的数据的方法-当订单上报金额多余订单金额的时候
+     * @param did - 用户ID
+     * @param orderNo - 订单号
+     * @param money - 订单金额
+     * @param lockTime - 锁定时间
+     * @return com.hz.fine.master.core.model.did.DidBalanceDeductModel
+     * @author yoko
+     * @date 2020/7/2 14:52
+     */
+    public static DidBalanceDeductModel assembleDidBalanceDeductAddByManyMoney(long did, String orderNo, String money, int lockTime, String remark){
+        DidBalanceDeductModel resBean = new DidBalanceDeductModel();
+        resBean.setDid(did);
+        resBean.setOrderNo(orderNo);
+        resBean.setMoney(money);
+        String delayTime = DateUtil.addDateMinute(30);
+        resBean.setDelayTime(delayTime);
+        resBean.setLockTime(DateUtil.addDateMinute(lockTime));
+        resBean.setOrderStatus(3);
+        resBean.setRemark(remark);
+        resBean.setCurday(DateUtil.getDayNumber(new Date()));
+        resBean.setCurhour(DateUtil.getHour(new Date()));
+        resBean.setCurminute(DateUtil.getCurminute(new Date()));
+        return resBean;
+    }
+
     /**
      * @Description: 组装更新用户金额的方法
      * @param did - 用户ID
