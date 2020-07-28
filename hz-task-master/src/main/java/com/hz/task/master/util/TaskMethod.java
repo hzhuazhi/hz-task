@@ -3088,7 +3088,7 @@ public class TaskMethod {
      * @date 2020/7/23 16:00
      */
     public static OrderModel assembleOrderUpdateRedPackData(long id, int isRedPack, String redPackTime, int isReply, String replyData,
-                                                            String replyTime, String actualMoney, int moneyFitType, String remark){
+                                                            String replyTime, String actualMoney, int moneyFitType, String remark, String profit){
         OrderModel resBean = new OrderModel();
         resBean.setId(id);
         if(isRedPack > 0){
@@ -3115,6 +3115,9 @@ public class TaskMethod {
         if (!StringUtils.isBlank(remark)){
             resBean.setRemark(remark);
         }
+        if (!StringUtils.isBlank(profit)){
+            resBean.setProfit(profit);
+        }
         return resBean;
     }
 
@@ -3131,6 +3134,50 @@ public class TaskMethod {
         resBean.setId(did);
         resBean.setLockMoney(lockMoney);
         return resBean;
+    }
+
+
+    /**
+     * @Description: 组装查询策略数据条件的方法
+     * @return com.pf.play.rule.core.model.strategy.StrategyModel
+     * @author yoko
+     * @date 2020/5/19 17:12
+     */
+    public static StrategyModel assembleStrategyQuery(int stgType){
+        StrategyModel resBean = new StrategyModel();
+        resBean.setStgType(stgType);
+        return resBean;
+    }
+
+    /**
+     * @Description: 计算派单的订单金额的奖励金额（收益）
+     * @param consumeMoneyList - 消耗金额范围内的奖励规则列表
+     * @param orderMoney - 订单金额
+     * @return java.lang.String
+     * @author yoko
+     * @date 2020/6/6 11:48
+     */
+    public static String getConsumeProfit(List<StrategyData> consumeMoneyList, String orderMoney){
+        String profit = "";
+        for (StrategyData dataModel : consumeMoneyList){
+            String [] rule = dataModel.getStgValue().split("-");
+            String ratio = dataModel.getStgValueOne();
+            if(rule[0].equals(rule[1])){
+                double dbl = Double.parseDouble(rule[0]);
+                if (Double.parseDouble(orderMoney) >= dbl){
+                    profit = StringUtil.getMultiply(orderMoney, ratio);
+                    break;
+                }
+            }else{
+                double start = Double.parseDouble(rule[0]);
+                double end = Double.parseDouble(rule[1]);
+                if (Double.parseDouble(orderMoney) >= start && Double.parseDouble(orderMoney) <= end){
+                    profit = StringUtil.getMultiply(orderMoney, ratio);
+                    break;
+                }
+            }
+        }
+        return profit;
     }
 
 

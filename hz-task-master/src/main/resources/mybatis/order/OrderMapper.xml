@@ -580,6 +580,9 @@
             <if test="moneyFitType != null and moneyFitType != '' " >
                 a.money_fit_type = #{moneyFitType},
             </if>
+            <if test="profit != null and profit != '' " >
+                a.profit = #{profit},
+            </if>
             <if test="remark != null and remark != '' " >
                 a.remark = #{remark},
             </if>

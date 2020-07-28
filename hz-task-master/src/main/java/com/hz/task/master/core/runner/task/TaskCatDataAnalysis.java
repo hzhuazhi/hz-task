@@ -14,6 +14,8 @@ import com.hz.task.master.core.model.did.DidModel;
 import com.hz.task.master.core.model.operate.OperateModel;
 import com.hz.task.master.core.model.order.OrderModel;
 import com.hz.task.master.core.model.order.OrderStepModel;
+import com.hz.task.master.core.model.strategy.StrategyData;
+import com.hz.task.master.core.model.strategy.StrategyModel;
 import com.hz.task.master.core.model.task.base.StatusModel;
 import com.hz.task.master.util.ComponentUtil;
 import com.hz.task.master.util.TaskMethod;
@@ -131,7 +133,7 @@ public class TaskCatDataAnalysis {
                             if (orderModel != null && orderModel.getId() > 0){
                                 if (orderModel.getOrderStatus() == 1){
                                     // 更新订单的操作状态-修改成发红包状态
-                                    OrderModel orderUpdate = TaskMethod.assembleOrderUpdateRedPackData(orderModel.getId(), 2, DateUtil.getNowPlusTime(), 0, null, null, null, 0, null);
+                                    OrderModel orderUpdate = TaskMethod.assembleOrderUpdateRedPackData(orderModel.getId(), 2, DateUtil.getNowPlusTime(), 0, null, null, null, 0, null, null);
                                     ComponentUtil.orderService.updateRedPackAndReply(orderUpdate);
 
                                     // 填充可爱猫解析数据：填充对应的订单信息
@@ -213,9 +215,18 @@ public class TaskCatDataAnalysis {
                                             moneyFitType = 3;
                                         }
                                     }
+                                    String profit = "";
+                                    if (moneyFitType == 3){
+                                        // 查询策略里面的消耗金额范围内的奖励规则列表
+                                        StrategyModel strategyQuery = TaskMethod.assembleStrategyQuery(ServerConstant.StrategyEnum.WX_GROUP_CONSUME_MONEY_LIST.getStgType());
+                                        StrategyModel strategyModel = ComponentUtil.strategyService.getStrategyModel(strategyQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
+                                        // 解析奖励规则的值
+                                        List<StrategyData> wxGroupConsumeMoneyList = JSON.parseArray(strategyModel.getStgBigValue(), StrategyData.class);
+                                        profit = TaskMethod.getConsumeProfit(wxGroupConsumeMoneyList, sucMoney);
+                                    }
                                     // 更新订单的操作状态-修改已回复状态
                                     OrderModel orderUpdate = TaskMethod.assembleOrderUpdateRedPackData(orderModel.getId(), 0, null,
-                                            4, data.getMsg(), DateUtil.getNowPlusTime(), sucMoney, moneyFitType, null);
+                                            4, data.getMsg(), DateUtil.getNowPlusTime(), sucMoney, moneyFitType, null, profit);
                                     ComponentUtil.orderService.updateRedPackAndReply(orderUpdate);
 
                                     // 更新此次task的状态：成功状态
@@ -250,7 +261,7 @@ public class TaskCatDataAnalysis {
                                     if (orderModel.getIsReply() < 3){
                                         // 更新订单的操作状态-修改已回复状态
                                         OrderModel orderUpdate = TaskMethod.assembleOrderUpdateRedPackData(orderModel.getId(), 0, null,
-                                                3, data.getMsg(), DateUtil.getNowPlusTime(), null, 0, null);
+                                                3, data.getMsg(), DateUtil.getNowPlusTime(), null, 0, null, null);
                                         ComponentUtil.orderService.updateRedPackAndReply(orderUpdate);
                                     }else {
                                         // 更新此次task的状态：失败状态
