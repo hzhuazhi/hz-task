@@ -127,7 +127,7 @@ public class TaskOrder {
                                     log.info("");
                                     // 2.修改此订单字段 is_reply = 2 （系统默认回复）
                                     OrderModel orderUpdateReply = TaskMethod.assembleOrderUpdateRedPackData(data.getId(), 0, null,
-                                            2, null, null, null, 0, "系统默认成功");
+                                            2, null, null, null, 0, "系统默认成功", null);
                                     ComponentUtil.orderService.updateRedPackAndReply(orderUpdateReply);
 
 //                                    // 3.修改用户扣款流水表《tb_fn_did_balance_deduct》的 orderStatus = 3
@@ -228,7 +228,7 @@ public class TaskOrder {
                                     ComponentUtil.orderService.updateOrderStatus(orderUpdateStatus);
                                     // 2.修改此订单字段 is_reply = 2 （系统默认回复）
                                     OrderModel orderUpdateReply = TaskMethod.assembleOrderUpdateRedPackData(data.getId(), 0, null,
-                                            2, null, null, null, 0, "系统默认成功");
+                                            2, null, null, null, 0, "系统默认成功", null);
                                     ComponentUtil.orderService.updateRedPackAndReply(orderUpdateReply);
                                 }
                             }
