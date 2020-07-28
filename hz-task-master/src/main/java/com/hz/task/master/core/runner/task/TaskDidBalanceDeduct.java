@@ -115,7 +115,7 @@ public class TaskDidBalanceDeduct {
     /**
      * @Description: task：用户扣减余额流水锁定的金额补充到用户锁定金额表里面
      * <p>
-     *     每2每秒运行一次
+     *     每60秒运行一次
      *     1.查询出未跑task的扣减余额流水的用户ID
      *     2.sum求和所有锁定金额
      *     3.把sum求和的锁定金额更新到用户表中的锁定金额字段中
@@ -125,7 +125,7 @@ public class TaskDidBalanceDeduct {
      * @date 2019/12/6 20:25
      */
 //    @Scheduled(cron = "1 * * * * ?")
-    @Scheduled(fixedDelay = 2000) // 每2秒执行
+    @Scheduled(fixedDelay = 60000) // 每1分钟执行
     public void didBalanceDeductByLock() throws Exception{
 //        log.info("----------------------------------TaskDidBalanceDeduct.didBalanceDeductByLock()----start");
         // 查询所有金额是锁定的用户集合
