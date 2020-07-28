@@ -110,4 +110,41 @@ public class TaskDidBalanceDeduct {
             }
         }
     }
+
+
+    /**
+     * @Description: task：用户扣减余额流水锁定的金额补充到用户锁定金额表里面
+     * <p>
+     *     每2每秒运行一次
+     *     1.查询出未跑task的扣减余额流水的用户ID
+     *     2.sum求和所有锁定金额
+     *     3.把sum求和的锁定金额更新到用户表中的锁定金额字段中
+     *
+     * </p>
+     * @author yoko
+     * @date 2019/12/6 20:25
+     */
+//    @Scheduled(cron = "1 * * * * ?")
+    @Scheduled(fixedDelay = 2000) // 每2秒执行
+    public void didBalanceDeductByLock() throws Exception{
+//        log.info("----------------------------------TaskDidBalanceDeduct.didBalanceDeductByLock()----start");
+        // 查询所有金额是锁定的用户集合
+        List<Long> synchroList = ComponentUtil.taskDidBalanceDeductService.getBalanceDeductDidList(null);
+        for (Long data : synchroList){
+            try{
+                DidBalanceDeductModel didBalanceDeductQuery = new DidBalanceDeductModel();
+                didBalanceDeductQuery.setDid(data);
+                DidBalanceDeductModel didBalanceDeductModel = ComponentUtil.didBalanceDeductService.getSumMoneyByDid(didBalanceDeductQuery);
+                if (didBalanceDeductModel != null && didBalanceDeductModel.getDid() > 0){
+                    DidModel didModel = TaskMethod.assembleDidDataByLockMoney(didBalanceDeductModel.getDid(), didBalanceDeductModel.getMoney());
+                    ComponentUtil.didService.updateDidLockMoney(didModel);
+                }
+
+//                log.info("----------------------------------TaskDidBalanceDeduct.didBalanceDeductByLock()----end");
+            }catch (Exception e){
+                log.error(String.format("this TaskDidBalanceDeduct.didBalanceDeductByLock() is error!"));
+                e.printStackTrace();
+            }
+        }
+    }
 }

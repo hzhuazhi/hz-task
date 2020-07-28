@@ -97,4 +97,13 @@ public interface DidMapper<T> extends BaseDao<T> {
      * @date 2020/7/27 20:17
      */
     public int updateDidDeductBalance(DidModel model);
+
+    /**
+     * @Description: 修改用户的锁定金额
+     * @param model
+     * @return
+     * @author yoko
+     * @date 2020/7/28 15:42
+    */
+    public int updateDidLockMoney(DidModel model);
 }

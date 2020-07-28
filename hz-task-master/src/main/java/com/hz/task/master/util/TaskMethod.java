@@ -3118,6 +3118,21 @@ public class TaskMethod {
         return resBean;
     }
 
+    /**
+     * @Description: 组装跟新用户的锁定金额
+     * @param did - 用户ID
+     * @param lockMoney - 锁定金额
+     * @return
+     * @author yoko
+     * @date 2020/7/28 15:51
+    */
+    public static DidModel assembleDidDataByLockMoney(long did, String lockMoney){
+        DidModel resBean = new DidModel();
+        resBean.setId(did);
+        resBean.setLockMoney(lockMoney);
+        return resBean;
+    }
+
 
 
 

@@ -30,4 +30,15 @@ public interface TaskDidBalanceDeductService<T> extends BaseService<T> {
      * @date 2020/1/11 16:30
      */
     public int updateDidBalanceDeductStatus(Object obj);
+
+    /**
+     * @Description: 查询所有金额是锁定的用户集合
+     * @param obj - 查询条件
+     * @return
+     * @author yoko
+     * @date 2020/6/5 18:45
+     */
+    public List<Long> getBalanceDeductDidList(Object obj);
+
+
 }

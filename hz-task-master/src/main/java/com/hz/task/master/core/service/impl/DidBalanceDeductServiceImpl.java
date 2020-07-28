@@ -34,4 +34,9 @@ public class DidBalanceDeductServiceImpl<T> extends BaseServiceImpl<T> implement
     public int updateOrderStatus(DidBalanceDeductModel model) {
         return didBalanceDeductMapper.updateOrderStatus(model);
     }
+
+    @Override
+    public DidBalanceDeductModel getSumMoneyByDid(DidBalanceDeductModel model) {
+        return didBalanceDeductMapper.getSumMoneyByDid(model);
+    }
 }

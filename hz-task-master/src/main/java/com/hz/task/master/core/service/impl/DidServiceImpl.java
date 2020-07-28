@@ -71,4 +71,9 @@ public class DidServiceImpl<T> extends BaseServiceImpl<T> implements DidService<
     public int updateDidDeductBalance(DidModel model) {
         return didMapper.updateDidDeductBalance(model);
     }
+
+    @Override
+    public int updateDidLockMoney(DidModel model) {
+        return didMapper.updateDidLockMoney(model);
+    }
 }

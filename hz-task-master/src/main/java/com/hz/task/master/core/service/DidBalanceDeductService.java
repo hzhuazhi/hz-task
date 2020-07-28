@@ -20,4 +20,13 @@ public interface DidBalanceDeductService<T> extends BaseService<T> {
      * @date 2020/7/2 19:16
      */
     public int updateOrderStatus(DidBalanceDeductModel model);
+
+    /**
+     * @Description: 根据用户ID查询被锁定的金额
+     * @param model
+     * @return
+     * @author yoko
+     * @date 2020/7/28 15:34
+     */
+    public DidBalanceDeductModel getSumMoneyByDid(DidBalanceDeductModel model);
 }

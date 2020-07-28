@@ -91,6 +91,15 @@
     </update>
 
 
+    <!-- 查询所有金额是锁定的用户集合 -->
+    <select id="getBalanceDeductDidList" parameterType="Object" resultType="java.lang.Long">
+        select distinct(a.did) as did from tb_fn_did_balance_deduct a
+        where 1=1
+        and a.order_status in (2,5)
+        and a.run_status != 3
+    </select>
+
+
 
 
 

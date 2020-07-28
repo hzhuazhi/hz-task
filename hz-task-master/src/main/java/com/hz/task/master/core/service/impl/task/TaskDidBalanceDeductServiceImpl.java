@@ -41,4 +41,9 @@ public class TaskDidBalanceDeductServiceImpl<T> extends BaseServiceImpl<T> imple
     public int updateDidBalanceDeductStatus(Object obj) {
         return taskDidBalanceDeductMapper.updateDidBalanceDeductStatus(obj);
     }
+
+    @Override
+    public List<Long> getBalanceDeductDidList(Object obj) {
+        return taskDidBalanceDeductMapper.getBalanceDeductDidList(obj);
+    }
 }
