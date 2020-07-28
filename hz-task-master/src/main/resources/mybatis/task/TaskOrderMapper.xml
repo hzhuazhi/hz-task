@@ -10,7 +10,7 @@
         a.id,a.did,a.order_no,a.order_money,a.collection_account_id,a.collection_type,a.qr_code_id,
         a.qr_code,a.wx_nickname,a.wx_id,a.out_trade_no,a.notify_url,a.order_status,a.invalid_time,
         a.program_time,a.did_status,a.profit,a.is_red_pack,a.red_pack_time,
-        a.is_reply,a.reply_data,a.reply_time,a.actual_money,a.money_fit_type,
+        a.is_reply,a.reply_data,a.reply_time,a.actual_money,a.money_fit_type,a.replenish_type,
         a.curday,a.curhour,a.curminute,a.run_num,a.run_status,a.send_num,a.send_status,
         a.create_time,a.update_time,a.yn,
         b.ac_name,b.ac_num
@@ -116,7 +116,7 @@
         a.id,a.did,a.order_no,a.order_money,a.collection_account_id,a.collection_type,
         a.qr_code,a.wx_nickname,a.wx_id,a.out_trade_no,a.notify_url,a.order_status,a.invalid_time,
         a.program_time,a.did_status,a.profit,a.is_red_pack,a.red_pack_time,
-        a.is_reply,a.reply_data,a.reply_time,a.actual_money,a.money_fit_type,
+        a.is_reply,a.reply_data,a.reply_time,a.actual_money,a.money_fit_type,a.replenish_type,
         a.curday,a.curhour,a.curminute,a.run_num,a.run_status,a.send_num,a.send_status,
         a.create_time,a.update_time,a.yn
         from tb_fn_order a
@@ -139,7 +139,7 @@
         a.id,a.did,a.order_no,a.order_money,a.collection_account_id,a.collection_type,
         a.qr_code,a.wx_nickname,a.wx_id,a.out_trade_no,a.notify_url,a.order_status,a.invalid_time,
         a.program_time,a.did_status,a.profit,a.is_red_pack,a.red_pack_time,
-        a.is_reply,a.reply_data,a.reply_time,a.actual_money,a.money_fit_type,
+        a.is_reply,a.reply_data,a.reply_time,a.actual_money,a.money_fit_type,a.replenish_type,
         a.curday,a.curhour,a.curminute,a.run_num,a.run_status,a.send_num,a.send_status,
         a.create_time,a.update_time,a.yn
         from tb_fn_order a

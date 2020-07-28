@@ -2619,15 +2619,17 @@ public class TaskMethod {
      * @param did - 用户ID
      * @param collectionAccountId - 收款账号ID
      * @param collectionType - 支付类型：3微信群支付
+     * @param replenishType -  是否是补单：1初始化不是补单，2是补单
      * @return com.hz.task.master.core.model.order.OrderModel
      * @author yoko
      * @date 2020/7/23 14:52
      */
-    public static OrderModel assembleOrderByNewestQuery(long did, long collectionAccountId, int collectionType){
+    public static OrderModel assembleOrderByNewestQuery(long did, long collectionAccountId, int collectionType, int replenishType){
         OrderModel resBean = new OrderModel();
         resBean.setDid(did);
         resBean.setCollectionAccountId(collectionAccountId);
         resBean.setCollectionType(collectionType);
+        resBean.setReplenishType(replenishType);
         return resBean;
     }
 
@@ -2977,12 +2979,13 @@ public class TaskMethod {
      * @param orderMoney - 订单金额
      * @param collectionType - 支付类型
      * @param remark - 备注
+     * @param replenishType - 是否是补单：1初始化不是补单，2是补单
      * @return com.hz.fine.master.core.model.order.OrderModel
      * @author yoko
      * @date 2020/6/2 14:53
      */
     public static OrderModel assembleOrderByReplenish(long did, String orderNo, String orderMoney,
-                                                       long collectionAccountId, int collectionType, String remark) throws Exception{
+                                                       long collectionAccountId, int collectionType, String remark, int replenishType) throws Exception{
         OrderModel resBean = new OrderModel();
         resBean.setDid(did);
         resBean.setOrderNo(orderNo);
@@ -2993,6 +2996,7 @@ public class TaskMethod {
         // 订单失效时间
         resBean.setInvalidTime(DateUtil.getNowPlusTime());
         resBean.setRemark(remark);
+        resBean.setReplenishType(replenishType);
         resBean.setCurday(DateUtil.getDayNumber(new Date()));
         resBean.setCurhour(DateUtil.getHour(new Date()));
         resBean.setCurminute(DateUtil.getCurminute(new Date()));

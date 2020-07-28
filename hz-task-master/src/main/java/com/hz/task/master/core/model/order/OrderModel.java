@@ -203,6 +203,11 @@ public class OrderModel extends BasePage implements Serializable {
      */
     private Integer moneyFitType;
 
+    /**
+     * 是否是补单：1初始化不是补单，2是补单
+     */
+    private Integer replenishType;
+
 
     private String startTime;
     private String endTime;
@@ -574,5 +579,13 @@ public class OrderModel extends BasePage implements Serializable {
 
     public void setDidTime(String didTime) {
         this.didTime = didTime;
+    }
+
+    public Integer getReplenishType() {
+        return replenishType;
+    }
+
+    public void setReplenishType(Integer replenishType) {
+        this.replenishType = replenishType;
     }
 }

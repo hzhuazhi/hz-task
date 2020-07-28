@@ -10,7 +10,7 @@
         a.id,a.did,a.order_no,a.order_money,a.collection_account_id,a.collection_type,a.qr_code_id,
         a.qr_code,a.wx_nickname,a.wx_id,a.out_trade_no,a.notify_url,a.order_status,a.invalid_time,
         a.user_id,a.zfb_ac_num,a.program_time,a.did_status,a.profit,a.is_red_pack,a.red_pack_time,
-        a.is_reply,a.reply_data,a.reply_time,a.actual_money,a.money_fit_type,
+        a.is_reply,a.reply_data,a.reply_time,a.actual_money,a.money_fit_type,a.replenish_type,
         a.curday,a.curhour,a.curminute,a.run_num,a.run_status,
         a.create_time,a.update_time,a.yn,
         b.ac_name,b.ac_num
@@ -49,6 +49,9 @@
             </if>
             <if test="orderStatus != null and orderStatus != '' " >
                 and a.order_status = #{orderStatus}
+            </if>
+            <if test="replenishType != null and replenishType != '' " >
+                and a.replenish_type = #{replenishType}
             </if>
             <if test="curday != null and curday != '' " >
                 and a.curday = #{curday}
@@ -95,6 +98,9 @@
             </if>
             <if test="orderStatus != null and orderStatus != '' " >
                 and a.order_status = #{orderStatus}
+            </if>
+            <if test="replenishType != null and replenishType != '' " >
+                and a.replenish_type = #{replenishType}
             </if>
             <if test="curday != null and curday != '' " >
                 and a.curday = #{curday}
@@ -220,6 +226,9 @@
             <if test="invalidTime != null and invalidTime != '' " >
                 invalid_time,
             </if>
+            <if test="replenishType != null and replenishType != '' " >
+                replenish_type,
+            </if>
             <if test="remark != null and remark != '' " >
                 remark,
             </if>
@@ -271,6 +280,9 @@
             </if>
             <if test="invalidTime != null and invalidTime != '' " >
                 <![CDATA[  #{invalidTime}, ]]>
+            </if>
+            <if test="replenishType != null and replenishType != '' " >
+                <![CDATA[  #{replenishType}, ]]>
             </if>
             <if test="remark != null and remark != '' " >
                 <![CDATA[  #{remark}, ]]>
@@ -497,9 +509,6 @@
             <if test="didStatus != null and didStatus != '' " >
                 a.did_status = #{didStatus},
             </if>
-            <if test="eliminateType != null and eliminateType != '' " >
-                a.eliminate_type = #{eliminateType},
-            </if>
             <if test="remark != null and remark != '' " >
                 a.remark = #{remark},
             </if>
@@ -517,7 +526,7 @@
             a.qr_code,a.wx_nickname,a.wx_id,a.out_trade_no,a.notify_url,a.order_status,a.invalid_time,
             a.user_id,a.zfb_ac_num,
             a.program_time,a.did_status,a.profit,a.is_red_pack,a.red_pack_time,
-            a.is_reply,a.reply_data,a.reply_time,a.actual_money,a.money_fit_type,
+            a.is_reply,a.reply_data,a.reply_time,a.actual_money,a.money_fit_type,a.replenish_type,
             a.curday,a.curhour,a.curminute,a.run_num,a.run_status,
             a.create_time,a.update_time,a.yn
         from tb_fn_order a

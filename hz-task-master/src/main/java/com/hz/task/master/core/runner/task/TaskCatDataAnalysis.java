@@ -126,7 +126,7 @@ public class TaskCatDataAnalysis {
 
                             // 处理订单逻辑
                             // 查询此账号最新订单数据
-                            OrderModel orderQuery = TaskMethod.assembleOrderByNewestQuery(data.getDid(), data.getCollectionAccountId(), 3);
+                            OrderModel orderQuery = TaskMethod.assembleOrderByNewestQuery(data.getDid(), data.getCollectionAccountId(), 3, 1);
                             OrderModel orderModel = ComponentUtil.orderService.getNewestOrder(orderQuery);
                             if (orderModel != null && orderModel.getId() > 0){
                                 if (orderModel.getOrderStatus() == 1){
@@ -192,7 +192,7 @@ public class TaskCatDataAnalysis {
                             String sucMoney = fg_msg[1];// 用户上报的成功金额
 
                             // 查询此账号最新订单数据
-                            OrderModel orderQuery = TaskMethod.assembleOrderByNewestQuery(data.getDid(), data.getCollectionAccountId(), 3);
+                            OrderModel orderQuery = TaskMethod.assembleOrderByNewestQuery(data.getDid(), data.getCollectionAccountId(), 3, 1);
                             OrderModel orderModel = ComponentUtil.orderService.getNewestOrder(orderQuery);
                             if (orderModel != null && orderModel.getId() > 0){
                                 // 判断此订单用户是否回复过
@@ -242,7 +242,7 @@ public class TaskCatDataAnalysis {
 
 
                             // 查询此账号最新订单数据
-                            OrderModel orderQuery = TaskMethod.assembleOrderByNewestQuery(data.getDid(), data.getCollectionAccountId(), 3);
+                            OrderModel orderQuery = TaskMethod.assembleOrderByNewestQuery(data.getDid(), data.getCollectionAccountId(), 3, 1);
                             OrderModel orderModel = ComponentUtil.orderService.getNewestOrder(orderQuery);
                             if (orderModel != null && orderModel.getId() > 0){
                                 // 判断此订单是否已发过红包
