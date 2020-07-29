@@ -10,6 +10,7 @@ import com.hz.task.master.core.model.did.DidRewardModel;
 import com.hz.task.master.core.model.task.base.StatusModel;
 import com.hz.task.master.util.ComponentUtil;
 import com.hz.task.master.util.TaskMethod;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -135,8 +136,8 @@ public class TaskDidBalanceDeduct {
                 DidBalanceDeductModel didBalanceDeductQuery = new DidBalanceDeductModel();
                 didBalanceDeductQuery.setDid(data);
                 DidBalanceDeductModel didBalanceDeductModel = ComponentUtil.didBalanceDeductService.getSumMoneyByDid(didBalanceDeductQuery);
-                if (didBalanceDeductModel != null && didBalanceDeductModel.getDid() > 0){
-                    DidModel didModel = TaskMethod.assembleDidDataByLockMoney(didBalanceDeductModel.getDid(), didBalanceDeductModel.getMoney());
+                if (didBalanceDeductModel != null && !StringUtils.isBlank(didBalanceDeductModel.getMoney())){
+                    DidModel didModel = TaskMethod.assembleDidDataByLockMoney(data, didBalanceDeductModel.getMoney());
                     ComponentUtil.didService.updateDidLockMoney(didModel);
                 }
 

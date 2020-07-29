@@ -242,7 +242,7 @@
 
     <!-- 根据用户ID查询被锁定的金额-->
     <select id="getSumMoneyByDid" parameterType="Object" resultType="com.hz.task.master.core.model.did.DidBalanceDeductModel">
-        select a.did,ifnull(sum(a.money), '0.00') as money from tb_fn_did_balance_deduct a
+        select ifnull(sum(a.money), '0.00') as money from tb_fn_did_balance_deduct a
         where 1=1
         and a.order_status in (2,5)
         and a.run_status != 3
