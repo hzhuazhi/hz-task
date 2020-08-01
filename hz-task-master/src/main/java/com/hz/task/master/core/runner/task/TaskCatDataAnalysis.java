@@ -17,6 +17,7 @@ import com.hz.task.master.core.model.order.OrderStepModel;
 import com.hz.task.master.core.model.strategy.StrategyData;
 import com.hz.task.master.core.model.strategy.StrategyModel;
 import com.hz.task.master.core.model.task.base.StatusModel;
+import com.hz.task.master.core.model.wx.WxClerkModel;
 import com.hz.task.master.util.ComponentUtil;
 import com.hz.task.master.util.TaskMethod;
 import org.apache.commons.lang.StringUtils;
@@ -87,6 +88,14 @@ public class TaskCatDataAnalysis {
                             // 根据微信群名称查询此收款账号信息
                             if (didCollectionAccountModel != null && didCollectionAccountModel.getId() > 0){
                                 if (didCollectionAccountModel.getCheckStatus() != 3){
+                                    // 查询小微与此收款账号之前是否已建立了关联关系
+                                    WxClerkModel wxClerkQuery = TaskMethod.assembleWxClerkAddOrQuery(data.getWxId(), didCollectionAccountModel.getId());
+                                    WxClerkModel wxClerkData = (WxClerkModel) ComponentUtil.wxClerkService.findByObject(wxClerkQuery);
+                                    if (wxClerkData == null || wxClerkData.getId() <= 0){
+                                        // 之前没有建立关系，需要添加小微与收款账号的关联关系
+                                        WxClerkModel wxClerkAdd = TaskMethod.assembleWxClerkAddOrQuery(data.getWxId(), didCollectionAccountModel.getId());
+                                        ComponentUtil.wxClerkService.add(wxClerkAdd);
+                                    }
                                     // 更新微信群收款账号信息
                                     DidCollectionAccountModel updateDidCollectionAccountModel = TaskMethod.assembleDidCollectionAccountUpdateByWxGroup(data, didCollectionAccountModel.getId());
                                     int upNum = ComponentUtil.didCollectionAccountService.updateDidCollectionAccountByWxData(updateDidCollectionAccountModel);

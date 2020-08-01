@@ -193,4 +193,34 @@ public interface CacheKey {
      */
     String DID_ONOFF = "-30";
 
+    /**
+     * 需要锁的金额：无条件锁定金额3分钟
+     * 锁住
+     */
+    String LOCK_MONEY_BY_RANDOM = "-31";
+
+    /**
+     * 会话ID存储银行卡的主键ID
+     */
+    String BANK_ID_BY_SGID = "-32";
+
+    /**
+     * 需要锁：银行卡ID + 充值金额的锁
+     * <p>
+     *     根据银行卡 + 充值金额 查询充值订单是否有存在相同金额的挂单
+     * </p>
+     * 锁住
+     */
+    String LOCK_BANK_ID_MONEY = "-33";
+
+    /**
+     * 小微每天加好友的数量
+     * <p>
+     *     1.task配合去累加当日加好友数量。
+     *     2.redis的失效时间是：距离今天凌晨的时间失效
+     *
+     * </p>
+     */
+    String WX_DAY_NUM = "-34";
+
 }

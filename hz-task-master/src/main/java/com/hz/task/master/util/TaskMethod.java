@@ -3180,6 +3180,21 @@ public class TaskMethod {
         return profit;
     }
 
+    /**
+     * @Description: 组装修改小微旗下店员关联关系的方法
+     * @param wxId - 小微主键ID
+     * @param collectionAccountId - 收款账号主键ID
+     * @return com.hz.task.master.core.model.wx.WxClerkModel
+     * @author yoko
+     * @date 2020/6/15 17:59
+     */
+    public static WxClerkModel assembleWxClerkAddOrQuery(long wxId, long collectionAccountId){
+        WxClerkModel resBean = new WxClerkModel();
+        resBean.setWxId(wxId);
+        resBean.setCollectionAccountId(collectionAccountId);
+        return resBean;
+    }
+
 
 
 
