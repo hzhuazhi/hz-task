@@ -35,6 +35,7 @@ import com.hz.task.master.core.model.task.client.ClientModel;
 import com.hz.task.master.core.model.task.did.TaskDidCollectionAccountDataModel;
 import com.hz.task.master.core.model.wx.WxClerkDataModel;
 import com.hz.task.master.core.model.wx.WxClerkModel;
+import com.hz.task.master.core.model.wx.WxFriendModel;
 import com.hz.task.master.core.model.wx.WxModel;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -3192,6 +3193,42 @@ public class TaskMethod {
         WxClerkModel resBean = new WxClerkModel();
         resBean.setWxId(wxId);
         resBean.setCollectionAccountId(collectionAccountId);
+        return resBean;
+    }
+
+
+    /**
+     * @Description: 组装小微加好友记录的添加方法或者查询方法
+     * @param wxId - 小微的主键ID
+     * @param did - 用户ID
+     * @param collectionAccountId - 收款账号ID
+     * @param finalFromWxid - 微信的原始账号
+     * @param curday - 日期
+     * @return com.hz.task.master.core.model.wx.WxFriendModel
+     * @author yoko
+     * @date 2020/8/1 18:07
+     */
+    public static WxFriendModel assembleWxFriendAddOrQuery(long wxId, long did, long collectionAccountId, String finalFromWxid, int curday){
+        WxFriendModel resBean = new WxFriendModel();
+        if (wxId > 0){
+            resBean.setWxId(wxId);
+        }
+        if (did > 0){
+            resBean.setDid(did);
+        }
+        if (collectionAccountId > 0){
+            resBean.setCollectionAccountId(collectionAccountId);
+        }
+        if (!StringUtils.isBlank(finalFromWxid)){
+            resBean.setFinalFromWxid(finalFromWxid);
+        }
+        if(curday > 0){
+            resBean.setCurday(curday);
+        }else{
+            resBean.setCurday(DateUtil.getDayNumber(new Date()));
+        }
+        resBean.setCurhour(DateUtil.getHour(new Date()));
+        resBean.setCurminute(DateUtil.getCurminute(new Date()));
         return resBean;
     }
 

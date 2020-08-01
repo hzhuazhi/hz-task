@@ -18,6 +18,7 @@ import com.hz.task.master.core.model.strategy.StrategyData;
 import com.hz.task.master.core.model.strategy.StrategyModel;
 import com.hz.task.master.core.model.task.base.StatusModel;
 import com.hz.task.master.core.model.wx.WxClerkModel;
+import com.hz.task.master.core.model.wx.WxFriendModel;
 import com.hz.task.master.util.ComponentUtil;
 import com.hz.task.master.util.TaskMethod;
 import org.apache.commons.lang.StringUtils;
@@ -313,68 +314,65 @@ public class TaskCatDataAnalysis {
 
 
 
-//    /**
-//     * @Description: 可爱猫数据解析数据，支付成功的数据进行更新订单状态
-//     * <p>
-//     *     每1每秒运行一次
-//     *     1.查询出已补充完毕的可爱猫数据解析数据。
-//     *     2.根据dataType类型进行执行：类型不等于7的一律修改成执行成功。
-//     *     3.dataType=7的：更新订单的状态，更新成成功状态
-//     *
-//     *
-//     * </p>
-//     * @author yoko
-//     * @date 2019/12/6 20:25
-//     */
-////    @Scheduled(cron = "5 * * * * ?")
-//    @Scheduled(fixedDelay = 1000) // 每秒执行
-//    public void catDataAnalysisSucWork() throws Exception{
-////        log.info("----------------------------------TaskCatDataAnalysis.catDataAnalysisSucWork()----start");
-//
-//        // 获取需要填充的可爱猫数据
-//        StatusModel statusQuery = TaskMethod.assembleTaskByWorkTypeAndRunStatusQuery(limitNum, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE);
-//        List<CatDataAnalysisModel> synchroList = ComponentUtil.taskCatDataAnalysisService.getCatDataAnalysisList(statusQuery);
-//        for (CatDataAnalysisModel data : synchroList){
-//            try{
-//                // 锁住这个数据流水
-//                String lockKey = CachedKeyUtils.getCacheKeyTask(TkCacheKey.LOCK_CAT_DATA_ANALYSIS_WORK_TYPE_SUC, data.getId());
-//                boolean flagLock = ComponentUtil.redisIdService.lock(lockKey);
-//                if (flagLock){
-//                    int runStatus = 0;
-//                    String info = "";
-//
-//                    if (data.getDataType() == 7){
-//                        // 更新订单状态：更新成成功状态
-//                        OrderModel orderUpdate = TaskMethod.assembleOrderUpdateStatusByOrderNo(data.getOrderNo(), 4);
-//                        int num = ComponentUtil.orderService.updateOrderStatusByOrderNo(orderUpdate);
-//                        if (num > 0){
-//                            // 更新此次task的状态：更新成成功状态
-//                            runStatus = ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE;
-//                        }else {
-//                            // 更新此次task的状态：更新成失败状态
-//                            runStatus = ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO;
-//                            info = "更新订单状态的响应行为0";
-//                        }
-//                    }else {
-//                        // 更新此次task的状态：更新成成功状态
-//                        runStatus = ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE;
-//                    }
-//
-//                    StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), runStatus, info);
-//                    ComponentUtil.taskCatDataAnalysisService.updateCatDataAnalysisStatus(statusModel);
-//                    // 解锁
-//                    ComponentUtil.redisIdService.delLock(lockKey);
-//                }
-//
-////                log.info("----------------------------------TaskCatDataAnalysis.catDataAnalysisSucWork()----end");
-//            }catch (Exception e){
-//                log.error(String.format("this TaskCatDataAnalysis.catDataAnalysisSucWork() is error , the dataId=%s !", data.getId()));
-//                e.printStackTrace();
-//                // 更新此次task的状态：更新成失败
-//                StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "异常失败try!");
-//                ComponentUtil.taskCatDataAnalysisService.updateCatDataAnalysisStatus(statusModel);
-//            }
-//        }
-//    }
+    /**
+     * 段峰
+     * @Description: 可爱猫数据解析数据，补充成功数据进行逻辑运算
+     * <p>
+     *     每1每秒运行一次
+     *     1.查询出已补充完毕的可爱猫数据解析数据。
+     *     2.根据dataType类型进行执行：类型不等于7的一律修改成执行成功。
+     *     3.dataType=7的：更新订单的状态，更新成成功状态
+     *
+     *
+     * </p>
+     * @author yoko
+     * @date 2019/12/6 20:25
+     */
+//    @Scheduled(cron = "5 * * * * ?")
+    @Scheduled(fixedDelay = 1000) // 每秒执行
+    public void catDataAnalysisSucWork() throws Exception{
+//        log.info("----------------------------------TaskCatDataAnalysis.catDataAnalysisSucWork()----start");
+
+        // 获取已经填充完毕的的可爱猫解析数据
+        StatusModel statusQuery = TaskMethod.assembleTaskByWorkTypeAndRunStatusQuery(limitNum, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE);
+        List<CatDataAnalysisModel> synchroList = ComponentUtil.taskCatDataAnalysisService.getCatDataAnalysisList(statusQuery);
+        for (CatDataAnalysisModel data : synchroList){
+            try{
+                // 锁住这个数据流水
+                String lockKey = CachedKeyUtils.getCacheKeyTask(TkCacheKey.LOCK_CAT_DATA_ANALYSIS_WORK_TYPE_SUC, data.getId());
+                boolean flagLock = ComponentUtil.redisIdService.lock(lockKey);
+                if (flagLock){
+                    int runStatus = 0;
+                    String info = "";
+
+                    if (data.getDataType() == 3){
+                        // 添加小微加好友记录的数据
+                        WxFriendModel wxFriendModel = TaskMethod.assembleWxFriendAddOrQuery(data.getWxId(),data.getDid(),
+                                data.getCollectionAccountId(),data.getFinalFromWxid(), 0);
+                        ComponentUtil.wxFriendService.add(wxFriendModel);
+
+                        // 更新此次task的状态：更新成成功状态
+                        runStatus = ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE;
+                    }else {
+                        // 更新此次task的状态：更新成成功状态
+                        runStatus = ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE;
+                    }
+
+                    StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), runStatus, info);
+                    ComponentUtil.taskCatDataAnalysisService.updateCatDataAnalysisStatus(statusModel);
+                    // 解锁
+                    ComponentUtil.redisIdService.delLock(lockKey);
+                }
+
+//                log.info("----------------------------------TaskCatDataAnalysis.catDataAnalysisSucWork()----end");
+            }catch (Exception e){
+                log.error(String.format("this TaskCatDataAnalysis.catDataAnalysisSucWork() is error , the dataId=%s !", data.getId()));
+                e.printStackTrace();
+                // 更新此次task的状态：更新成失败
+                StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "异常失败try!");
+                ComponentUtil.taskCatDataAnalysisService.updateCatDataAnalysisStatus(statusModel);
+            }
+        }
+    }
 
 }

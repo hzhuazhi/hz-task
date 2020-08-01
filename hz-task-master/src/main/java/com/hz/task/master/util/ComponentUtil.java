@@ -49,6 +49,7 @@ public class ComponentUtil {
     public static OperateService operateService;
     public static CatDataAnalysisUnusualService catDataAnalysisUnusualService;
     public static OrderStepService orderStepService;
+    public static WxFriendService wxFriendService;
 
 
 
