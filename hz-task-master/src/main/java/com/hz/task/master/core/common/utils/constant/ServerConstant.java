@@ -111,6 +111,9 @@ public class ServerConstant {
         TEAM_CONSUME_REWARD_WX_GROUP(31,""),
         WX_GROUP_REPLY_INSTRUCT(32,""),
         REPLY_TIME(33,""),
+        GROUP_NAME(34,""),
+        GROUP_RED_PACK_NUM(35,""),
+        GROUP_NUM(36,""),
 
         ;
         private int stgType;

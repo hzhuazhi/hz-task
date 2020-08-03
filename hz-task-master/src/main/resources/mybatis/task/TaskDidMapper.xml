@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hz.task.master.core.mapper.task.TaskDidMapper">
+
+
+
+
+    <!-- 定义数据库基本列,只适用代替单表的*-->
+    <sql id="Base_Column_List">
+        a.id,a.nickname,a.ac_num,a.phone_num,a.pass_wd,a.operate_wd,a.icode,a.total_money,a.balance,a.lock_money,a.vip_type,a.total_recharge_profit,a.total_grade_profit,
+        a.total_direct_profit,a.total_indirect_profit,a.total_team_profit,a.total_consume_profit,a.total_team_consume_profit,
+        a.trigger_quota_grade,a.total_trigger_quota_profit,a.team_consume_cumulative_grade,a.total_team_consume_cumulative_profit,a.total_team_direct_consume_profit,
+        a.total_direct_num,a.total_indirect_num,a.total_profit,a.zfb_total_profit,
+        a.is_notify,a.notify_url,a.is_team,a.own_id,a.group_num,a.switch_type,a.use_status,
+        a.create_time,a.update_time,a.yn
+    </sql>
+
+
+    <!-- 查询条件 -->
+    <sql id="Example_Where_Clause">
+        where 1=1
+        <trim  suffixOverrides="," >
+            <if test="id != null and id != '' " >
+                and a.id = #{id}
+            </if>
+            <if test="acNum != null and acNum != '' " >
+                and a.ac_num = #{acNum}
+            </if>
+            <if test="phoneNum != null and phoneNum != '' " >
+                and a.phone_num = #{phoneNum}
+            </if>
+            <if test="passWd != null and passWd != '' " >
+                and a.pass_wd = #{passWd}
+            </if>
+            <if test="operateWd != null and operateWd != '' " >
+                and a.operate_wd = #{operateWd}
+            </if>
+            <if test="icode != null and icode != '' " >
+                and a.icode = #{icode}
+            </if>
+            <if test="vipType != null and vipType != '' " >
+                and a.vip_type = #{vipType}
+            </if>
+            <if test="switchType != null and switchType != '' " >
+                and a.switch_type = #{switchType}
+            </if>
+            <if test="ownId != null and ownId != '' " >
+                and a.own_id = #{ownId}
+            </if>
+            <if test="isTeam != null and isTeam != '' " >
+                and a.is_team = #{isTeam}
+            </if>
+            and a.use_status = 1
+            and a.yn = 0
+        </trim>
+    </sql>
+
+
+    <!-- 查询条件_id -->
+    <sql id="Example_Where_Clause_id">
+        where 1=1
+        <trim  suffixOverrides="," >
+            <if test="id != null and id != '' " >
+                and a.id = #{id}
+            </if>
+            and a.yn =  0
+        </trim>
+    </sql>
+
+    <!-- 排序条件 -->
+    <sql id="Example_Order_By">
+        order by a.create_time asc
+    </sql>
+
+
+    <!-- 显示所有数据 -->
+    <select id="findAll" resultType="com.hz.task.master.core.model.did.DidModel">
+        select
+        <include refid="Base_Column_List" />
+        from tb_fn_did a
+        <include refid="Example_Where_Clause"/>
+        <include refid="Example_Order_By"/>
+    </select>
+
+    <!-- 查询列表 -->
+    <select id="findByCondition" parameterType="Object" resultType="com.hz.task.master.core.model.did.DidModel">
+        select
+        <include refid="Base_Column_List" />
+        from tb_fn_did a
+        <include refid="Example_Where_Clause"/>
+        <include refid="Example_Order_By"/>
+    </select>
+
+    <!-- 根据条件查询信息-->
+    <select id="findByObject" parameterType="Object" resultType="com.hz.task.master.core.model.did.DidModel">
+        select
+        <include refid="Base_Column_List" />
+        from tb_fn_did a
+        <include refid="Example_Where_Clause"/>
+        limit 1
+    </select>
+
+    <!-- 根据id查询信息-->
+    <select id="findById" parameterType="java.lang.Long" resultType="com.hz.task.master.core.model.did.DidModel">
+        select
+        <include refid="Base_Column_List" />
+        from tb_fn_did a
+        <include refid="Example_Where_Clause_id"/>
+    </select>
+
+
+
+    <!-- 查询总数-->
+    <select id="queryByCount" resultType="java.lang.Integer"  parameterType="Object">
+        select count(1)
+        from tb_fn_did a
+        <include refid="Example_Where_Clause"/>
+    </select>
+
+    <!-- 查询分页列表 -->
+    <select id="queryByList" parameterType="Object" resultType="com.hz.task.master.core.model.did.DidModel">
+        select
+        <include refid="Base_Column_List" />
+        from tb_fn_did a
+        <include refid="Example_Where_Clause"/>
+        <include refid="Example_Order_By"/>
+        <if test="pageNumber != null and pageNumber != ''" >
+            limit #{start},#{end}
+        </if>
+    </select>
+
+
+
+
+
+    <!-- 获取有效的用户-微信群-new -->
+    <select id="getNewEffectiveDidByWxGroupList" parameterType="Object" resultType="com.hz.task.master.core.model.did.DidModel">
+        select a1.*,
+        a2.did,a2.count_group_num from (
+        select a.id,a.nickname,a.ac_num,a.phone_num,a.pass_wd,a.operate_wd,a.icode,a.total_money,a.balance,a.lock_money,a.vip_type,a.total_recharge_profit,a.total_grade_profit,
+        a.total_direct_profit,a.total_indirect_profit,a.total_team_profit,a.total_direct_num,a.total_indirect_num,a.total_profit,a.zfb_total_profit,
+        a.is_notify,a.notify_url,a.own_id,a.use_status,a.switch_type,
+        a.create_time,a.update_time,a.yn
+        from tb_fn_did a
+        where 1=1
+        and a.id = #{id} a.use_status =1 and a.switch_type =1 and a.yn = 0
+        )a1
+        left join (
+        select a.did,count(a.id) as count_group_num from tb_fn_did_collection_account a
+        where 1=1
+        and a.did = #{did}
+        and a.is_invalid =1 and a.invalid_time > now() and a.check_status =3
+        and a.red_pack_num > 0
+        and a.ac_type = #{acType}
+        and a.day_switch = 1 and a.month_switch = 1 and a.total_switch = 1 and a.use_status=1
+        and a.yn = 0
+        group by a.did
+	    ) a2 on a1.id = a2.did
+        <!--where a2.did is not null-->
+    </select>
+
+
+
+</mapper>

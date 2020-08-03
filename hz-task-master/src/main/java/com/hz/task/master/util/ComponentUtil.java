@@ -69,6 +69,7 @@ public class ComponentUtil {
     public static TaskClientDataService taskClientDataService;
     public static TaskCatDataAnalysisService taskCatDataAnalysisService;
     public static TaskWxService taskWxService;
+    public static TaskDidService taskDidService;
 
 
 

@@ -468,5 +468,20 @@
     </update>
 
 
+    <!-- 获取有效的收款账号 -->
+    <select id="getEffectiveDidCollectionAccountList" parameterType="Object" resultType="com.hz.task.master.core.model.did.DidCollectionAccountModel">
+        select
+        <include refid="Base_Column_List" />
+        from tb_fn_did_collection_account a
+        where 1=1
+        and a.did = #{did}
+        and a.is_invalid =1 and a.invalid_time > now() and a.check_status =3
+        and a.red_pack_num > 0
+        and a.ac_type = #{acType}
+        and a.day_switch = 1 and a.month_switch = 1 and a.total_switch = 1 and a.use_status=1
+        and a.yn = 0
+    </select>
+
+
 
 </mapper>

@@ -197,6 +197,9 @@ public class AutowireRunner implements ApplicationRunner {
     @Autowired
     private TaskWxService taskWxService;
 
+    @Autowired
+    private TaskDidService taskDidService;
+
 
 
 
@@ -268,6 +271,7 @@ public class AutowireRunner implements ApplicationRunner {
         ComponentUtil.taskClientDataService = taskClientDataService;
         ComponentUtil.taskCatDataAnalysisService = taskCatDataAnalysisService;
         ComponentUtil.taskWxService = taskWxService;
+        ComponentUtil.taskDidService = taskDidService;
 
         runThread = new RunThread();
         runThread.start();

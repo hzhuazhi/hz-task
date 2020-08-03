@@ -20,6 +20,11 @@ public class DidModel extends BasePage implements Serializable {
     private Long id;
 
     /**
+     * 用户ID
+     */
+    private Long did;
+
+    /**
      * 账号昵称
      */
     private String nickname;
@@ -176,6 +181,16 @@ public class DidModel extends BasePage implements Serializable {
     private Long ownId;
 
     /**
+     * 群序号
+     */
+    private Integer groupNum;
+
+    /**
+     * 个人出码开关：1打开状态，2暂停状态
+     */
+    private Integer switchType;
+
+    /**
      * 使用状态:1初始化有效正常使用，2无效暂停使用
      */
     private Integer useStatus;
@@ -217,6 +232,36 @@ public class DidModel extends BasePage implements Serializable {
      * 订单金额
      */
     private String orderMoney;
+
+    /**
+     * 用户收款账号ID：对应表tb_fn_did_collection_account的主键ID
+     */
+    private Long collectionAccountId;
+
+    /**
+     * 支付宝账号ID
+     */
+    private String userId;
+
+    /**
+     * 支付宝账号
+     */
+    private String zfbAcNum;
+
+    /**
+     * 微信群名称
+     */
+    private String payee;
+
+    /**
+     * 收款账号/地址（转码）：二维码
+     */
+    private String ddQrCode;
+
+    /**
+     * 有效微信群个数
+     */
+    private Integer countGroupNum;
 
     public Long getId() {
         return id;
@@ -537,5 +582,77 @@ public class DidModel extends BasePage implements Serializable {
 
     public void setTotalTeamDirectConsumeProfit(String totalTeamDirectConsumeProfit) {
         this.totalTeamDirectConsumeProfit = totalTeamDirectConsumeProfit;
+    }
+
+    public Integer getGroupNum() {
+        return groupNum;
+    }
+
+    public void setGroupNum(Integer groupNum) {
+        this.groupNum = groupNum;
+    }
+
+    public Integer getSwitchType() {
+        return switchType;
+    }
+
+    public void setSwitchType(Integer switchType) {
+        this.switchType = switchType;
+    }
+
+    public Long getCollectionAccountId() {
+        return collectionAccountId;
+    }
+
+    public void setCollectionAccountId(Long collectionAccountId) {
+        this.collectionAccountId = collectionAccountId;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getZfbAcNum() {
+        return zfbAcNum;
+    }
+
+    public void setZfbAcNum(String zfbAcNum) {
+        this.zfbAcNum = zfbAcNum;
+    }
+
+    public String getPayee() {
+        return payee;
+    }
+
+    public void setPayee(String payee) {
+        this.payee = payee;
+    }
+
+    public String getDdQrCode() {
+        return ddQrCode;
+    }
+
+    public void setDdQrCode(String ddQrCode) {
+        this.ddQrCode = ddQrCode;
+    }
+
+    public Integer getCountGroupNum() {
+        return countGroupNum;
+    }
+
+    public void setCountGroupNum(Integer countGroupNum) {
+        this.countGroupNum = countGroupNum;
+    }
+
+    public Long getDid() {
+        return did;
+    }
+
+    public void setDid(Long did) {
+        this.did = did;
     }
 }

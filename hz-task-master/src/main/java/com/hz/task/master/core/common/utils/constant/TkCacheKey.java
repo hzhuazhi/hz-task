@@ -185,4 +185,10 @@ public interface TkCacheKey {
      * 锁住
      */
     String LOCK_WX_IS_OK = "-30";
+
+    /**
+     * 锁：用户出码开关运算
+     * 锁住
+     */
+    String LOCK_DID_SWITCH_TYPE = "-31";
 }

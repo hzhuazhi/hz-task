@@ -520,4 +520,21 @@
     </update>
 
 
+    <!-- 更新用户的群序号或者更新用户的出码开关 -->
+    <update id="updateDidGroupNumOrSwitchType" parameterType="com.hz.task.master.core.model.did.DidModel">
+        UPDATE tb_fn_did a
+        <trim prefix="set" suffixOverrides=",">
+            <if test="groupNum != null and groupNum != '' " >
+                a.group_num = a.group_num + #{groupNum},
+            </if>
+            <if test="switchType != null and switchType != '' " >
+                a.switch_type = #{switchType},
+            </if>
+            a.update_time = NOW(),
+        </trim>
+        where 1=1
+        and a.id = #{id}
+    </update>
+
+
 </mapper>

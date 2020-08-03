@@ -3,6 +3,8 @@ package com.hz.task.master.core.service;
 import com.hz.task.master.core.common.service.BaseService;
 import com.hz.task.master.core.model.did.DidCollectionAccountModel;
 
+import java.util.List;
+
 /**
  * @Description 用户的收款账号的Service层
  * @Author yoko
@@ -114,5 +116,17 @@ public interface DidCollectionAccountService<T> extends BaseService<T> {
      * @date 2020/8/3 10:52
     */
     public int updateDidCollectionAccountRedPackNumOrInvalid(DidCollectionAccountModel model);
+
+    /**
+     * @Description: 获取有效的收款账号
+     * <p>
+     *     获取有效的微信群数据集合
+     * </p>
+     * @param model
+     * @return
+     * @author yoko
+     * @date 2020/8/3 15:50
+     */
+    public List<DidCollectionAccountModel> getEffectiveDidCollectionAccountList(DidCollectionAccountModel model);
 
 }

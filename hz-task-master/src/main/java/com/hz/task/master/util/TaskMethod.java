@@ -3300,6 +3300,56 @@ public class TaskMethod {
         return resBean;
     }
 
+    /**
+     * @Description: 组装查询开启出码的用户账号
+     * @param switchType - 个人出码开关：1打开状态，2暂停状态
+     * @return
+     * @author yoko
+     * @date 2020/8/3 15:44
+    */
+    public static DidModel assembleDidBySwitch(int switchType){
+        DidModel resBean = new DidModel();
+        resBean.setSwitchType(switchType);
+        return resBean;
+    }
+
+
+    /**
+     * @Description: 组装查询有效的收款账号的查询条件
+     * @param did - 用户ID
+     * @param acType - 用户账号类型
+     * @return com.hz.task.master.core.model.did.DidCollectionAccountModel
+     * @author yoko
+     * @date 2020/8/3 15:54
+     */
+    public static DidCollectionAccountModel assembleDidCollectionAccountByEffective(long did, int acType){
+        DidCollectionAccountModel resBean = new DidCollectionAccountModel();
+        resBean.setDid(did);
+        resBean.setAcType(acType);
+        return resBean;
+    }
+
+    /**
+     * @Description: 组装更新用户的群序号更出码开关的方法
+     * @param did - 用户ID
+     * @param groupNum - 群序号
+     * @param switchType - 个人出码开关：1打开状态，2暂停状态
+     * @return com.hz.fine.master.core.model.did.DidModel
+     * @author yoko
+     * @date 2020/7/30 20:09
+     */
+    public static DidModel assembleUpdateGroupOrSwitchData(long did, int groupNum, int switchType){
+        DidModel resBean = new DidModel();
+        resBean.setId(did);
+        if (groupNum > 0){
+            resBean.setGroupNum(groupNum);
+        }
+        if (switchType > 0){
+            resBean.setSwitchType(switchType);
+        }
+        return resBean;
+    }
+
 
 
 
