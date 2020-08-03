@@ -76,6 +76,21 @@ public class DidCollectionAccountModel extends BasePage implements Serializable 
     private String wxQrCodeAds;
 
     /**
+     * 失效时间：微信群二维码的失效时间
+     */
+    private String invalidTime;
+
+    /**
+     * 是否失效：1未失效，2已失效
+     */
+    private Integer isInvalid;
+
+    /**
+     * 剩余收红包次数
+     */
+    private Integer redPackNum;
+
+    /**
      * 日开关是否启用（等于1正常使用，其它是暂停）:：1正常使用，2暂停使用
      */
     private Integer daySwitch;
@@ -339,5 +354,29 @@ public class DidCollectionAccountModel extends BasePage implements Serializable 
 
     public void setToWxid(String toWxid) {
         this.toWxid = toWxid;
+    }
+
+    public String getInvalidTime() {
+        return invalidTime;
+    }
+
+    public void setInvalidTime(String invalidTime) {
+        this.invalidTime = invalidTime;
+    }
+
+    public Integer getIsInvalid() {
+        return isInvalid;
+    }
+
+    public void setIsInvalid(Integer isInvalid) {
+        this.isInvalid = isInvalid;
+    }
+
+    public Integer getRedPackNum() {
+        return redPackNum;
+    }
+
+    public void setRedPackNum(Integer redPackNum) {
+        this.redPackNum = redPackNum;
     }
 }

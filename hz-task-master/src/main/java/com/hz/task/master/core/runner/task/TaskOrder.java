@@ -542,9 +542,12 @@ public class TaskOrder {
                         DidBalanceDeductModel didBalanceDeductUpdate = TaskMethod.assembleDidBalanceDeductUpdate(data.getOrderNo(), data.getOrderStatus());
                         num = ComponentUtil.didBalanceDeductService.updateOrderStatus(didBalanceDeductUpdate);
 
-                        // 删除此用户名下的挂单
-                        String strKeyCache_lock_did_order_ing = CachedKeyUtils.getCacheKey(CacheKey.LOCK_DID_ORDER_ING, data.getDid());
-                        ComponentUtil.redisService.remove(strKeyCache_lock_did_order_ing);
+//                        // 删除此用户名下的挂单
+//                        String strKeyCache_lock_did_order_ing = CachedKeyUtils.getCacheKey(CacheKey.LOCK_DID_ORDER_ING, data.getDid());
+//                        ComponentUtil.redisService.remove(strKeyCache_lock_did_order_ing);
+                        // 删除此收款账号下的挂单
+                        String strKeyCache_lock_did_collection_account_order_ing = CachedKeyUtils.getCacheKey(CacheKey.LOCK_DID_COLLECTION_ACCOUNT_ORDER_ING, data.getCollectionAccountId());
+                        ComponentUtil.redisService.remove(strKeyCache_lock_did_collection_account_order_ing);
                         if (num > 0){
                             // 更新此次task的状态：更新成成功
                             StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE, "");

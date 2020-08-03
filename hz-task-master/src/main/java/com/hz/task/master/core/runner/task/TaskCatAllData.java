@@ -252,6 +252,22 @@ public class TaskCatAllData {
                                                     }else{
                                                         collectionAccountType = 3;
                                                     }
+
+                                                    // 判断是否是发红包的数据类型
+                                                    if (dataType == 5){
+                                                        // 需要扣减微信群红包的数量
+                                                        int isInvalid = 0;// 是否失效：1未失效，2已失效
+                                                        int packNum = didCollectionAccountByWxGroupIdOrWxGroupNameAndYnModel.getRedPackNum();
+                                                        int resNum = packNum - 1;
+
+                                                        if (resNum <= 0){
+                                                            isInvalid = 2;
+                                                        }
+                                                        DidCollectionAccountModel updateRedPackNum = TaskMethod.assembleDidCollectionAccountUpdateRedPackNumOrInvalid(didCollectionAccountByWxGroupIdOrWxGroupNameAndYnModel.getId(),1, isInvalid);
+                                                        ComponentUtil.didCollectionAccountService.updateDidCollectionAccountRedPackNumOrInvalid(updateRedPackNum);
+
+                                                    }
+
                                                 }else{
                                                     collectionAccountType = 2;
                                                 }

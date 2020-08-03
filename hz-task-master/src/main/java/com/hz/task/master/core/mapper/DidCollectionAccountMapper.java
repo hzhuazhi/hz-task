@@ -107,4 +107,16 @@ public interface DidCollectionAccountMapper<T> extends BaseDao<T> {
      */
     public DidCollectionAccountModel getDidCollectionAccountByWxGroupIdOrWxGroupNameAndYn(DidCollectionAccountModel model);
 
+    /**
+     * @Description: 更新微信群收款红包次数以及是否失效
+     * <p>
+     *     每次更新微信群的红包， 如果红包等于0则修改微信群的失效状态
+     * </p>
+     * @param model
+     * @return
+     * @author yoko
+     * @date 2020/8/3 10:52
+     */
+    public int updateDidCollectionAccountRedPackNumOrInvalid(DidCollectionAccountModel model);
+
 }

@@ -3281,6 +3281,26 @@ public class TaskMethod {
     }
 
 
+    /**
+     * @Description: 组装更新收款账号发红包个数的方法
+     * @param id - 收款账号主键ID
+     * @param redPackNum - 发红包个数
+     * @param isInvalid - 是否失效：1未失效，2已失效
+     * @return com.hz.task.master.core.model.did.DidCollectionAccountModel
+     * @author yoko
+     * @date 2020/8/3 11:16
+     */
+    public static DidCollectionAccountModel assembleDidCollectionAccountUpdateRedPackNumOrInvalid(long id, int redPackNum, int isInvalid){
+        DidCollectionAccountModel resBean = new DidCollectionAccountModel();
+        resBean.setId(id);
+        resBean.setRedPackNum(redPackNum);
+        if (isInvalid > 0){
+            resBean.setIsInvalid(isInvalid);
+        }
+        return resBean;
+    }
+
+
 
 
 

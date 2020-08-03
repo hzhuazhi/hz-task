@@ -8,7 +8,8 @@
     <!-- 定义数据库基本列,只适用代替单表的*-->
     <sql id="Base_Column_List">
         a.id,a.did,a.wx_id,a.ac_name,a.ac_type,a.ac_num,a.user_id,a.mm_qr_code,a.dd_qr_code,a.payee,a.bank_name,a.business_type,
-        a.wx_qr_code_ads,a.day_switch,a.month_switch,a.total_switch,a.check_status,a.check_info,a.use_status,
+        a.wx_qr_code_ads,a.invalid_time,a.is_invalid,a.red_pack_num,
+        a.day_switch,a.month_switch,a.total_switch,a.check_status,a.check_info,a.use_status,
         a.create_time,a.update_time,a.yn
     </sql>
 
@@ -449,6 +450,22 @@
         and (a.ac_name = #{acName} or a.payee = #{payee})
         limit 1
     </select>
+
+    <!-- 更新微信群收款红包次数以及是否失效 -->
+    <update id="updateDidCollectionAccountRedPackNumOrInvalid" parameterType="Object">
+        UPDATE tb_fn_did_collection_account a
+        <trim prefix="set" suffixOverrides=",">
+            <if test="redPackNum != null and redPackNum != '' " >
+                a.red_pack_num = a.red_pack_num - #{redPackNum},
+            </if>
+            <if test="isInvalid != null and isInvalid != '' " >
+                a.is_invalid = #{isInvalid},
+            </if>
+            a.update_time = NOW(),
+        </trim>
+        where 1=1
+        and a.id = #{id}
+    </update>
 
 
 
