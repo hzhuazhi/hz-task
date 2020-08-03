@@ -180,4 +180,9 @@ public interface TkCacheKey {
      */
     String LOCK_CAT_DATA_ANALYSIS_WORK_TYPE_SUC = "-29";
 
+    /**
+     * 锁：小微加好友上限的运算
+     * 锁住
+     */
+    String LOCK_WX_IS_OK = "-30";
 }

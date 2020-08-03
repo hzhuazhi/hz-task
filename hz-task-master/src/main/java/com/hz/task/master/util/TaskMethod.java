@@ -3231,8 +3231,54 @@ public class TaskMethod {
         resBean.setCurminute(DateUtil.getCurminute(new Date()));
         return resBean;
     }
+    
+    /**
+     * @Description: 组装查询小微的查询条件
+     * @param isOk - 是否以及完成了限制目标：1未完成，2完成
+     * @return 
+     * @author yoko
+     * @date 2020/8/2 9:43 
+    */
+    public static WxModel assembleWxByIsOk(int isOk){
+        WxModel resBean = new WxModel();
+        resBean.setIsOk(isOk);
+        return resBean;
+    }
+
+    /**
+     * @Description: 组装查询小微与好友纪录的查询条件
+     * @param wxId - 小微的主键ID
+     * @param curday - 日期
+     * @return
+     * @author yoko
+     * @date 2020/8/2 9:55
+    */
+    public static WxFriendModel assembleWxFriendQuery(long wxId, int curday){
+        WxFriendModel resBean = new WxFriendModel();
+        resBean.setWxId(wxId);
+        if (curday > 0){
+            resBean.setCurday(curday);
+        }
+        return resBean;
+    }
 
 
+    /**
+     * @Description: 组装更新小微加好友限制的组装方法
+     * @param id - 小微主键ID
+     * @param isOk - 是否以及完成了限制目标：1未完成，2完成
+     * @param isDataNum - 已经加了多少用户
+     * @return
+     * @author yoko
+     * @date 2020/8/2 10:21
+    */
+    public static WxModel assembleWxUpdate(long id, int isOk, int isDataNum){
+        WxModel resBean = new WxModel();
+        resBean.setId(id);
+        resBean.setIsOk(isOk);
+        resBean.setIsDataNum(isDataNum);
+        return resBean;
+    }
 
 
 

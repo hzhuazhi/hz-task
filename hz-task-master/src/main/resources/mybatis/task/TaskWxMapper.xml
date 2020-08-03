@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hz.task.master.core.mapper.task.TaskWxMapper">
+
+
+
+
+    <!-- 定义数据库基本列,只适用代替单表的*-->
+    <sql id="Base_Column_List">
+        a.id,a.ac_name,a.wx_pass_wd,a.wx_name,a.to_wxid,a.total_link,a.binding_mobile,
+        a.data_num,a.is_data_num,a.is_ok,a.day_num,a.wx_qr_code,a.use_status,
+        a.create_time,a.update_time,a.yn
+    </sql>
+
+
+    <!-- 查询条件 -->
+    <sql id="Example_Where_Clause">
+        where 1=1
+        <trim  suffixOverrides="," >
+            <if test="id != null and id != '' " >
+                and a.id = #{id}
+            </if>
+            <if test="acName != null and acName != '' " >
+                and a.ac_name = #{acName}
+            </if>
+            <if test="wxPassWd != null and wxPassWd != '' " >
+                and a.wx_pass_wd = #{wxPassWd}
+            </if>
+            <if test="wxName != null and wxName != '' " >
+                and a.wx_name = #{wxName}
+            </if>
+            <if test="toWxid != null and toWxid != '' " >
+                and a.to_wxid = #{toWxid}
+            </if>
+            <if test="isOk != null and isOk != '' " >
+                and a.is_ok = #{isOk}
+            </if>
+            <if test="useStatus != null and useStatus != '' " >
+                and a.use_status = #{useStatus}
+            </if>
+            and a.yn = 0
+        </trim>
+    </sql>
+
+
+    <!-- 查询条件_id -->
+    <sql id="Example_Where_Clause_id">
+        where 1=1
+        <trim  suffixOverrides="," >
+            <if test="id != null and id != '' " >
+                and a.id = #{id}
+            </if>
+            and a.yn =  0
+        </trim>
+    </sql>
+
+    <!-- 排序条件 -->
+    <sql id="Example_Order_By">
+        order by a.create_time asc
+    </sql>
+
+
+    <!-- 查询小微数据 -->
+    <select id="getWxList" parameterType="Object" resultType="com.hz.task.master.core.model.wx.WxModel">
+        select
+        <include refid="Base_Column_List" />
+        from tb_fn_wx a
+        <include refid="Example_Where_Clause"/>
+        <include refid="Example_Order_By"/>
+    </select>
+
+
+
+    <!-- 更新小微数据的状态、运行状态 -->
+    <update id="updateWxStatus" parameterType="com.hz.task.master.core.model.wx.WxModel">
+        UPDATE tb_fn_wx a
+        <trim prefix="set" suffixOverrides=",">
+            <if test="acName != null and acName != '' " >
+                a.ac_name = #{acName},
+            </if>
+            <if test="wxPassWd != null and wxPassWd != '' " >
+                a.wx_pass_wd = #{wxPassWd},
+            </if>
+            <if test="wxName != null and wxName != '' " >
+                a.wx_name = #{wxName},
+            </if>
+            <if test="toWxid != null and toWxid != '' " >
+                a.to_wxid = #{toWxid},
+            </if>
+            <if test="totalLink != null and totalLink != '' " >
+                a.total_link = #{totalLink},
+            </if>
+            <if test="bindingMobile != null and bindingMobile != '' " >
+                a.binding_mobile = #{bindingMobile},
+            </if>
+            <if test="dataNum != null and dataNum != '' " >
+                a.data_num = #{dataNum},
+            </if>
+            <if test="isDataNum != null and isDataNum != '' " >
+                a.is_data_num = #{isDataNum},
+            </if>
+            <if test="isOk != null and isOk != '' " >
+                a.is_ok = #{isOk},
+            </if>
+            <if test="dayNum != null and dayNum != '' " >
+                a.day_num = #{dayNum},
+            </if>
+            <if test="wxQrCode != null and wxQrCode != '' " >
+                a.wx_qr_code = #{wxQrCode},
+            </if>
+            <if test="useStatus != null and useStatus != '' " >
+                a.use_status = #{useStatus},
+            </if>
+            <if test="remark != null and remark != '' " >
+                a.remark = #{remark},
+            </if>
+            a.update_time = NOW(),
+        </trim>
+        <include refid="Example_Where_Clause_id"/>
+    </update>
+
+
+
+
+</mapper>
