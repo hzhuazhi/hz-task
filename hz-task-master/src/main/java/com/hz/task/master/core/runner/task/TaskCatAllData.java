@@ -378,6 +378,7 @@ public class TaskCatAllData {
 
                                                                 if (collectionAccountType == 5){
                                                                     // 收款账号正常
+
                                                                 }else{
                                                                     // 收款账号不属于正常
                                                                     if (collectionAccountType == 2){
@@ -404,6 +405,18 @@ public class TaskCatAllData {
                                                                 }
 
                                                                 if (collectionAccountType != 2){
+                                                                    // 判断数据类型dataType=7，dataType=8是否是群主回复的
+                                                                    if(dataType == 7 || dataType == 8){
+                                                                        if (!StringUtils.isBlank(fromCatModel.getFinal_from_wxid())){
+                                                                            if (!fromCatModel.getFinal_from_wxid().equals(didCollectionAccountByWxGroupIdOrWxGroupNameAndYnModel.getUserId())){
+                                                                                // 数据不是群主回复的
+                                                                                dataType = 2;
+                                                                            }
+                                                                        }else {
+                                                                            dataType = 2;
+                                                                        }
+                                                                    }
+
                                                                     CatDataAnalysisModel catDataAnalysisModel = TaskMethod.assembleCatDataAnalysisData(fromCatModel, dataType, data.getId(), wxModel.getId(), did, collectionAccountId, collectionAccountType);
                                                                     ComponentUtil.catDataAnalysisService.add(catDataAnalysisModel);
                                                                     // 添加运营数据
