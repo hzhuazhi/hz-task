@@ -39,6 +39,16 @@ public class WxFriendModel extends BasePage implements Serializable {
     private String finalFromWxid;
 
     /**
+     * 微信群ID
+     */
+    private String fromWxid;
+
+    /**
+     * 数据类型：0初始化，1加好友，2加群
+     */
+    private Integer dataType;
+
+    /**
      * 创建日期：存的日期格式20160530
      */
     private Integer curday;
@@ -173,5 +183,21 @@ public class WxFriendModel extends BasePage implements Serializable {
 
     public void setCurdayEnd(Integer curdayEnd) {
         this.curdayEnd = curdayEnd;
+    }
+
+    public String getFromWxid() {
+        return fromWxid;
+    }
+
+    public void setFromWxid(String fromWxid) {
+        this.fromWxid = fromWxid;
+    }
+
+    public Integer getDataType() {
+        return dataType;
+    }
+
+    public void setDataType(Integer dataType) {
+        this.dataType = dataType;
     }
 }

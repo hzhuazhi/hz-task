@@ -7,7 +7,7 @@
 
     <!-- 定义数据库基本列,只适用代替单表的*-->
     <sql id="Base_Column_List">
-        a.id,a.wx_id,a.did,a.collection_account_id,a.final_from_wxid,
+        a.id,a.wx_id,a.did,a.collection_account_id,a.final_from_wxid,a.from_wxid,a.data_type,
         a.curday,a.curhour,a.curminute,
         a.create_time,a.update_time,a.yn
     </sql>
@@ -27,6 +27,15 @@
             </if>
             <if test="collectionAccountId != null and collectionAccountId != '' " >
                 and a.collection_account_id = #{collectionAccountId}
+            </if>
+            <if test="finalFromWxid != null and finalFromWxid != '' " >
+                and a.final_from_wxid = #{finalFromWxid}
+            </if>
+            <if test="fromWxid != null and fromWxid != '' " >
+                and a.from_wxid = #{fromWxid}
+            </if>
+            <if test="dataType != null and dataType != '' " >
+                and a.data_type = #{dataType}
             </if>
             <if test="curday != null and curday != '' " >
                 and a.curday = #{curday}
@@ -126,6 +135,12 @@
             <if test="finalFromWxid != null and finalFromWxid != '' " >
                 final_from_wxid,
             </if>
+            <if test="fromWxid != null and fromWxid != '' " >
+                from_wxid,
+            </if>
+            <if test="dataType != null and dataType != '' " >
+                data_type,
+            </if>
             <if test="curday != null and curday != '' " >
                 curday,
             </if>
@@ -150,6 +165,12 @@
             </if>
             <if test="finalFromWxid != null and finalFromWxid != '' " >
                 <![CDATA[  #{finalFromWxid}, ]]>
+            </if>
+            <if test="fromWxid != null and fromWxid != '' " >
+                <![CDATA[  #{fromWxid}, ]]>
+            </if>
+            <if test="dataType != null and dataType != '' " >
+                <![CDATA[  #{dataType}, ]]>
             </if>
             <if test="curday != null and curday != '' " >
                 <![CDATA[  #{curday}, ]]>
@@ -179,6 +200,12 @@
             </if>
             <if test="finalFromWxid != null and finalFromWxid != '' " >
                 a.final_from_wxid = #{finalFromWxid},
+            </if>
+            <if test="fromWxid != null and fromWxid != '' " >
+                a.from_wxid = #{fromWxid},
+            </if>
+            <if test="dataType != null and dataType != '' " >
+                a.data_type = #{dataType},
             </if>
             a.update_time = NOW(),
         </trim>

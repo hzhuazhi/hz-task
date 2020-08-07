@@ -3221,11 +3221,13 @@ public class TaskMethod {
      * @param collectionAccountId - 收款账号ID
      * @param finalFromWxid - 微信的原始账号
      * @param curday - 日期
+     * @param fromWxid - 微信群ID
+     * @param dataType - 数据类型：0初始化，1加好友，2加群
      * @return com.hz.task.master.core.model.wx.WxFriendModel
      * @author yoko
      * @date 2020/8/1 18:07
      */
-    public static WxFriendModel assembleWxFriendAddOrQuery(long wxId, long did, long collectionAccountId, String finalFromWxid, int curday){
+    public static WxFriendModel assembleWxFriendAddOrQuery(long wxId, long did, long collectionAccountId, String finalFromWxid, int curday, String fromWxid, int dataType){
         WxFriendModel resBean = new WxFriendModel();
         if (wxId > 0){
             resBean.setWxId(wxId);
@@ -3241,8 +3243,12 @@ public class TaskMethod {
         }
         if(curday > 0){
             resBean.setCurday(curday);
-        }else{
-            resBean.setCurday(DateUtil.getDayNumber(new Date()));
+        }
+        if (!StringUtils.isBlank(fromWxid)){
+            resBean.setFromWxid(fromWxid);
+        }
+        if (dataType > 0){
+            resBean.setDataType(dataType);
         }
         resBean.setCurhour(DateUtil.getHour(new Date()));
         resBean.setCurminute(DateUtil.getCurminute(new Date()));
@@ -3266,15 +3272,19 @@ public class TaskMethod {
      * @Description: 组装查询小微与好友纪录的查询条件
      * @param wxId - 小微的主键ID
      * @param curday - 日期
+     * @param dataType - 数据类型：0初始化，1加好友，2加群
      * @return
      * @author yoko
      * @date 2020/8/2 9:55
     */
-    public static WxFriendModel assembleWxFriendQuery(long wxId, int curday){
+    public static WxFriendModel assembleWxFriendQuery(long wxId, int curday, int dataType){
         WxFriendModel resBean = new WxFriendModel();
         resBean.setWxId(wxId);
         if (curday > 0){
             resBean.setCurday(curday);
+        }
+        if (dataType > 0){
+            resBean.setDataType(dataType);
         }
         return resBean;
     }
@@ -3285,15 +3295,27 @@ public class TaskMethod {
      * @param id - 小微主键ID
      * @param isOk - 是否以及完成了限制目标：1未完成，2完成
      * @param isDataNum - 已经加了多少用户
+     * @param isOkGroup - 加群是否以及完成了限制目标：1未完成，2完成
+     * @param isGroupNum - 已经加了多少个群
      * @return
      * @author yoko
      * @date 2020/8/2 10:21
     */
-    public static WxModel assembleWxUpdate(long id, int isOk, int isDataNum){
+    public static WxModel assembleWxUpdate(long id, int isOk, int isDataNum, int isOkGroup, int isGroupNum){
         WxModel resBean = new WxModel();
         resBean.setId(id);
-        resBean.setIsOk(isOk);
-        resBean.setIsDataNum(isDataNum);
+        if (isOk > 0){
+            resBean.setIsOk(isOk);
+        }
+        if (isDataNum > 0){
+            resBean.setIsDataNum(isDataNum);
+        }
+        if (isOkGroup > 0){
+            resBean.setIsOkGroup(isOkGroup);
+        }
+        if (isGroupNum > 0){
+            resBean.setIsGroupNum(isGroupNum);
+        }
         return resBean;
     }
 
@@ -3364,6 +3386,22 @@ public class TaskMethod {
         if (switchType > 0){
             resBean.setSwitchType(switchType);
         }
+        return resBean;
+    }
+
+    /**
+     * @Description: 组装更新收款账号的审核信息的方法
+     * @param id - 主键ID
+     * @param checkStatus - 审核状态
+     * @param checkInfo - 审核说明
+     * @return com.hz.task.master.core.model.did.DidCollectionAccountModel
+     * @author yoko
+     * @date 2020/8/7 20:45
+     */
+    public static DidCollectionAccountModel assembleDidCollectionAccountUpdateCheckInfo(long id, int checkStatus, String checkInfo){
+        DidCollectionAccountModel resBean = new DidCollectionAccountModel();
+        resBean.setId(id);
+        resBean.setCheckInfo(checkInfo);
         return resBean;
     }
 

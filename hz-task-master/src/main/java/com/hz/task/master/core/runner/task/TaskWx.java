@@ -59,8 +59,8 @@ public class TaskWx {
      * @author yoko
      * @date 2019/12/6 20:25
      */
-//    @Scheduled(fixedDelay = 1000) // 每秒执行
-    @Scheduled(fixedDelay = 120000) // 每2分钟执行
+    @Scheduled(fixedDelay = 1000) // 每秒执行
+//    @Scheduled(fixedDelay = 120000) // 每2分钟执行
     public void wxLimitNum() throws Exception{
 //        log.info("----------------------------------TaskWx.wxLimitNum()----start");
         // 获取小微未超过总上限的数据
@@ -74,7 +74,7 @@ public class TaskWx {
                 boolean flagLock = ComponentUtil.redisIdService.lock(lockKey);
                 if (flagLock){
                     // 查所有加好友的数量
-                    WxFriendModel wxFriendAllQuery = TaskMethod.assembleWxFriendQuery(data.getId(), 0);
+                    WxFriendModel wxFriendAllQuery = TaskMethod.assembleWxFriendQuery(data.getId(), 0, 1);
                     int dataNum = ComponentUtil.wxFriendService.queryByCount(wxFriendAllQuery);
                     if (dataNum > 0){
                         int isOk = 0;
@@ -85,7 +85,7 @@ public class TaskWx {
                             //未超过规定的限制
                             isOk = 1;
                         }
-                        WxModel wxUpdate = TaskMethod.assembleWxUpdate(data.getId(), isOk, dataNum);
+                        WxModel wxUpdate = TaskMethod.assembleWxUpdate(data.getId(), isOk, dataNum, 0, 0);
                         ComponentUtil.taskWxService.updateWxStatus(wxUpdate);
                     }
 
@@ -98,12 +98,50 @@ public class TaskWx {
                     if (StringUtils.isBlank(strCache_wx_day_num)){
                         // 表示缓存中没有数据，则需要执行
                         int curday = DateUtil.getDayNumber(new Date());
-                        WxFriendModel wxFriendAdyQuery = TaskMethod.assembleWxFriendQuery(data.getId(), curday);
+                        WxFriendModel wxFriendAdyQuery = TaskMethod.assembleWxFriendQuery(data.getId(), curday, 1);
                         int dayNum = ComponentUtil.wxFriendService.queryByCount(wxFriendAdyQuery);// 当日加好友数量
                         if (dayNum >= data.getDayNum()){
                             // 缓存设置：设置日新增好友已到达上限-失效时间当日的凌晨零点
                             long time = DateUtil.getTomorrowMinute();
                             String strKeyCache = CachedKeyUtils.getCacheKey(CacheKey.WX_DAY_NUM, data.getId());
+                            ComponentUtil.redisService.set(strKeyCache, String.valueOf(dayNum) , time);
+                        }
+
+                    }
+
+
+
+                    // 查所有加群的数量
+                    WxFriendModel wxGroupAllQuery = TaskMethod.assembleWxFriendQuery(data.getId(), 0, 2);
+                    int groupNum = ComponentUtil.wxFriendService.queryByCount(wxGroupAllQuery);
+                    if (groupNum > 0){
+                        int isOk = 0;
+                        if (groupNum >= data.getGroupNum()){
+                            // 更新状态:已经超过规定的限制
+                            isOk = 2;
+                        }else {
+                            //未超过规定的限制
+                            isOk = 1;
+                        }
+                        WxModel wxUpdate = TaskMethod.assembleWxUpdate(data.getId(), 0, 0, isOk, groupNum);
+                        ComponentUtil.taskWxService.updateWxStatus(wxUpdate);
+                    }
+
+
+                    // 查当日加群的数量
+
+                    // 先查看缓存中是否有当日已经超的数据，如果有，则无需执行
+                    String strKeyCache_wx_day_group_num = CachedKeyUtils.getCacheKey(CacheKey.WX_DAY_GROUP_NUM, data.getId());
+                    String strCache_wx_day_group_num = (String) ComponentUtil.redisService.get(strKeyCache_wx_day_group_num);
+                    if (StringUtils.isBlank(strCache_wx_day_group_num)){
+                        // 表示缓存中没有数据，则需要执行
+                        int curday = DateUtil.getDayNumber(new Date());
+                        WxFriendModel wxFriendAdyQuery = TaskMethod.assembleWxFriendQuery(data.getId(), curday, 2);
+                        int dayNum = ComponentUtil.wxFriendService.queryByCount(wxFriendAdyQuery);// 当日加群数量
+                        if (dayNum >= data.getDayGroupNum()){
+                            // 缓存设置：设置日新增好友已到达上限-失效时间当日的凌晨零点
+                            long time = DateUtil.getTomorrowMinute();
+                            String strKeyCache = CachedKeyUtils.getCacheKey(CacheKey.WX_DAY_GROUP_NUM, data.getId());
                             ComponentUtil.redisService.set(strKeyCache, String.valueOf(dayNum) , time);
                         }
 

@@ -29,6 +29,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -89,26 +90,37 @@ public class TaskCatDataAnalysis {
                             // 根据微信群名称查询此收款账号信息
                             if (didCollectionAccountModel != null && didCollectionAccountModel.getId() > 0){
                                 if (didCollectionAccountModel.getCheckStatus() != 3){
-                                    // 查询小微与此收款账号之前是否已建立了关联关系
-                                    WxClerkModel wxClerkQuery = TaskMethod.assembleWxClerkAddOrQuery(data.getWxId(), didCollectionAccountModel.getId());
-                                    WxClerkModel wxClerkData = (WxClerkModel) ComponentUtil.wxClerkService.findByObject(wxClerkQuery);
-                                    if (wxClerkData == null || wxClerkData.getId() <= 0){
-                                        // 之前没有建立关系，需要添加小微与收款账号的关联关系
-                                        WxClerkModel wxClerkAdd = TaskMethod.assembleWxClerkAddOrQuery(data.getWxId(), didCollectionAccountModel.getId());
-                                        ComponentUtil.wxClerkService.add(wxClerkAdd);
-                                    }
-                                    // 更新微信群收款账号信息
-                                    DidCollectionAccountModel updateDidCollectionAccountModel = TaskMethod.assembleDidCollectionAccountUpdateByWxGroup(data, didCollectionAccountModel.getId());
-                                    int upNum = ComponentUtil.didCollectionAccountService.updateDidCollectionAccountByWxData(updateDidCollectionAccountModel);
-                                    if (upNum > 0){
-                                        // 更新此次task的状态：更新成成功
-                                        StatusModel statusModel = TaskMethod.assembleUpdateStatusByWorkType(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE, "");
+
+                                    // 判断发送指令的收到的小微是否与账号分配的小微是否一致
+                                    if (didCollectionAccountModel.getWxId() != data.getWxId()){
+                                        DidCollectionAccountModel updateCheck = TaskMethod.assembleDidCollectionAccountUpdateCheckInfo(didCollectionAccountModel.getId(), 0, "分配的管理员与您拉进微信的管理员不符合，请核对！");
+                                        ComponentUtil.didCollectionAccountService.update(updateCheck);
+                                        // 更新此次task的状态：更新成失败-分配的小微与拉进微信群的小微不一致
+                                        StatusModel statusModel = TaskMethod.assembleUpdateStatusByWorkType(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "分配的小微与拉进微信群的小微不一致");
                                         ComponentUtil.taskCatDataAnalysisService.updateCatDataAnalysisStatus(statusModel);
-                                    }else {
-                                        // 更新此次task的状态：更新成失败-更新微信群收款账号信息响应行为0
-                                        StatusModel statusModel = TaskMethod.assembleUpdateStatusByWorkType(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "更新微信群收款账号信息响应行为0");
-                                        ComponentUtil.taskCatDataAnalysisService.updateCatDataAnalysisStatus(statusModel);
+                                    }else{
+                                        // 查询小微与此收款账号之前是否已建立了关联关系
+                                        WxClerkModel wxClerkQuery = TaskMethod.assembleWxClerkAddOrQuery(data.getWxId(), didCollectionAccountModel.getId());
+                                        WxClerkModel wxClerkData = (WxClerkModel) ComponentUtil.wxClerkService.findByObject(wxClerkQuery);
+                                        if (wxClerkData == null || wxClerkData.getId() <= 0){
+                                            // 之前没有建立关系，需要添加小微与收款账号的关联关系
+                                            WxClerkModel wxClerkAdd = TaskMethod.assembleWxClerkAddOrQuery(data.getWxId(), didCollectionAccountModel.getId());
+                                            ComponentUtil.wxClerkService.add(wxClerkAdd);
+                                        }
+                                        // 更新微信群收款账号信息
+                                        DidCollectionAccountModel updateDidCollectionAccountModel = TaskMethod.assembleDidCollectionAccountUpdateByWxGroup(data, didCollectionAccountModel.getId());
+                                        int upNum = ComponentUtil.didCollectionAccountService.updateDidCollectionAccountByWxData(updateDidCollectionAccountModel);
+                                        if (upNum > 0){
+                                            // 更新此次task的状态：更新成成功
+                                            StatusModel statusModel = TaskMethod.assembleUpdateStatusByWorkType(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE, "");
+                                            ComponentUtil.taskCatDataAnalysisService.updateCatDataAnalysisStatus(statusModel);
+                                        }else {
+                                            // 更新此次task的状态：更新成失败-更新微信群收款账号信息响应行为0
+                                            StatusModel statusModel = TaskMethod.assembleUpdateStatusByWorkType(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "更新微信群收款账号信息响应行为0");
+                                            ComponentUtil.taskCatDataAnalysisService.updateCatDataAnalysisStatus(statusModel);
+                                        }
                                     }
+
                                 }else{
                                     // 更新此次task的状态：更新成失败-已审核通过的微信群无需重复发送审核指令
                                     StatusModel statusModel = TaskMethod.assembleUpdateStatusByWorkType(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "已审核通过的微信群无需重复发送审核指令");
@@ -332,7 +344,7 @@ public class TaskCatDataAnalysis {
     @Scheduled(fixedDelay = 1000) // 每秒执行
     public void catDataAnalysisSucWork() throws Exception{
 //        log.info("----------------------------------TaskCatDataAnalysis.catDataAnalysisSucWork()----start");
-
+        int curday = DateUtil.getDayNumber(new Date());
         // 获取已经填充完毕的的可爱猫解析数据
         StatusModel statusQuery = TaskMethod.assembleTaskByWorkTypeAndRunStatusQuery(limitNum, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE);
         List<CatDataAnalysisModel> synchroList = ComponentUtil.taskCatDataAnalysisService.getCatDataAnalysisList(statusQuery);
@@ -346,10 +358,31 @@ public class TaskCatDataAnalysis {
                     String info = "";
 
                     if (data.getDataType() == 3){
-                        // 添加小微加好友记录的数据
-                        WxFriendModel wxFriendModel = TaskMethod.assembleWxFriendAddOrQuery(data.getWxId(),data.getDid(),
-                                data.getCollectionAccountId(),data.getFinalFromWxid(), 0);
-                        ComponentUtil.wxFriendService.add(wxFriendModel);
+                        // 查询小微是否已经与微信ID存在关系
+                        WxFriendModel wxFriendQuery = TaskMethod.assembleWxFriendAddOrQuery(data.getWxId(),0,
+                                0,data.getFinalFromWxid(), 0,null, 1);
+                        WxFriendModel wxFriendData = (WxFriendModel) ComponentUtil.wxFriendService.findByObject(wxFriendQuery);
+                        if (wxFriendData != null && wxFriendData.getId() > 0){
+                            // 表示之前就是好友，无需再次添加
+                        }else {
+                            // 添加小微加好友记录的数据
+                            WxFriendModel wxFriendAdd = TaskMethod.assembleWxFriendAddOrQuery(data.getWxId(),data.getDid(),
+                                    data.getCollectionAccountId(),data.getFinalFromWxid(), curday,null, 1);
+                            ComponentUtil.wxFriendService.add(wxFriendAdd);
+                        }
+
+                        // 查询小微是否已经与微信群存在关系
+                        WxFriendModel wxGroupQuery = TaskMethod.assembleWxFriendAddOrQuery(data.getWxId(),0,
+                                0,null, 0,data.getFromWxid(), 2);
+                        WxFriendModel wxGroupData = (WxFriendModel) ComponentUtil.wxFriendService.findByObject(wxGroupQuery);
+                        if (wxGroupData != null && wxGroupData.getId() > 0){
+                            // 表示之前就与群有关联关系，无需再次添加
+                        }else {
+                            // 添加小微与微信群记录的数据
+                            WxFriendModel wxGroupAdd = TaskMethod.assembleWxFriendAddOrQuery(data.getWxId(),data.getDid(),
+                                    data.getCollectionAccountId(),null, curday,data.getFromWxid(), 2);
+                            ComponentUtil.wxFriendService.add(wxGroupAdd);
+                        }
 
                         // 更新此次task的状态：更新成成功状态
                         runStatus = ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE;
