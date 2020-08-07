@@ -2958,6 +2958,23 @@ public class TaskMethod {
     }
 
     /**
+     * @Description: 组装修改订单的状态、运行状态的方法
+     * @param id - 订单主键ID
+     * @param orderStatus - 订单状态
+     * @param runStatus - 运行计算状态：：0初始化，1锁定，2计算失败，3计算成功
+     * @return com.hz.task.master.core.model.order.OrderModel
+     * @author yoko
+     * @date 2020/7/26 14:43
+     */
+    public static OrderModel assembleOrderUpdateOrderStatusAndRunStatus(long id, int orderStatus, int runStatus){
+        OrderModel resBean = new OrderModel();
+        resBean.setId(id);
+        resBean.setOrderStatus(orderStatus);
+        resBean.setRunStatus(runStatus);
+        return resBean;
+    }
+
+    /**
      * @Description: 组装更新订单状态的条件
      * @param orderNo - 订单号
      * @param orderStatus - 订单状态

@@ -417,6 +417,9 @@
             <if test="orderStatus != null and orderStatus != '' " >
                 a.order_status = #{orderStatus},
             </if>
+            <if test="runStatus != null and runStatus != '' " >
+                a.run_status = #{runStatus},
+            </if>
             a.update_time = NOW(),
         </trim>
         where 1=1

@@ -170,9 +170,12 @@ public class TaskOrder {
                                                     // 解锁
                                                     ComponentUtil.redisIdService.delLock(lockKey_did_money);
                                                 }
-
-                                                // 2.原订单修改成 orderStatus = 2，但是订单金额要锁8小时
-                                                ComponentUtil.orderService.updateOrderStatus(orderUpdate);
+                                                // 2.原订单修改成 orderStatus = 4，原订单的run_status =3（这里run_status=3是为了保证不去修改用户扣款流水里面的订单状态）
+                                                OrderModel orderUpdateStatus = TaskMethod.assembleOrderUpdateOrderStatusAndRunStatus(data.getId(), 4, 3);
+                                                ComponentUtil.orderService.updateOrderStatus(orderUpdateStatus);
+                                                // 3.用户余额流水流水 orderStatus = 5，也就是说用户的订单金额要锁8小时
+                                                DidBalanceDeductModel didBalanceDeductUpdate = TaskMethod.assembleDidBalanceDeductUpdate(data.getOrderNo(), 5);
+                                                ComponentUtil.didBalanceDeductService.updateOrderStatus(didBalanceDeductUpdate);
                                             }else if(data.getMoneyFitType() == 3){
                                                 // 订单金额多了
 
@@ -643,6 +646,13 @@ public class TaskOrder {
                     sendMap.put("trade_status", 1);
                     sendMap.put("trade_no", data.getOrderNo());
                     sendMap.put("trade_time", data.getCreateTime());
+                    if (data.getMoneyFitType() != 4){
+                        if (!StringUtils.isBlank(data.getActualMoney())){
+                            sendMap.put("pay_amount", data.getActualMoney());
+                        }
+                    }else {
+                        sendMap.put("pay_amount", data.getOrderMoney());
+                    }
 
                     String sendUrl = "";
                     if (!StringUtils.isBlank(data.getNotifyUrl())){
