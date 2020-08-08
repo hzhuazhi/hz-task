@@ -50,6 +50,7 @@ public class ComponentUtil {
     public static CatDataAnalysisUnusualService catDataAnalysisUnusualService;
     public static OrderStepService orderStepService;
     public static WxFriendService wxFriendService;
+    public static WxOrderService wxOrderService;
 
 
 
