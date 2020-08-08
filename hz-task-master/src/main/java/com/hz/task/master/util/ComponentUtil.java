@@ -71,7 +71,7 @@ public class ComponentUtil {
     public static TaskCatDataAnalysisService taskCatDataAnalysisService;
     public static TaskWxService taskWxService;
     public static TaskDidService taskDidService;
-
+    public static TaskWxOrderService taskWxOrderService;
 
 
 

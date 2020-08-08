@@ -114,7 +114,7 @@ public class ServerConstant {
         GROUP_NAME(34,""),
         GROUP_RED_PACK_NUM(35,""),
         GROUP_NUM(36,""),
-
+        WX_NUM(37,""),
         ;
         private int stgType;
         private String stgKey;

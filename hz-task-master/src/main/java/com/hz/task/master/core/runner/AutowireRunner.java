@@ -203,6 +203,9 @@ public class AutowireRunner implements ApplicationRunner {
     @Autowired
     private TaskDidService taskDidService;
 
+    @Autowired
+    private TaskWxOrderService taskWxOrderService;
+
 
 
 
@@ -276,6 +279,7 @@ public class AutowireRunner implements ApplicationRunner {
         ComponentUtil.taskCatDataAnalysisService = taskCatDataAnalysisService;
         ComponentUtil.taskWxService = taskWxService;
         ComponentUtil.taskDidService = taskDidService;
+        ComponentUtil.taskWxOrderService = taskWxOrderService;
 
         runThread = new RunThread();
         runThread.start();

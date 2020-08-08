@@ -74,6 +74,11 @@ public class WxOrderModel extends BasePage implements Serializable {
      */
     private Integer yn;
 
+    /**
+     * 查询多少条数据
+     */
+    private Integer limitNum;
+
     public Long getId() {
         return id;
     }
@@ -168,5 +173,13 @@ public class WxOrderModel extends BasePage implements Serializable {
 
     public void setCurminute(Integer curminute) {
         this.curminute = curminute;
+    }
+
+    public Integer getLimitNum() {
+        return limitNum;
+    }
+
+    public void setLimitNum(Integer limitNum) {
+        this.limitNum = limitNum;
     }
 }

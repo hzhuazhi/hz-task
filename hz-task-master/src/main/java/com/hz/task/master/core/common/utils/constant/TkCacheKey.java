@@ -191,4 +191,16 @@ public interface TkCacheKey {
      * 锁住
      */
     String LOCK_DID_SWITCH_TYPE = "-31";
+
+    /**
+     * 锁：检测小微回执数据是否异常-这里锁小微ID
+     * 锁住
+     */
+    String LOCK_WX_ID = "-32";
+
+
+    /**
+     * 纪录小微运营回执是否正常的redis
+     */
+    String WX_ID_DATA = "-33";
 }

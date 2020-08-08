@@ -33,10 +33,7 @@ import com.hz.task.master.core.model.task.cat.CatMsg;
 import com.hz.task.master.core.model.task.cat.FromCatModel;
 import com.hz.task.master.core.model.task.client.ClientModel;
 import com.hz.task.master.core.model.task.did.TaskDidCollectionAccountDataModel;
-import com.hz.task.master.core.model.wx.WxClerkDataModel;
-import com.hz.task.master.core.model.wx.WxClerkModel;
-import com.hz.task.master.core.model.wx.WxFriendModel;
-import com.hz.task.master.core.model.wx.WxModel;
+import com.hz.task.master.core.model.wx.*;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -2655,7 +2652,9 @@ public class TaskMethod {
     public static OperateModel assembleOperateData(long analysisId, DidCollectionAccountModel didCollectionAccountModel, OrderModel orderModel,
                                                   int punishType, String punishMoney, int dataType, String dataExplain, String remark, int endType, long wxId, String money){
         OperateModel resBean = new OperateModel();
-        resBean.setAnalysisId(analysisId);
+        if (analysisId > 0){
+            resBean.setAnalysisId(analysisId);
+        }
         if (didCollectionAccountModel != null && didCollectionAccountModel.getId() > 0){
             resBean.setDid(didCollectionAccountModel.getDid());
             if (didCollectionAccountModel.getWxId() > 0){
@@ -3402,6 +3401,30 @@ public class TaskMethod {
         DidCollectionAccountModel resBean = new DidCollectionAccountModel();
         resBean.setId(id);
         resBean.setCheckInfo(checkInfo);
+        return resBean;
+    }
+
+
+    /**
+     * @Description: 组装查询根据条件获取派发订单里面去重复的小微ID集合
+     * @param wxId - 小微主键ID
+     * @param curday - 日期
+     * @param limitNum - 查询的条数
+     * @return
+     * @author yoko
+     * @date 2020/1/11 16:23
+     */
+    public static WxOrderModel assembleTaskWxOrderByFialNumQuery(long wxId, int curday, int limitNum){
+        WxOrderModel resBean = new WxOrderModel();
+        if (wxId > 0){
+            resBean.setWxId(wxId);
+        }
+        if (curday > 0){
+            resBean.setCurday(curday);
+        }
+        if (limitNum > 0){
+            resBean.setLimitNum(limitNum);
+        }
         return resBean;
     }
 

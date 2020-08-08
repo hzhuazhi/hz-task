@@ -59,8 +59,8 @@ public class TaskWx {
      * @author yoko
      * @date 2019/12/6 20:25
      */
-    @Scheduled(fixedDelay = 1000) // 每秒执行
-//    @Scheduled(fixedDelay = 120000) // 每2分钟执行
+//    @Scheduled(fixedDelay = 1000) // 每秒执行
+    @Scheduled(fixedDelay = 120000) // 每2分钟执行
     public void wxLimitNum() throws Exception{
 //        log.info("----------------------------------TaskWx.wxLimitNum()----start");
         // 获取小微未超过总上限的数据
