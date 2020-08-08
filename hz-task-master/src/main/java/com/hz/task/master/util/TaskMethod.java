@@ -3429,6 +3429,39 @@ public class TaskMethod {
     }
 
 
+    /**
+     * @Description: 组装查询小微订单纪录的查询条件
+     * @param wxId - 小微主键ID
+     * @param collectionAccountId - 收款账号ID
+     * @return com.hz.task.master.core.model.wx.WxOrderModel
+     * @author yoko
+     * @date 2020/8/8 20:47
+     */
+    public static WxOrderModel assembleWxOrderQuery(long wxId, long collectionAccountId, int dataType){
+        WxOrderModel resBean = new WxOrderModel();
+        resBean.setWxId(wxId);
+        resBean.setCollectionAccountId(collectionAccountId);
+        resBean.setDataType(dataType);
+        return resBean;
+    }
+
+
+    /**
+     * @Description: 组装更新小微订单记录的回执数据
+     * @param id - 主键ID
+     * @param dataType - 数据类型;1初始化，2表示小微有数据回执
+     * @return com.hz.task.master.core.model.wx.WxOrderModel
+     * @author yoko
+     * @date 2020/8/8 20:51
+     */
+    public static WxOrderModel assembleWxOrderUpdate(long id, int dataType){
+        WxOrderModel resBean = new WxOrderModel();
+        resBean.setId(id);
+        resBean.setDataType(dataType);
+        return resBean;
+    }
+
+
 
 
 

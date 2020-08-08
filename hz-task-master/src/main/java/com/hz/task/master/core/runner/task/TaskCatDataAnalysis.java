@@ -19,6 +19,7 @@ import com.hz.task.master.core.model.strategy.StrategyModel;
 import com.hz.task.master.core.model.task.base.StatusModel;
 import com.hz.task.master.core.model.wx.WxClerkModel;
 import com.hz.task.master.core.model.wx.WxFriendModel;
+import com.hz.task.master.core.model.wx.WxOrderModel;
 import com.hz.task.master.util.ComponentUtil;
 import com.hz.task.master.util.TaskMethod;
 import org.apache.commons.lang.StringUtils;
@@ -384,6 +385,18 @@ public class TaskCatDataAnalysis {
                             ComponentUtil.wxFriendService.add(wxGroupAdd);
                         }
 
+                        // 更新此次task的状态：更新成成功状态
+                        runStatus = ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE;
+                    }else if(data.getDataType() == 4){
+                        // 加群
+                        // 更新小微回执信息
+                        WxOrderModel wxOrderQuery = TaskMethod.assembleWxOrderQuery(data.getWxId(), data.getCollectionAccountId(), 1);
+                        WxOrderModel wxOrderModel = (WxOrderModel) ComponentUtil.wxOrderService.findByObject(wxOrderQuery);
+                        if (wxOrderModel != null && wxOrderModel.getId() > 0){
+                            // 更新小微订单的回执信息
+                            WxOrderModel wxOrderUpdate = TaskMethod.assembleWxOrderUpdate(wxOrderModel.getId(), 2);
+                            ComponentUtil.wxOrderService.update(wxOrderUpdate);
+                        }
                         // 更新此次task的状态：更新成成功状态
                         runStatus = ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE;
                     }else {
