@@ -120,9 +120,13 @@ public class TaskOrder {
                                 // 判断回复时间是否超过了策略规定时间
                                 int differSecond = DateUtil.differSecond(data.getReplyTime(), data.getRedPackTime());
                                 if (differSecond >= strategyModel.getStgNumValue()){
+                                    /**
                                     // 已经超过回复的规定时间：不管回复什么派单的订单状态修改成 orderStatus = 3
                                     // 1.修改订单状态 orderStatus = 3（有质疑的订单状态）
-                                    OrderModel orderUpdateStatus = TaskMethod.assembleOrderUpdateStatus(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE);
+                                     **/
+                                    // 发了红包但是已经超过回复的规定时间：不管回复什么派单的订单状态修改成 orderStatus = 4
+                                    // 1.修改订单状态 orderStatus = 4（订单成功）
+                                    OrderModel orderUpdateStatus = TaskMethod.assembleOrderUpdateStatus(data.getId(), 4);
                                     ComponentUtil.orderService.updateOrderStatus(orderUpdateStatus);
                                     log.info("");
                                     // 2.修改此订单字段 is_reply = 2 （系统默认回复）

@@ -423,6 +423,7 @@
             a.ac_name = #{acName},
             a.ac_num = #{acNum},
             a.user_id = #{userId},
+            a.check_info ='',
             a.update_time = NOW(),
         </trim>
         where 1=1
