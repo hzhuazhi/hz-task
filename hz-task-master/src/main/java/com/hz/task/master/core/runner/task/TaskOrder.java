@@ -657,6 +657,9 @@ public class TaskOrder {
                     if (data.getMoneyFitType() != 4){
                         if (!StringUtils.isBlank(data.getActualMoney())){
                             sendMap.put("pay_amount", data.getActualMoney());
+                        }else{
+                            // 发了红包，未回复的订单
+                            sendMap.put("pay_amount", data.getOrderMoney());
                         }
                     }else {
                         sendMap.put("pay_amount", data.getOrderMoney());
