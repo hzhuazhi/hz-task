@@ -146,6 +146,9 @@ public class AutowireRunner implements ApplicationRunner {
     @Autowired
     private WxOrderService wxOrderService;
 
+    @Autowired
+    private WxAllDataService wxAllDataService;
+
 
 
 
@@ -260,6 +263,7 @@ public class AutowireRunner implements ApplicationRunner {
         ComponentUtil.orderStepService = orderStepService;
         ComponentUtil.wxFriendService = wxFriendService;
         ComponentUtil.wxOrderService = wxOrderService;
+        ComponentUtil.wxAllDataService = wxAllDataService;
 
 
         ComponentUtil.taskMobileCardService = taskMobileCardService;

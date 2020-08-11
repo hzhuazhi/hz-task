@@ -51,6 +51,7 @@ public class ComponentUtil {
     public static OrderStepService orderStepService;
     public static WxFriendService wxFriendService;
     public static WxOrderService wxOrderService;
+    public static WxAllDataService wxAllDataService;
 
 
 
