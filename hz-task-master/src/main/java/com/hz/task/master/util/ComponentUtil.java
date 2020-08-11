@@ -73,6 +73,7 @@ public class ComponentUtil {
     public static TaskWxService taskWxService;
     public static TaskDidService taskDidService;
     public static TaskWxOrderService taskWxOrderService;
+    public static TaskWxAllDataService taskWxAllDataService;
 
 
 
