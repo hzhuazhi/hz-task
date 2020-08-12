@@ -11,7 +11,7 @@
         a.invalid_time,a.red_pack_invalid_type,a.money_fit_type,a.reply_invalid_type,
         a.final_from_wxid,a.from_name,
         a.final_from_name,a.from_wxid,a.msg,a.msg_type,a.robot_wxid,a.type,a.group_wxid,
-        a.group_name,a.guest,a.member_wxid,a.member_nickname,a.data_type,a.is_matching,
+        a.group_name,a.guest,a.member_wxid,a.member_nickname,a.data_type,a.is_matching,a.data_from,
         a.curday,a.curhour,a.curminute,a.work_type,a.remark,a.run_num,a.run_status,
         a.create_time,a.update_time,a.yn
     </sql>
@@ -79,6 +79,9 @@
             </if>
             <if test="isMatching != null and isMatching != '' " >
                 and a.is_matching = #{isMatching}
+            </if>
+            <if test="dataFrom != null and dataFrom != '' " >
+                and a.data_from = #{dataFrom}
             </if>
             <if test="workType != null and workType != '' " >
                 and a.work_type = #{workType}
@@ -256,6 +259,9 @@
             <if test="isMatching != null and isMatching != '' " >
                 is_matching,
             </if>
+            <if test="dataFrom != null and dataFrom != '' " >
+                data_from,
+            </if>
             <if test="workType != null and workType != '' " >
                 work_type,
             </if>
@@ -355,6 +361,9 @@
             </if>
             <if test="isMatching != null and isMatching != '' " >
                 <![CDATA[  #{isMatching}, ]]>
+            </if>
+            <if test="dataFrom != null and dataFrom != '' " >
+                <![CDATA[  #{dataFrom}, ]]>
             </if>
             <if test="workType != null and workType != '' " >
                 <![CDATA[  #{workType}, ]]>

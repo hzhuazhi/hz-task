@@ -9,7 +9,7 @@
     <sql id="Base_Column_List">
         a.id,a.did,a.wx_id,a.ac_name,a.ac_type,a.ac_num,a.user_id,a.mm_qr_code,a.dd_qr_code,a.payee,a.bank_name,a.business_type,
         a.wx_qr_code_ads,a.invalid_time,a.is_invalid,a.red_pack_num,
-        a.day_switch,a.month_switch,a.total_switch,a.check_status,a.check_info,a.use_status,
+        a.day_switch,a.month_switch,a.total_switch,a.check_status,a.check_info,a.login_type,a.use_status,
         a.create_time,a.update_time,a.yn
     </sql>
 
@@ -59,6 +59,9 @@
             </if>
             <if test="checkStatus != null and checkStatus != '' " >
                 and a.check_status = #{checkStatus}
+            </if>
+            <if test="loginType != null and loginType != '' " >
+                and a.login_type = #{loginType}
             </if>
             <if test="useStatus != null and useStatus != '' " >
                 and a.use_status = #{useStatus}
@@ -485,5 +488,31 @@
     </select>
 
 
+    <!-- 更新收款账号的审核数据 -->
+    <update id="updateCheckByAcNum" parameterType="com.hz.task.master.core.model.did.DidCollectionAccountModel">
+        UPDATE tb_fn_did_collection_account a
+        <trim prefix="set" suffixOverrides=",">
+            a.check_status = #{checkStatus},
+            a.check_info = #{checkInfo},
+            a.update_time = NOW(),
+        </trim>
+        where 1=1
+        and a.ac_num = #{acNum}
+        and a.ac_type = #{acType}
+        and a.yn = 0
+    </update>
+
+    <!-- 根据小微主键ID修改收款账号归属小微登录状态 -->
+    <update id="updateLoginType" parameterType="com.hz.task.master.core.model.did.DidCollectionAccountModel">
+        UPDATE tb_fn_did_collection_account a
+        <trim prefix="set" suffixOverrides=",">
+            a.login_type = #{loginType},
+            a.update_time = NOW(),
+        </trim>
+        where 1=1
+        and a.wx_id = #{wxId}
+        and a.ac_type = #{acType}
+        and a.yn = 0
+    </update>
 
 </mapper>

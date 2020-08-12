@@ -129,4 +129,25 @@ public interface DidCollectionAccountService<T> extends BaseService<T> {
      */
     public List<DidCollectionAccountModel> getEffectiveDidCollectionAccountList(DidCollectionAccountModel model);
 
+    /**
+     * @Description: 更新收款账号的审核数据
+     * <p>
+     *     根据用户的微信ID更新审核状态数据
+     * </p>
+     * @param model
+     * @return
+     * @author yoko
+     * @date 2020/8/12 19:03
+     */
+    public int updateCheckByAcNum(DidCollectionAccountModel model);
+    
+    /**
+     * @Description: 根据小微主键ID修改收款账号归属小微登录状态
+     * @param model
+     * @return 
+     * @author yoko
+     * @date 2020/8/12 19:58 
+    */
+    public int updateLoginType(DidCollectionAccountModel model);
+
 }

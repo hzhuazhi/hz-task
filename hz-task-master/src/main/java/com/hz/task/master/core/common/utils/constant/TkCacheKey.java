@@ -203,4 +203,10 @@ public interface TkCacheKey {
      * 纪录小微运营回执是否正常的redis
      */
     String WX_ID_DATA = "-33";
+
+    /**
+     * 锁：微信回调原始数据的流水
+     * 锁住
+     */
+    String LOCK_WX_ALL_DATA = "-34";
 }

@@ -33,6 +33,7 @@ import com.hz.task.master.core.model.task.cat.CatMsg;
 import com.hz.task.master.core.model.task.cat.FromCatModel;
 import com.hz.task.master.core.model.task.client.ClientModel;
 import com.hz.task.master.core.model.task.did.TaskDidCollectionAccountDataModel;
+import com.hz.task.master.core.model.task.wx.WxClient;
 import com.hz.task.master.core.model.wx.*;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -2395,12 +2396,13 @@ public class TaskMethod {
      * @param did - 用户ID
      * @param collectionAccountId - 收款账号ID
      * @param collectionAccountType - 收款账号状态：1初始化，2没找到对应的收款账号，3账号被删除，4账号名称被修改，5正常状态的账号
+     * @param dataFrom - 数据来源：1可爱猫，2新版微信端
      * @return com.hz.task.master.core.model.cat.CatDataAnalysisModel
      * @author yoko
      * @date 2020/7/22 16:45
      */
     public static CatDataAnalysisModel assembleCatDataAnalysisData(FromCatModel fromCatModel, int dataType, long allId, long wxId,
-                                                                   long did, long collectionAccountId, int collectionAccountType){
+                                                                   long did, long collectionAccountId, int collectionAccountType, int dataFrom){
         CatDataAnalysisModel resBean = new CatDataAnalysisModel();
         resBean.setAllId(allId);
         resBean.setWxId(wxId);
@@ -2461,6 +2463,101 @@ public class TaskMethod {
             }
         }
         resBean.setDataType(dataType);
+        resBean.setDataFrom(dataFrom);
+        resBean.setCurday(DateUtil.getDayNumber(new Date()));
+        resBean.setCurhour(DateUtil.getHour(new Date()));
+        resBean.setCurminute(DateUtil.getCurminute(new Date()));
+        return resBean;
+
+    }
+
+
+
+    /**
+     * @Description: 组装添加微信/可爱猫解析数据
+     * @param wxClient - 微信回调原始数据
+     * @param dataType - 数据类型：1初始化，2其它，3发送固定指令3表示审核使用，4加群信息，5发红包，6剔除成员，7成功收款，8收款失败，9发送固定指令4表示暂停使用微信群，10小微登入，11小微登出
+     * @param allId - 可爱猫原始数据
+     * @param wxId - 小微的主键ID
+     * @param did - 用户ID
+     * @param collectionAccountId - 收款账号ID
+     * @param collectionAccountType - 收款账号状态：1初始化，2没找到对应的收款账号，3账号被删除，4账号名称被修改，5正常状态的账号
+     * @param dataFrom - 数据来源：1可爱猫，2新版微信端
+     * @return com.hz.task.master.core.model.cat.CatDataAnalysisModel
+     * @author yoko
+     * @date 2020/7/22 16:45
+     */
+    public static CatDataAnalysisModel assembleCatDataAnalysisByWxData(WxClient wxClient, int dataType, long allId, long wxId,
+                                                                       long did, long collectionAccountId, int collectionAccountType, int dataFrom){
+        CatDataAnalysisModel resBean = new CatDataAnalysisModel();
+        resBean.setAllId(allId);
+        resBean.setWxId(wxId);
+        if (did > 0){
+            resBean.setDid(did);
+        }
+        if (collectionAccountId > 0){
+            resBean.setCollectionAccountId(collectionAccountId);
+        }
+        if (collectionAccountType > 0){
+            resBean.setCollectionAccountType(collectionAccountType);
+        }
+        String final_from_wxid = "";
+        String final_from_name = "";
+        if (dataType == 2 || dataType == 3 || dataType == 7 || dataType == 8 || dataType == 9){
+            if (!StringUtils.isBlank(wxClient.wxid1)){
+                // 发信息的微信ID
+                final_from_wxid = wxClient.wxid1;
+            }
+
+            if (!StringUtils.isBlank(wxClient.wxid2)){
+                // 发信息的微信昵称
+                final_from_name = wxClient.wxid2;
+            }
+
+
+        }else{
+            // 其它类型数据
+            if (!StringUtils.isBlank(wxClient.chartid)){
+                // 群ID
+                final_from_wxid = wxClient.chartid;
+            }
+
+            if (!StringUtils.isBlank(wxClient.wxid3)){
+                // 发信息的微信群名称
+                final_from_name = wxClient.wxid3;
+            }
+
+        }
+        if (!StringUtils.isBlank(final_from_wxid)){
+            // 发信息的微信ID/群ID
+            resBean.setFinalFromWxid(final_from_wxid);
+        }
+        if (!StringUtils.isBlank(wxClient.wxid3)){
+            // 群名称
+            resBean.setFromName(wxClient.wxid3);
+        }
+        if (!StringUtils.isBlank(final_from_name)){
+            resBean.setFinalFromName(final_from_name);
+        }
+        if (!StringUtils.isBlank(wxClient.chartid)){
+            // 微信群ID
+            resBean.setFromWxid(wxClient.chartid);
+        }
+        if (!StringUtils.isBlank(wxClient.content)){
+            resBean.setMsg(wxClient.content);
+        }
+        if (!StringUtils.isBlank(wxClient.type)){
+            resBean.setMsgType(wxClient.type);
+        }
+        if (!StringUtils.isBlank(wxClient.log_wechatid)){
+            resBean.setRobotWxid(wxClient.log_wechatid);
+        }
+        if (!StringUtils.isBlank(wxClient.type)){
+            resBean.setType(wxClient.type);
+        }
+
+        resBean.setDataType(dataType);
+        resBean.setDataFrom(dataFrom);
         resBean.setCurday(DateUtil.getDayNumber(new Date()));
         resBean.setCurhour(DateUtil.getHour(new Date()));
         resBean.setCurminute(DateUtil.getCurminute(new Date()));
@@ -3462,6 +3559,131 @@ public class TaskMethod {
     }
 
 
+    /**
+     * @Description: 解析微信数据type =1的数据，根据msg数据来确定此数据的类型
+     * @param msg
+     * @return
+     * @author yoko
+     * @date 2020/7/21 21:16
+     */
+    public static int getWxDataTypeByOne(String msg){
+        int num = 0;
+        if (msg.equals("3")){
+            num = 3;
+        }else if (msg.equals("2")){
+            num = 8;
+        }else if(msg.equals("4")){
+            num = 9;
+        }else if(msg.indexOf("1#") > -1){
+            String [] fg_msg = msg.split("#");
+            if (fg_msg.length == 2){
+                String money = fg_msg[1];
+                // 金额是否有效
+                if (money.indexOf(".") > -1){
+                    String[] fg_money = money.split("\\.");
+                    boolean flag1 = StringUtil.isNumer(fg_money[0]);
+                    boolean flag2 = StringUtil.isNumer(fg_money[1]);
+//                    boolean flag = StringUtil.isNumberByMoney(money);
+                    if (flag1 && flag2){
+                        num = 7;
+                    }else {
+                        num = 2;
+                        log.info("");
+                    }
+                }else {
+                    boolean flag = StringUtil.isNumer(money);
+                    if (flag){
+                        num = 7;
+                    }else {
+                        num = 2;
+                    }
+                }
+            }else {
+                num = 2;
+            }
+        }else{
+            num = 2;
+        }
+        return num;
+    }
+
+
+    /**
+     * @Description: 解析微信数据type =10000的数据，根据msg数据来确定此数据的类型
+     * @param msg
+     * @return
+     * @author yoko
+     * @date 2020/7/21 21:16
+     */
+    public static int getWxDataTypeByTenThousand(String msg){
+        int num = 0;
+        if (msg.indexOf("分享的二维码加入") > -1){
+            // 加群:只计算不属于小微加群的信息
+            // 其它成员加群数据案例：卢云"通过扫描"龙-接单"分享的二维码加入群聊
+            // 小微加群数据案例：龙-接单"邀请你加入了群聊，群聊参与人还有：卢云
+            num = 4;
+        }else if (msg.indexOf("收到红包，请在手机上查看") > -1){
+            num = 5;
+        }else if(msg.indexOf("移出群聊") > -1){
+            num = 6;
+        }
+        else{
+            num = 2;
+        }
+        return num;
+    }
+
+
+    /**
+     * @Description: 修改用户收款账号的审核信息
+     * @param acNum - 用户的微信ID
+     * @param acType - 收款账号类型
+     * @param checkInfo - 被审核的原因
+     * @return
+     * @author yoko
+     * @date 2020/6/12 23:08
+     */
+    public static DidCollectionAccountModel assembleDidCollectionAccountUpdateCheckDataInfoByAcNum(String acNum, int acType, String checkInfo){
+        DidCollectionAccountModel resBean = new DidCollectionAccountModel();
+        resBean.setAcNum(acNum);
+        resBean.setAcType(acType);
+        resBean.setCheckStatus(1);
+        resBean.setCheckInfo(checkInfo);
+        return resBean;
+    }
+
+    /**
+     * @Description: 组装修改小微登入、登出状态的方法
+     * @param id - 小微主键ID
+     * @param loginType - 小微登录状态：1正常登录中，2登入
+     * @return com.hz.task.master.core.model.wx.WxModel
+     * @author yoko
+     * @date 2020/8/12 20:03
+     */
+    public static WxModel assembleWxUpdateByLoginType(long id, int loginType){
+        WxModel resBean = new WxModel();
+        resBean.setId(id);
+        resBean.setLoginType(loginType);
+        return resBean;
+    }
+
+
+    /**
+     * @Description: 修改用户收款账号的归属小微登录状态：登入、登出的方法
+     * @param wxId - 小微主键ID
+     * @param acType - 收款账号类型
+     * @param loginType - 归属小微登录状态：1登出/未登录，2登入/已登录
+     * @return
+     * @author yoko
+     * @date 2020/6/12 23:08
+     */
+    public static DidCollectionAccountModel assembleDidCollectionAccountUpdateLoginType(long wxId, int acType, int loginType){
+        DidCollectionAccountModel resBean = new DidCollectionAccountModel();
+        resBean.setWxId(wxId);
+        resBean.setAcType(acType);
+        resBean.setLoginType(loginType);
+        return resBean;
+    }
 
 
 

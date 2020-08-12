@@ -19,6 +19,7 @@ import com.hz.task.master.core.model.strategy.StrategyModel;
 import com.hz.task.master.core.model.task.base.StatusModel;
 import com.hz.task.master.core.model.wx.WxClerkModel;
 import com.hz.task.master.core.model.wx.WxFriendModel;
+import com.hz.task.master.core.model.wx.WxModel;
 import com.hz.task.master.core.model.wx.WxOrderModel;
 import com.hz.task.master.util.ComponentUtil;
 import com.hz.task.master.util.TaskMethod;
@@ -304,6 +305,66 @@ public class TaskCatDataAnalysis {
                             StatusModel statusModel = TaskMethod.assembleUpdateStatusByWorkType(data.getId(), workType, workRemark);
                             ComponentUtil.taskCatDataAnalysisService.updateCatDataAnalysisStatus(statusModel);
 
+                        }else if (data.getDataType() == 9){
+                            // 发送固定指令4表示暂停使用微信群
+                            int workType = 0; // task的补充结果状态
+                            String workRemark = "";// task的补充的备注
+
+                            // 根据发指令的微信ID更新用户群的审核状态
+                            if (!StringUtils.isBlank(data.getFinalFromWxid())){
+                                DidCollectionAccountModel didCollectionAccountUpdate = TaskMethod.assembleDidCollectionAccountUpdateCheckDataInfoByAcNum(data.getFinalFromWxid(), 3, "检测：微信收款异常");
+                                ComponentUtil.didCollectionAccountService.updateCheckByAcNum(didCollectionAccountUpdate);
+                                workType = ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE;
+                            }else {
+                                // 更新此次task的状态：更新成失败
+                                workType = ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO;
+                                workRemark = "微信ID数据为空";
+                            }
+
+                            // 更新此次task的状态
+                            StatusModel statusModel = TaskMethod.assembleUpdateStatusByWorkType(data.getId(), workType, workRemark);
+                            ComponentUtil.taskCatDataAnalysisService.updateCatDataAnalysisStatus(statusModel);
+
+                        }else if (data.getDataType() == 10){
+                            // 小微登入
+                            int workType = 0; // task的补充结果状态
+                            String workRemark = "";// task的补充的备注
+
+
+                            // 组装修改小微登入状态
+                            WxModel wxModel = TaskMethod.assembleWxUpdateByLoginType(data.getWxId(), 2);
+                            ComponentUtil.wxService.update(wxModel);
+
+                            // 组装修改小微旗下收款账号的登入状态
+                            DidCollectionAccountModel didCollectionAccountUpdate = TaskMethod.assembleDidCollectionAccountUpdateLoginType(data.getWxId(), 3, 2);
+                            ComponentUtil.didCollectionAccountService.updateLoginType(didCollectionAccountUpdate);
+
+
+                            workType = ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE;
+
+                            // 更新此次task的状态
+                            StatusModel statusModel = TaskMethod.assembleUpdateStatusByWorkType(data.getId(), workType, workRemark);
+                            ComponentUtil.taskCatDataAnalysisService.updateCatDataAnalysisStatus(statusModel);
+                        }else if (data.getDataType() == 11){
+                            // 小微登出
+                            int workType = 0; // task的补充结果状态
+                            String workRemark = "";// task的补充的备注
+
+
+                            // 组装修改小微登出状态
+                            WxModel wxModel = TaskMethod.assembleWxUpdateByLoginType(data.getWxId(), 1);
+                            ComponentUtil.wxService.update(wxModel);
+
+                            // 组装修改小微旗下收款账号的登出状态
+                            DidCollectionAccountModel didCollectionAccountUpdate = TaskMethod.assembleDidCollectionAccountUpdateLoginType(data.getWxId(), 3, 1);
+                            ComponentUtil.didCollectionAccountService.updateLoginType(didCollectionAccountUpdate);
+
+
+                            workType = ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE;
+
+                            // 更新此次task的状态
+                            StatusModel statusModel = TaskMethod.assembleUpdateStatusByWorkType(data.getId(), workType, workRemark);
+                            ComponentUtil.taskCatDataAnalysisService.updateCatDataAnalysisStatus(statusModel);
                         }
                     }
 

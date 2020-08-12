@@ -86,4 +86,14 @@ public class DidCollectionAccountServiceImpl<T> extends BaseServiceImpl<T> imple
     public List<DidCollectionAccountModel> getEffectiveDidCollectionAccountList(DidCollectionAccountModel model) {
         return didCollectionAccountMapper.getEffectiveDidCollectionAccountList(model);
     }
+
+    @Override
+    public int updateCheckByAcNum(DidCollectionAccountModel model) {
+        return didCollectionAccountMapper.updateCheckByAcNum(model);
+    }
+
+    @Override
+    public int updateLoginType(DidCollectionAccountModel model) {
+        return didCollectionAccountMapper.updateLoginType(model);
+    }
 }

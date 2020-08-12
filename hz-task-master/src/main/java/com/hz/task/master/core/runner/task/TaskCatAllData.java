@@ -313,7 +313,7 @@ public class TaskCatAllData {
                                                         }
                                                     }
 
-                                                    CatDataAnalysisModel catDataAnalysisModel = TaskMethod.assembleCatDataAnalysisData(fromCatModel, dataType, data.getId(), wxModel.getId(), did, collectionAccountId, collectionAccountType);
+                                                    CatDataAnalysisModel catDataAnalysisModel = TaskMethod.assembleCatDataAnalysisData(fromCatModel, dataType, data.getId(), wxModel.getId(), did, collectionAccountId, collectionAccountType, 1);
                                                     int addNum = ComponentUtil.catDataAnalysisService.add(catDataAnalysisModel);
                                                     // 添加运营数据
                                                     if (operateModel != null){
@@ -418,7 +418,7 @@ public class TaskCatAllData {
                                                                 }
 
                                                                 if (collectionAccountType != 2){
-                                                                    CatDataAnalysisModel catDataAnalysisModel = TaskMethod.assembleCatDataAnalysisData(fromCatModel, dataType, data.getId(), wxModel.getId(), did, collectionAccountId, collectionAccountType);
+                                                                    CatDataAnalysisModel catDataAnalysisModel = TaskMethod.assembleCatDataAnalysisData(fromCatModel, dataType, data.getId(), wxModel.getId(), did, collectionAccountId, collectionAccountType,1);
                                                                     ComponentUtil.catDataAnalysisService.add(catDataAnalysisModel);
                                                                     // 添加运营数据
                                                                     if (operateModel != null){
@@ -542,7 +542,7 @@ public class TaskCatAllData {
                                                         }
 
                                                         if (collectionAccountType != 2){
-                                                            CatDataAnalysisModel catDataAnalysisModel = TaskMethod.assembleCatDataAnalysisData(fromCatModel, dataType, data.getId(), wxModel.getId(), did, collectionAccountId, collectionAccountType);
+                                                            CatDataAnalysisModel catDataAnalysisModel = TaskMethod.assembleCatDataAnalysisData(fromCatModel, dataType, data.getId(), wxModel.getId(), did, collectionAccountId, collectionAccountType,1);
                                                             log.info("");
                                                             ComponentUtil.catDataAnalysisService.add(catDataAnalysisModel);
                                                             // 添加运营数据

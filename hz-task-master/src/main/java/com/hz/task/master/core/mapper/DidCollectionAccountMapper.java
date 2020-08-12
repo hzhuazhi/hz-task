@@ -133,4 +133,23 @@ public interface DidCollectionAccountMapper<T> extends BaseDao<T> {
     */
     public List<DidCollectionAccountModel> getEffectiveDidCollectionAccountList(DidCollectionAccountModel model);
 
+
+    /**
+     * @Description: 更新收款账号的审核数据
+     * @param model
+     * @return
+     * @author yoko
+     * @date 2020/8/12 19:03
+    */
+    public int updateCheckByAcNum(DidCollectionAccountModel model);
+
+    /**
+     * @Description: 根据小微主键ID修改收款账号归属小微登录状态
+     * @param model
+     * @return
+     * @author yoko
+     * @date 2020/8/12 19:58
+     */
+    public int updateLoginType(DidCollectionAccountModel model);
+
 }

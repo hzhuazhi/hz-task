@@ -164,6 +164,11 @@ public class CatDataAnalysisModel extends BasePage implements Serializable {
     private Integer isMatching;
 
     /**
+     * 数据来源：1可爱猫，2新版微信端
+     */
+    private Integer dataFrom;
+
+    /**
      * 创建日期：存的日期格式20160530
      */
     private Integer curday;
@@ -570,5 +575,13 @@ public class CatDataAnalysisModel extends BasePage implements Serializable {
 
     public void setInvalidTimeSmall(String invalidTimeSmall) {
         this.invalidTimeSmall = invalidTimeSmall;
+    }
+
+    public Integer getDataFrom() {
+        return dataFrom;
+    }
+
+    public void setDataFrom(Integer dataFrom) {
+        this.dataFrom = dataFrom;
     }
 }
