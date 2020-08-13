@@ -49,6 +49,7 @@ public class TaskDid {
     /**
      * @Description: task：check用户的有效微信群
      * <p>
+     *     #目前总开关废弃
      *     每1分钟运行一次
      *     1.查询所有用户。
      *     2.根据用户查询有效微信群。
@@ -59,7 +60,7 @@ public class TaskDid {
      * @date 2019/12/6 20:25
      */
 //    @Scheduled(fixedDelay = 1000) // 每秒执行
-    @Scheduled(fixedDelay = 60000) // 每1分钟执行
+//    @Scheduled(fixedDelay = 60000) // 每1分钟执行
     public void didSwitch() throws Exception{
 //        log.info("----------------------------------TaskDid.didSwitch()----start");
 
