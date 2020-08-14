@@ -68,11 +68,10 @@ public class TaskPoolWait {
      * @author yoko
      * @date 2019/12/6 20:25
      */
-    @Scheduled(fixedDelay = 1000) // 每1分钟执行
-//    @Scheduled(fixedDelay = 60000) // 每1分钟执行
+//    @Scheduled(fixedDelay = 1000) // 每1分钟执行
+    @Scheduled(fixedDelay = 60000) // 每1分钟执行
     public void checkPoolWait() throws Exception{
 //        log.info("----------------------------------TaskPoolWait.checkPoolWait()----start");
-        int curday = DateUtil.getDayNumber(new Date());
         // 查询策略里面的池子中的用户余额不得低于的保底金额
         String poolMinMoney = "";
         StrategyModel strategyQuery = HodgepodgeMethod.assembleStrategyQuery(ServerConstant.StrategyEnum.POOL_MIN_MONEY.getStgType());

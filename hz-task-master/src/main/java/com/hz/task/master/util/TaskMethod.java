@@ -22,6 +22,7 @@ import com.hz.task.master.core.model.mobilecard.MobileCardModel;
 import com.hz.task.master.core.model.operate.OperateModel;
 import com.hz.task.master.core.model.order.OrderModel;
 import com.hz.task.master.core.model.order.OrderStepModel;
+import com.hz.task.master.core.model.pool.PoolOpenModel;
 import com.hz.task.master.core.model.pool.PoolOriginModel;
 import com.hz.task.master.core.model.pool.PoolWaitModel;
 import com.hz.task.master.core.model.strategy.StrategyData;
@@ -3844,6 +3845,28 @@ public class TaskMethod {
      */
     public static PoolWaitModel assemblePoolWaitUpdate(long id, long did, int yn){
         PoolWaitModel resBean = new PoolWaitModel();
+        if (id > 0){
+            resBean.setId(id);
+        }
+        if (did > 0){
+            resBean.setDid(did);
+        }
+        if (yn > 0){
+            resBean.setYn(yn);
+        }
+        return resBean;
+    }
+
+    /**
+     * @Description: 组装更新抢单进行中的查询条件
+     * @param id - 主键ID
+     * @param did - 用户ID
+     * @return com.hz.fine.master.core.model.pool.PoolWaitModel
+     * @author yoko
+     * @date 2020/8/13 17:36
+     */
+    public static PoolOpenModel assemblePoolOpenUpdate(long id, long did, int yn){
+        PoolOpenModel resBean = new PoolOpenModel();
         if (id > 0){
             resBean.setId(id);
         }
