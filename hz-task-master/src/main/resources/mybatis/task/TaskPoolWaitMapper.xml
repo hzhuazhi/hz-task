@@ -37,9 +37,6 @@
             <if test="curdayStart != null and curdayStart != '' and curdayEnd != null and curdayEnd != '' " >
                 and a.curday >= #{curdayStart} and a.curday &lt;= #{curdayEnd}
             </if>
-            <if test="createTime != null and createTime != '' " >
-                and a.create_time &lt;= #{createTime}
-            </if>
             and a.yn = 0
         </trim>
     </sql>
@@ -62,138 +59,24 @@
     </sql>
 
 
-    <!-- 显示所有数据 -->
-    <select id="findAll" resultType="com.hz.task.master.core.model.pool.PoolWaitModel">
+    <!-- 查询等待池中的用户集合 -->
+    <select id="getPoolWaitDidList" parameterType="Object" resultType="java.lang.Long">
         select
-        <include refid="Base_Column_List" />
+        DISTINCT(a.did) as did
         from tb_fn_pool_wait a
         <include refid="Example_Where_Clause"/>
     </select>
 
-    <!-- 查询列表 -->
-    <select id="findByCondition" parameterType="Object" resultType="com.hz.task.master.core.model.pool.PoolWaitModel">
-        select
-        <include refid="Base_Column_List" />
-        from tb_fn_pool_wait a
-        <include refid="Example_Where_Clause"/>
-    </select>
-
-    <!-- 根据条件查询信息-->
-    <select id="findByObject" parameterType="Object" resultType="com.hz.task.master.core.model.pool.PoolWaitModel">
-        select
-        <include refid="Base_Column_List" />
-        from tb_fn_pool_wait a
-        <include refid="Example_Where_Clause"/>
-        limit 1
-    </select>
-
-    <!-- 根据id查询信息-->
-    <select id="findById" parameterType="java.lang.Long" resultType="com.hz.task.master.core.model.pool.PoolWaitModel">
-        select
-        <include refid="Base_Column_List" />
-        from tb_fn_pool_wait a
-        <include refid="Example_Where_Clause_id"/>
-    </select>
 
 
-    <!-- 查询总数-->
-    <select id="queryByCount" resultType="java.lang.Integer"  parameterType="Object">
-        select count(1)
-        from tb_fn_pool_wait a
-        <include refid="Example_Where_Clause"/>
-    </select>
-
-    <!-- 查询分页列表 -->
-    <select id="queryByList" parameterType="Object" resultType="com.hz.task.master.core.model.pool.PoolWaitModel">
-        select
-        <include refid="Base_Column_List" />
-        from tb_fn_pool_wait a
-        <include refid="Example_Where_Clause"/>
-        <include refid="Example_Order_By"/>
-        <if test="pageNumber != null and pageNumber != ''" >
-            limit #{start},#{end}
-        </if>
-    </select>
-
-
-    <!-- 添加基本信息 -->
-    <insert id="add" parameterType="com.hz.task.master.core.model.pool.PoolWaitModel" >
-        <!--<selectKey resultType="java.lang.Long" order="AFTER" keyProperty="id">-->
-        <!--SELECT LAST_INSERT_ID() as id-->
-        <!--</selectKey>-->
-        insert into tb_fn_pool_wait
-        <trim prefix="(" suffix=")" suffixOverrides="," >
-            <if test="did != null and did != '' " >
-                did,
-            </if>
-            <if test="dataType != null and dataType != '' " >
-                data_type,
-            </if>
-            <if test="curday != null and curday != '' " >
-                curday,
-            </if>
-            <if test="curhour != null and curhour != '' " >
-                curhour,
-            </if>
-            <if test="curminute != null and curminute != '' " >
-                curminute,
-            </if>
-            create_time,
-        </trim>
-        values
-        <trim prefix="(" suffix=")" suffixOverrides="," >
-            <if test="did != null and did != '' " >
-                <![CDATA[  #{did}, ]]>
-            </if>
-            <if test="dataType != null and dataType != '' " >
-                <![CDATA[  #{dataType}, ]]>
-            </if>
-            <if test="curday != null and curday != '' " >
-                <![CDATA[  #{curday}, ]]>
-            </if>
-            <if test="curhour != null and curhour != '' " >
-                <![CDATA[  #{curhour}, ]]>
-            </if>
-            <if test="curminute != null and curminute != '' " >
-                <![CDATA[  #{curminute}, ]]>
-            </if>
-            NOW(),
-        </trim>
-    </insert>
-
-    <!-- 更新基本信息 -->
-    <update id="update" parameterType="com.hz.task.master.core.model.pool.PoolWaitModel">
-        UPDATE tb_fn_pool_wait a
-        <trim prefix="set" suffixOverrides=",">
-            <if test="did != null and did != '' " >
-                a.did = #{did},
-            </if>
-            <if test="dataType != null and dataType != '' " >
-                a.data_type = #{dataType},
-            </if>
-            a.update_time = NOW(),
-        </trim>
-        <include refid="Example_Where_Clause"/>
-    </update>
-
-    <!-- 主要作用1.逻辑删除，2更新状态 -->
-    <update id="manyOperation" parameterType="Object">
+    <!-- 更新剔除等待池的用户 -->
+    <update id="updatePoolWaitYn" parameterType="Object">
         update tb_fn_pool_wait a
         <trim prefix="set" suffixOverrides=",">
             <if test="yn != 0 and yn >0 " >
                 a.yn = #{yn},
             </if>
         </trim>
-        <if test="id != null and id != '' " >
-            and a.id = #{id}
-        </if>
-        and a.did = #{did}
-        and a.yn = 0
-    </update>
-
-    <!-- 物理删除 -->
-    <update id="delete" parameterType="Object">
-        delete from tb_fn_pool_wait a
         where 1=1
         <if test="id != null and id != '' " >
             and a.id = #{id}
