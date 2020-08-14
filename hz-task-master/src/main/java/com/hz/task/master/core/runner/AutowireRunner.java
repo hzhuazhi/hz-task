@@ -149,7 +149,14 @@ public class AutowireRunner implements ApplicationRunner {
     @Autowired
     private WxAllDataService wxAllDataService;
 
+    @Autowired
+    private PoolOpenService poolOpenService;
 
+    @Autowired
+    private PoolWaitService poolWaitService;
+
+    @Autowired
+    private PoolOriginService poolOriginService;
 
 
     @Autowired
@@ -212,6 +219,11 @@ public class AutowireRunner implements ApplicationRunner {
     @Autowired
     private TaskWxAllDataService taskWxAllDataService;
 
+    @Autowired
+    private TaskPoolOpenService taskPoolOpenService;
+
+    @Autowired
+    private TaskPoolWaitService taskPoolWaitService;
 
 
 
@@ -267,6 +279,9 @@ public class AutowireRunner implements ApplicationRunner {
         ComponentUtil.wxFriendService = wxFriendService;
         ComponentUtil.wxOrderService = wxOrderService;
         ComponentUtil.wxAllDataService = wxAllDataService;
+        ComponentUtil.poolOpenService = poolOpenService;
+        ComponentUtil.poolWaitService = poolWaitService;
+        ComponentUtil.poolOriginService = poolOriginService;
 
 
         ComponentUtil.taskMobileCardService = taskMobileCardService;
@@ -288,6 +303,8 @@ public class AutowireRunner implements ApplicationRunner {
         ComponentUtil.taskDidService = taskDidService;
         ComponentUtil.taskWxOrderService = taskWxOrderService;
         ComponentUtil.taskWxAllDataService = taskWxAllDataService;
+        ComponentUtil.taskPoolOpenService = taskPoolOpenService;
+        ComponentUtil.taskPoolWaitService = taskPoolWaitService;
 
         runThread = new RunThread();
         runThread.start();

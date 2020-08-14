@@ -52,6 +52,9 @@ public class ComponentUtil {
     public static WxFriendService wxFriendService;
     public static WxOrderService wxOrderService;
     public static WxAllDataService wxAllDataService;
+    public static PoolOpenService poolOpenService;
+    public static PoolWaitService poolWaitService;
+    public static PoolOriginService poolOriginService;
 
 
 
@@ -74,6 +77,8 @@ public class ComponentUtil {
     public static TaskDidService taskDidService;
     public static TaskWxOrderService taskWxOrderService;
     public static TaskWxAllDataService taskWxAllDataService;
+    public static TaskPoolOpenService taskPoolOpenService;
+    public static TaskPoolWaitService taskPoolWaitService;
 
 
 
