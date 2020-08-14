@@ -209,4 +209,16 @@ public interface TkCacheKey {
      * 锁住
      */
     String LOCK_WX_ALL_DATA = "-34";
+
+    /**
+     * 锁：接单池子等待接单的的流水-这里是用户DID
+     * 锁住
+     */
+    String LOCK_POOL_WAIT_DID = "-35";
+
+    /**
+     * 锁：接单池子正在接单的流水-这里是用户DID
+     * 锁住
+     */
+    String LOCK_POOL_OPEN_DID = "-36";
 }

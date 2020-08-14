@@ -7,6 +7,8 @@ import com.hz.task.master.core.service.task.TaskPoolWaitService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * @Description task:接单池子等待接单的Service层的实现层
  * @Author yoko
@@ -27,5 +29,15 @@ public class TaskPoolWaitServiceImpl<T> extends BaseServiceImpl<T> implements Ta
 
     public BaseDao<T> getDao() {
         return taskPoolWaitMapper;
+    }
+
+    @Override
+    public List<Long> getPoolWaitDidList(Object obj) {
+        return taskPoolWaitMapper.getPoolWaitDidList(obj);
+    }
+
+    @Override
+    public int updatePoolWaitYn(Object obj) {
+        return taskPoolWaitMapper.updatePoolWaitYn(obj);
     }
 }

@@ -99,6 +99,16 @@
             <if test="orderStatus != null and orderStatus != '' " >
                 and a.order_status = #{orderStatus}
             </if>
+            <if test="orderStatusStr != null and orderStatusStr != '' " >
+                and a.order_status >= 3
+            </if>
+            <if test="isRedPack != null and isRedPack != '' " >
+                and a.is_red_pack = #{isRedPack}
+            </if>
+
+            <if test="isReply != null and isReply != '' " >
+                and a.is_reply = #{isReply}
+            </if>
             <if test="replenishType != null and replenishType != '' " >
                 and a.replenish_type = #{replenishType}
             </if>
@@ -595,5 +605,16 @@
         and a.id = #{id}
         and a.yn = 0
     </update>
+
+
+    <!-- 根据条件查询订单信息-->
+    <select id="getOrderByNotIsReply" parameterType="Object" resultType="com.hz.task.master.core.model.order.OrderModel">
+        select
+        <include refid="Base_Column_List" />
+        from tb_fn_order a left join tb_fn_did_collection_account b on a.collection_account_id = b.id
+        <include refid="Example_Where_Clause"/>
+        order by id desc
+        limit 1
+    </select>
 
 </mapper>

@@ -48,6 +48,15 @@
             <if test="businessType != null and businessType != '' " >
                 and a.business_type = #{businessType}
             </if>
+            <if test="isInvalid != null and isInvalid != '' " >
+                and a.is_invalid = #{isInvalid}
+            </if>
+            <if test="invalidTimeStart != null and invalidTimeStart != '' " >
+                and a.invalid_time > now()
+            </if>
+            <if test="invalidTimeEnd != null and invalidTimeEnd != '' " >
+                or a.invalid_time &lt;= now()
+            </if>
             <if test="daySwitch != null and daySwitch != '' " >
                 and a.day_switch = #{daySwitch}
             </if>
@@ -514,5 +523,17 @@
         and a.ac_type = #{acType}
         and a.yn = 0
     </update>
+
+    <!-- 获取有效的微信群收款账号 -->
+    <select id="getEffectiveDidCollectionAccountByWxGroup" parameterType="Object" resultType="com.hz.task.master.core.model.did.DidCollectionAccountModel">
+        select
+        <include refid="Base_Column_List" />
+        from tb_fn_did_collection_account a
+        <include refid="Example_Where_Clause"/>
+        order by a.id asc
+        <if test="countGroupNum != null and countGroupNum != ''" >
+            limit #{countGroupNum}
+        </if>
+    </select>
 
 </mapper>

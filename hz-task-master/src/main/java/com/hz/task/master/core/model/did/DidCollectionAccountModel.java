@@ -160,6 +160,23 @@ public class DidCollectionAccountModel extends BasePage implements Serializable 
      */
     private String toWxid;
 
+    /**
+     * 有效时间
+     * SQL判断
+     */
+    private String invalidTimeStart;
+
+    /**
+     * 失效时间
+     * SQL判断
+     */
+    private String invalidTimeEnd;
+
+    /**
+     * 有效微信群个数
+     */
+    private Integer countGroupNum;
+
 
     public Long getId() {
         return id;
@@ -391,5 +408,29 @@ public class DidCollectionAccountModel extends BasePage implements Serializable 
 
     public void setLoginType(Integer loginType) {
         this.loginType = loginType;
+    }
+
+    public String getInvalidTimeStart() {
+        return invalidTimeStart;
+    }
+
+    public void setInvalidTimeStart(String invalidTimeStart) {
+        this.invalidTimeStart = invalidTimeStart;
+    }
+
+    public Integer getCountGroupNum() {
+        return countGroupNum;
+    }
+
+    public void setCountGroupNum(Integer countGroupNum) {
+        this.countGroupNum = countGroupNum;
+    }
+
+    public String getInvalidTimeEnd() {
+        return invalidTimeEnd;
+    }
+
+    public void setInvalidTimeEnd(String invalidTimeEnd) {
+        this.invalidTimeEnd = invalidTimeEnd;
     }
 }

@@ -220,6 +220,11 @@ public class OrderModel extends BasePage implements Serializable {
     private List<Long> didList;
 
     /**
+     * 订单状态
+     */
+    private String orderStatusStr;
+
+    /**
      * 订单状态_用户操作的状态：1初始化，2失败，3超时后默认成功，4用户点击成功
      * 订单状态_微信群的操作状态：1初始化，2用户加群，3用户发红包，4剔除成员，5收款失败，6收款部分（跟订单金额不相同），7收款成功
      */
@@ -587,5 +592,13 @@ public class OrderModel extends BasePage implements Serializable {
 
     public void setReplenishType(Integer replenishType) {
         this.replenishType = replenishType;
+    }
+
+    public String getOrderStatusStr() {
+        return orderStatusStr;
+    }
+
+    public void setOrderStatusStr(String orderStatusStr) {
+        this.orderStatusStr = orderStatusStr;
     }
 }

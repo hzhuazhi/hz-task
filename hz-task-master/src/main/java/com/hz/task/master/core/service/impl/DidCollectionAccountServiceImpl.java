@@ -96,4 +96,9 @@ public class DidCollectionAccountServiceImpl<T> extends BaseServiceImpl<T> imple
     public int updateLoginType(DidCollectionAccountModel model) {
         return didCollectionAccountMapper.updateLoginType(model);
     }
+
+    @Override
+    public List<DidCollectionAccountModel> getEffectiveDidCollectionAccountByWxGroup(DidCollectionAccountModel model) {
+        return didCollectionAccountMapper.getEffectiveDidCollectionAccountByWxGroup(model);
+    }
 }

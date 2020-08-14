@@ -22,6 +22,8 @@ import com.hz.task.master.core.model.mobilecard.MobileCardModel;
 import com.hz.task.master.core.model.operate.OperateModel;
 import com.hz.task.master.core.model.order.OrderModel;
 import com.hz.task.master.core.model.order.OrderStepModel;
+import com.hz.task.master.core.model.pool.PoolOriginModel;
+import com.hz.task.master.core.model.pool.PoolWaitModel;
 import com.hz.task.master.core.model.strategy.StrategyData;
 import com.hz.task.master.core.model.strategy.StrategyModel;
 import com.hz.task.master.core.model.strategy.StrategyZfbMoneyRule;
@@ -3686,6 +3688,173 @@ public class TaskMethod {
     }
 
 
+    /**
+     * @Description: check校验用户余额是否低于池子中的用户最低保底金额
+     * @param didModel - 用户信息
+     * @param minMoney - 策略里面池子中的用户余额不得低于的保底金额
+     * @return void
+     * @author yoko
+     * @date 2020/8/13 19:28
+     */
+    public static boolean checkDidMoney(DidModel didModel, String minMoney){
+        boolean flag = false;
+        if (didModel == null || didModel.getId() == null || didModel.getId() <= 0){
+            return false;
+        }
+
+        if(StringUtils.isBlank(didModel.getBalance())){
+            return false;
+        }else{
+            boolean flag_money = StringUtil.getBigDecimalSubtract(didModel.getBalance(), minMoney);
+            if (!flag_money){
+                return false;
+            }else {
+                flag = true;
+            }
+        }
+        return flag;
+    }
+
+
+    /**
+     * @Description: 组装添加移出池子的起因数据
+     * @param did - 用户ID
+     * @param dataType - 数据类型:1初始化，2其它，3余额不足，4有效群不足，5有订单未回复，6有违规操作
+     * @param origin - 起因
+     * @return com.hz.task.master.core.model.pool.PoolOriginModel
+     * @author yoko
+     * @date 2020/8/14 16:18
+     */
+    public static PoolOriginModel assemblePoolOriginAdd(long did, int dataType, String origin){
+        PoolOriginModel resBean = new PoolOriginModel();
+        resBean.setDid(did);
+        resBean.setDataType(dataType);
+        resBean.setOrigin(origin);
+        resBean.setCurday(DateUtil.getDayNumber(new Date()));
+        resBean.setCurhour(DateUtil.getHour(new Date()));
+        resBean.setCurminute(DateUtil.getCurminute(new Date()));
+        return resBean;
+    }
+
+
+    /**
+     * @Description: 根据条件查询用户获取微信群收款账号信息-有效
+     * @param did - 用户ID
+     * @param acType - 收款账号类型
+     * @param isInvalid - 是否失效：1未失效，2已失效
+     * @param checkStatus - 收款账号审核：1初始化，2审核失败，3审核成功
+     * @param useStatus - 使用状态:1初始化有效正常使用，2无效暂停使用
+     * @param loginType - 归属小微登录状态：1登出/未登录，2登入/已登录
+     * @param countGroupNum - 有效微信群个数
+     * @return com.hz.fine.master.core.model.did.DidCollectionAccountModel
+     * @author yoko
+     * @date 2020/5/15 17:17
+     */
+    public static DidCollectionAccountModel assembleDidCollectionAccountListEffective(long did, int acType, int isInvalid, int checkStatus,int useStatus, int loginType, int countGroupNum){
+        DidCollectionAccountModel resBean = new DidCollectionAccountModel();
+        resBean.setDid(did);
+        if(acType > 0){
+            resBean.setAcType(acType);
+        }
+        resBean.setIsInvalid(isInvalid);
+        if (isInvalid == 1){
+            // 未失效
+            resBean.setInvalidTimeStart("1");
+        }
+        resBean.setCheckStatus(checkStatus);
+        if (useStatus > 0){
+            resBean.setUseStatus(useStatus);
+        }
+        if (loginType > 0){
+            resBean.setLoginType(loginType);
+        }
+        if (countGroupNum > 0){
+            resBean.setCountGroupNum(countGroupNum);
+        }
+        return resBean;
+    }
+
+    /**
+     * @Description: check用户有效群信息
+     * @param didCollectionAccountList - 有效群集合
+     * @return
+     * @author yoko
+     * @date 2020/8/13 20:02
+     */
+    public static boolean checkDidCollectionAccountListEffective(List<DidCollectionAccountModel> didCollectionAccountList) throws Exception{
+        if (didCollectionAccountList == null || didCollectionAccountList.size() <= 0){
+            return false;
+        }else{
+            return true;
+        }
+    }
+
+    /**
+     * @Description: 组装查询订单信息的查询条件
+     * @param did - 用户ID
+     * @param collectionType - 收款账号类型：1微信，2支付宝，3微信群
+     * @param replenishType -  是否是补单：1初始化不是补单，2是补单
+     * @param isRedPack - 是否发了红包：1初始化未发红包，2发了红包
+     * @param isReply - 是否回复：1初始化未回复，2系统默认回复，3已回复失败，4已回复成功
+     * @return com.hz.fine.master.core.model.order.OrderModel
+     * @author yoko
+     * @date 2020/7/20 20:48
+     */
+    public static OrderModel assembleOrderByIsReply(long did, int collectionType, int replenishType, int isRedPack, int isReply){
+        OrderModel resBean = new OrderModel();
+        resBean.setDid(did);
+        if(collectionType > 0){
+            resBean.setCollectionType(collectionType);
+        }
+        if(replenishType > 0){
+            resBean.setReplenishType(replenishType);
+        }
+        if (isRedPack > 0){
+            resBean.setIsRedPack(isRedPack);
+        }
+        if (isReply > 0){
+            resBean.setIsReply(isReply);
+        }
+        return resBean;
+    }
+
+
+    /**
+     * @Description: check用户是否有未回复的订单信息
+     * @param orderModel - 订单信息
+     * @return
+     * @author yoko
+     * @date 2020/8/13 20:02
+     */
+    public static boolean checkOrderByIsReply(OrderModel orderModel){
+        if (orderModel != null && orderModel.getId() > 0){
+            return false;
+        }else {
+            return true;
+        }
+    }
+
+    /**
+     * @Description: 组装更新抢单等待中的条件
+     * @param id - 主键ID
+     * @param did - 用户ID
+     * @return com.hz.fine.master.core.model.pool.PoolWaitModel
+     * @author yoko
+     * @date 2020/8/13 17:36
+     */
+    public static PoolWaitModel assemblePoolWaitUpdate(long id, long did, int yn){
+        PoolWaitModel resBean = new PoolWaitModel();
+        if (id > 0){
+            resBean.setId(id);
+        }
+        if (did > 0){
+            resBean.setDid(did);
+        }
+        if (yn > 0){
+            resBean.setYn(yn);
+        }
+        return resBean;
+    }
 
 
 

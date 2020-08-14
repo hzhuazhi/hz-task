@@ -115,6 +115,10 @@ public class ServerConstant {
         GROUP_RED_PACK_NUM(35,""),
         GROUP_NUM(36,""),
         WX_NUM(37,""),
+        POOL_CONSUME_TIME(38,""),
+        POOL_OPEN_MIN_MONEY(39,""),
+        GROUP_MIN_MONEY(40,""),
+        POOL_MIN_MONEY(41,""),
         ;
         private int stgType;
         private String stgKey;

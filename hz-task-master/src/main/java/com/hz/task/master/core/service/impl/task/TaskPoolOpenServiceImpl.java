@@ -7,6 +7,8 @@ import com.hz.task.master.core.service.task.TaskPoolOpenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * @Description task:接单池子正在接单的Service层的实现层
  * @Author yoko
@@ -27,5 +29,15 @@ public class TaskPoolOpenServiceImpl<T> extends BaseServiceImpl<T> implements Ta
 
     public BaseDao<T> getDao() {
         return taskPoolOpenMapper;
+    }
+
+    @Override
+    public List<Long> getPoolOpenDidList(Object obj) {
+        return taskPoolOpenMapper.getPoolOpenDidList(obj);
+    }
+
+    @Override
+    public int updatePoolOpenYn(Object obj) {
+        return taskPoolOpenMapper.updatePoolOpenYn(obj);
     }
 }

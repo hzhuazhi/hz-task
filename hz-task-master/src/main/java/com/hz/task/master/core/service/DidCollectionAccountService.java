@@ -150,4 +150,13 @@ public interface DidCollectionAccountService<T> extends BaseService<T> {
     */
     public int updateLoginType(DidCollectionAccountModel model);
 
+    /**
+     * @Description: 获取有效的微信群收款账号
+     * @param model
+     * @return
+     * @author yoko
+     * @date 2020/7/31 16:37
+     */
+    public List<DidCollectionAccountModel> getEffectiveDidCollectionAccountByWxGroup(DidCollectionAccountModel model);
+
 }
