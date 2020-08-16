@@ -3776,6 +3776,45 @@ public class TaskMethod {
     }
 
     /**
+     * @Description: 根据条件查询用户获取微信群收款账号信息-有效
+     * @param didList - 用户ID集合
+     * @param acType - 收款账号类型
+     * @param isInvalid - 是否失效：1未失效，2已失效
+     * @param checkStatus - 收款账号审核：1初始化，2审核失败，3审核成功
+     * @param useStatus - 使用状态:1初始化有效正常使用，2无效暂停使用
+     * @param loginType - 归属小微登录状态：1登出/未登录，2登入/已登录
+     * @param countGroupNum - 有效微信群个数
+     * @return com.hz.fine.master.core.model.did.DidCollectionAccountModel
+     * @author yoko
+     * @date 2020/5/15 17:17
+     */
+    public static DidCollectionAccountModel assembleDidCollectionAccountByDidListEffective(List<Long> didList, int acType, int isInvalid, int checkStatus,int useStatus, int loginType, int countGroupNum){
+        DidCollectionAccountModel resBean = new DidCollectionAccountModel();
+        if (didList != null && didList.size() > 0){
+            resBean.setIdList(didList);
+        }
+        if(acType > 0){
+            resBean.setAcType(acType);
+        }
+        resBean.setIsInvalid(isInvalid);
+        if (isInvalid == 1){
+            // 未失效
+            resBean.setInvalidTimeStart("1");
+        }
+        resBean.setCheckStatus(checkStatus);
+        if (useStatus > 0){
+            resBean.setUseStatus(useStatus);
+        }
+        if (loginType > 0){
+            resBean.setLoginType(loginType);
+        }
+        if (countGroupNum > 0){
+            resBean.setCountGroupNum(countGroupNum);
+        }
+        return resBean;
+    }
+
+    /**
      * @Description: check用户有效群信息
      * @param didCollectionAccountList - 有效群集合
      * @return
@@ -3876,6 +3915,26 @@ public class TaskMethod {
         if (yn > 0){
             resBean.setYn(yn);
         }
+        return resBean;
+    }
+
+
+    /**
+     * @Description: 组装添加抢单进行中的方法
+     * @param did - 用户ID
+     * @return com.hz.fine.master.core.model.pool.PoolWaitModel
+     * @author yoko
+     * @date 2020/8/13 17:36
+     */
+    public static PoolOpenModel assemblePoolOpenAdd(long did, int dataType){
+        PoolOpenModel resBean = new PoolOpenModel();
+        resBean.setDid(did);
+        if (dataType > 0){
+            resBean.setDataType(dataType);
+        }
+        resBean.setCurday(DateUtil.getDayNumber(new Date()));
+        resBean.setCurhour(DateUtil.getHour(new Date()));
+        resBean.setCurminute(DateUtil.getCurminute(new Date()));
         return resBean;
     }
 

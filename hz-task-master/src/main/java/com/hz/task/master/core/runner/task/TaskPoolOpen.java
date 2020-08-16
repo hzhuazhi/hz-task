@@ -65,7 +65,7 @@ public class TaskPoolOpen {
      * @author yoko
      * @date 2019/12/6 20:25
      */
-    @Scheduled(fixedDelay = 1000) // 每1分钟执行
+//    @Scheduled(fixedDelay = 1000) // 每1分钟执行
 //    @Scheduled(fixedDelay = 60000) // 每1分钟执行
     public void checkPoolOpen() throws Exception{
 //        log.info("----------------------------------TaskPoolOpen.checkPoolOpen()----start");
@@ -138,4 +138,95 @@ public class TaskPoolOpen {
             }
         }
     }
+
+
+
+    /**
+     * @Description: 从等待池中拉人进入接单进行中的池子
+     * <p>
+     *     每1秒运行一次
+     *     1.查询接单池子正在接单中所有进行接单的用户是否少于策略中的人数。
+     *     2.少于则从等待池中拉人进入。
+     *     3.查询接单池子正在接单中所有进行接单的用户旗下的有效群是否少于策略中最低要求的有效群。
+     *     4.有效群少于则从等待池中拉人进入。
+     * </p>
+     * @author yoko
+     * @date 2019/12/6 20:25
+     */
+    @Scheduled(fixedDelay = 1000) // 每秒执行
+    public void enterPool() throws Exception{
+//        log.info("----------------------------------TaskPoolOpen.enterPool()----start");
+        // 查询策略里面的池子中最低人数标准
+        int poolMinNum = 0;
+        StrategyModel strategyPoolMinNumQuery = HodgepodgeMethod.assembleStrategyQuery(ServerConstant.StrategyEnum.POOL_MIN_NUM.getStgType());
+        StrategyModel strategyPoolMinNumModel = ComponentUtil.strategyService.getStrategyModel(strategyPoolMinNumQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
+        poolMinNum = strategyPoolMinNumModel.getStgNumValue();
+
+        // 查询策略里面的池子中最低有效群数标准
+        int poolMinGroupNum = 0;
+        StrategyModel strategyPoolMinGroupNumQuery = HodgepodgeMethod.assembleStrategyQuery(ServerConstant.StrategyEnum.POOL_MIN_GROUP_NUM.getStgType());
+        StrategyModel strategyPoolMinGroupNumModel = ComponentUtil.strategyService.getStrategyModel(strategyPoolMinGroupNumQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
+        poolMinGroupNum = strategyPoolMinGroupNumModel.getStgNumValue();
+
+        // 获取等待池中最早创建时间的一条数据
+        PoolWaitModel poolWaitModel = (PoolWaitModel) ComponentUtil.poolWaitService.findByObject(new PoolWaitModel());
+
+        // 查询接单池子正在接单中的用户集合
+        List<Long> synchroList = ComponentUtil.taskPoolOpenService.getPoolOpenDidList(new PoolOpenModel());
+
+        // check是否需要从等待池中拉人进入接单进行中的池子
+        boolean flag = false;// flag=fasle表示无需拉人，flag=true表示需要拉人进入
+        try{
+            if (synchroList != null && synchroList.size() > 0){
+
+                // 人数是否有达标
+                if (poolMinNum > 0 && synchroList.size() < poolMinNum){
+                    if (poolWaitModel != null && poolWaitModel.getId() > 0){
+                        flag = true;
+                    }
+                }
+
+                if (!flag){
+                    // 有效群是否有达标
+                    if (poolMinGroupNum > 0){
+                        if (poolWaitModel != null && poolWaitModel.getId() > 0){
+                            // 校验进行中池子的所有有效群数量是否达到最低标准数量
+                            DidCollectionAccountModel didCollectionAccountQuery = TaskMethod.assembleDidCollectionAccountByDidListEffective(synchroList, 3, 1, 3,1,2, 0);
+                            List<DidCollectionAccountModel> didCollectionAccountList = ComponentUtil.didCollectionAccountService.getEffectiveDidCollectionAccountByWxGroup(didCollectionAccountQuery);
+                            if (didCollectionAccountList == null || didCollectionAccountList.size() <= 0){
+                                flag = true;
+                            }else {
+                                if (didCollectionAccountList.size() < poolMinGroupNum){
+                                    flag = true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }else {
+                // 说明正在接单池中没人，需要从等待池中拉人进入正在进行中池里面
+                if (poolMinNum > 0){
+                    if (poolWaitModel != null && poolWaitModel.getId() > 0){
+                        flag = true;
+                    }
+                }
+            }
+
+            if (flag){
+                // 把用户移出等待池
+                PoolWaitModel poolWaitUpdate = TaskMethod.assemblePoolWaitUpdate(0, poolWaitModel.getDid(), 1);
+                int num = ComponentUtil.taskPoolWaitService.updatePoolWaitYn(poolWaitUpdate);
+                if (num > 0){
+                    // 添加数据到抢单进行中的池子中
+                    PoolOpenModel poolOpenAdd = TaskMethod.assemblePoolOpenAdd(poolWaitModel.getDid(), 1);
+                    ComponentUtil.poolOpenService.add(poolOpenAdd);
+                }
+            }
+        }catch (Exception e){
+            log.error(String.format("this TaskPoolOpen.enterPool() is error!"));
+            e.printStackTrace();
+        }
+        //                log.info("----------------------------------TaskPoolOpen.enterPool()----end");
+    }
+
 }

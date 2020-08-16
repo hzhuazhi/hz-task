@@ -119,6 +119,8 @@ public class ServerConstant {
         POOL_OPEN_MIN_MONEY(39,""),
         GROUP_MIN_MONEY(40,""),
         POOL_MIN_MONEY(41,""),
+        POOL_MIN_NUM(42,""),
+        POOL_MIN_GROUP_NUM(43,""),
         ;
         private int stgType;
         private String stgKey;

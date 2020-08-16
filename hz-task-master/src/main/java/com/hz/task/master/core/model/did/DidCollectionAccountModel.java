@@ -3,6 +3,7 @@ package com.hz.task.master.core.model.did;
 import com.hz.task.master.core.protocol.page.BasePage;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @Description 用户的收款账号的实体属性Bean
@@ -177,6 +178,10 @@ public class DidCollectionAccountModel extends BasePage implements Serializable 
      */
     private Integer countGroupNum;
 
+    /**
+     * 数据集合-SQL
+     */
+    private List<Long> idList;
 
     public Long getId() {
         return id;
@@ -432,5 +437,13 @@ public class DidCollectionAccountModel extends BasePage implements Serializable 
 
     public void setInvalidTimeEnd(String invalidTimeEnd) {
         this.invalidTimeEnd = invalidTimeEnd;
+    }
+
+    public List<Long> getIdList() {
+        return idList;
+    }
+
+    public void setIdList(List<Long> idList) {
+        this.idList = idList;
     }
 }

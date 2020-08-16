@@ -24,6 +24,12 @@
             <if test="did != null and did != '' " >
                 and a.did = #{did}
             </if>
+            <if test="idList != null and idList.size()>0">
+                and a.did in
+                <foreach item="item" index="index" collection="idList" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
             <if test="acName != null and acName != '' " >
                 and a.ac_name = #{acName}
             </if>

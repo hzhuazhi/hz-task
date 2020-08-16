@@ -1,21 +1,17 @@
 package com.hz.task.master.core.runner.task;
 
-import com.hz.task.master.core.common.utils.DateUtil;
 import com.hz.task.master.core.common.utils.constant.CachedKeyUtils;
 import com.hz.task.master.core.common.utils.constant.ServerConstant;
 import com.hz.task.master.core.common.utils.constant.TkCacheKey;
 import com.hz.task.master.core.model.did.DidCollectionAccountModel;
 import com.hz.task.master.core.model.did.DidModel;
-import com.hz.task.master.core.model.operate.OperateModel;
 import com.hz.task.master.core.model.order.OrderModel;
 import com.hz.task.master.core.model.pool.PoolOriginModel;
 import com.hz.task.master.core.model.pool.PoolWaitModel;
 import com.hz.task.master.core.model.strategy.StrategyModel;
-import com.hz.task.master.core.model.wx.WxOrderModel;
 import com.hz.task.master.util.ComponentUtil;
 import com.hz.task.master.util.HodgepodgeMethod;
 import com.hz.task.master.util.TaskMethod;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,9 +19,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @Description task:接单池子等待接单
@@ -69,7 +63,7 @@ public class TaskPoolWait {
      * @date 2019/12/6 20:25
      */
 //    @Scheduled(fixedDelay = 1000) // 每1分钟执行
-    @Scheduled(fixedDelay = 60000) // 每1分钟执行
+//    @Scheduled(fixedDelay = 60000) // 每1分钟执行
     public void checkPoolWait() throws Exception{
 //        log.info("----------------------------------TaskPoolWait.checkPoolWait()----start");
         // 查询策略里面的池子中的用户余额不得低于的保底金额
