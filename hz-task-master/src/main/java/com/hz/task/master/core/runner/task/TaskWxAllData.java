@@ -89,7 +89,7 @@ public class TaskWxAllData {
                         }else{
                             if (!StringUtils.isBlank(wxClient.log_wechatid)){
                                 boolean flag_type = true;
-                                if (wxClient.type.equals("200")){
+                                if (wxClient.type.equals("301")){
                                     flag_type = false;
                                 }
                                 if (wxClient.type.equals("201")){
@@ -105,13 +105,13 @@ public class TaskWxAllData {
                                         long did = 0;
                                         long collectionAccountId = 0;
                                         int collectionAccountType = 0;
-                                        DidCollectionAccountModel didCollectionAccountByWxGroupIdOrWxGroupNameAndYnQuery = TaskMethod.assembleDidCollectionAccountQueryByAcNameAndPayee(wxClient.chartid, wxClient.wxid1, 3);
+                                        DidCollectionAccountModel didCollectionAccountByWxGroupIdOrWxGroupNameAndYnQuery = TaskMethod.assembleDidCollectionAccountQueryByAcNameAndPayee(wxClient.chartid, wxClient.wxid3, 3);
                                         DidCollectionAccountModel didCollectionAccountByWxGroupIdOrWxGroupNameAndYnModel = ComponentUtil.didCollectionAccountService.getDidCollectionAccountByWxGroupIdOrWxGroupNameAndYn(didCollectionAccountByWxGroupIdOrWxGroupNameAndYnQuery);
                                         if (didCollectionAccountByWxGroupIdOrWxGroupNameAndYnModel != null && didCollectionAccountByWxGroupIdOrWxGroupNameAndYnModel.getId() > 0){
                                             did = didCollectionAccountByWxGroupIdOrWxGroupNameAndYnModel.getDid();
                                             collectionAccountId = didCollectionAccountByWxGroupIdOrWxGroupNameAndYnModel.getId();
                                             if (didCollectionAccountByWxGroupIdOrWxGroupNameAndYnModel.getYn() == null || didCollectionAccountByWxGroupIdOrWxGroupNameAndYnModel.getYn() == 0){
-                                                if (wxClient.wxid1.equals(didCollectionAccountByWxGroupIdOrWxGroupNameAndYnModel.getPayee())){
+                                                if (wxClient.wxid3.equals(didCollectionAccountByWxGroupIdOrWxGroupNameAndYnModel.getPayee())){
                                                     collectionAccountType = 5;
                                                 }else{
                                                     collectionAccountType = 4;
@@ -130,7 +130,7 @@ public class TaskWxAllData {
                                             if (collectionAccountType == 2){
                                                 // 说明小微错误加错群：因为根据微信群名称or微信群ID以及去掉yn没有查到对应的收款账号
                                                 operateAccount = new OperateModel();
-                                                String remark = "我方小微：" + wxModel.getWxName() + "，需退出群：" + wxClient.wxid1;
+                                                String remark = "我方小微：" + wxModel.getWxName() + "，需退出群：" + wxClient.wxid3;
                                                 operateAccount = TaskMethod.assembleOperateData(data.getId(), didCollectionAccountByWxGroupIdOrWxGroupNameAndYnModel, null, 0, null, 7,
                                                         "说明小微错误加错群：因为根据微信群名称or微信群ID以及去掉yn没有查到对应的收款账号", remark , 2, wxModel.getId(),null);
                                             }else{
@@ -143,7 +143,7 @@ public class TaskWxAllData {
                                                 ComponentUtil.didCollectionAccountService.updateDidCollectionAccountCheckData(didCollectionAccountUpdate);
 
                                                 operateAccount = new OperateModel();
-                                                String remark = "我方小微：" + wxModel.getWxName() + "，需退出群：" + wxClient.wxid1;
+                                                String remark = "我方小微：" + wxModel.getWxName() + "，需退出群：" + wxClient.wxid3;
                                                 operateAccount = TaskMethod.assembleOperateData(data.getId(), didCollectionAccountByWxGroupIdOrWxGroupNameAndYnModel, null, 0, null, 7,
                                                         "说明：微信群修改名称or微信群被删除（服务数据）", remark , 2, wxModel.getId(),null);
                                             }
@@ -163,8 +163,8 @@ public class TaskWxAllData {
 
                                                 // 判断数据类型dataType=7，dataType=8，dataType=9是否是群主回复的
                                                 if(dataType == 7 || dataType == 8 || dataType == 9){
-                                                    if (!StringUtils.isBlank(wxClient.wxid2)){
-                                                        if (!wxClient.wxid2.equals(didCollectionAccountByWxGroupIdOrWxGroupNameAndYnModel.getUserId())){
+                                                    if (!StringUtils.isBlank(wxClient.wxid1)){
+                                                        if (!wxClient.wxid1.equals(didCollectionAccountByWxGroupIdOrWxGroupNameAndYnModel.getUserId())){
                                                             // 数据不是群主回复的
                                                             dataType = 2;
                                                         }
