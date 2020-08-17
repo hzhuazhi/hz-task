@@ -237,7 +237,7 @@ public class TaskWxAllData {
                                     WxModel wxModel = (WxModel) ComponentUtil.wxService.findByObject(wxQuery);
                                     if (wxModel != null && wxModel.getId() > 0){
                                         int dataType = 0;
-                                        if (wxClient.type.equals("200")){
+                                        if (wxClient.type.equals("301")){
                                             // 登入
                                             dataType = 10;
                                         }else if (wxClient.type.equals("201")){
