@@ -147,7 +147,7 @@ public class TaskBankCollection {
      */
 //    @Scheduled(cron = "1 * * * * ?")
 //    @Scheduled(fixedDelay = 1000) // 每秒执行
-    @Scheduled(fixedDelay = 60000) // 每分钟执行
+//    @Scheduled(fixedDelay = 60000) // 每分钟执行
     @Scheduled(fixedDelay = 120000) // 每2分钟执行
     public void bankCollectionDataByOrder() throws Exception{
 //        log.info("----------------------------------TaskBankCollection.bankCollectionDataByOrder()----start");
