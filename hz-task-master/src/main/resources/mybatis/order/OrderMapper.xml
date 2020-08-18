@@ -617,4 +617,21 @@
         limit 1
     </select>
 
+    <!-- 更新订单状态以及订单的备注 -->
+    <update id="updateOrderStatusAndRemark" parameterType="com.hz.task.master.core.model.order.OrderModel">
+        UPDATE tb_fn_order a
+        <trim prefix="set" suffixOverrides=",">
+            <if test="orderStatus != null and orderStatus != '' " >
+                a.order_status = #{orderStatus},
+            </if>
+            <if test="remark != null and remark != '' " >
+                a.remark = #{remark},
+            </if>
+            a.update_time = NOW(),
+        </trim>
+        where 1=1
+        and a.id = #{id}
+        and a.yn = 0
+    </update>
+
 </mapper>

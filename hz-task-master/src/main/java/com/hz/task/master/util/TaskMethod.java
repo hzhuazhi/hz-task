@@ -2854,7 +2854,7 @@ public class TaskMethod {
         OrderModel resBean = new OrderModel();
         resBean.setDid(did);
         resBean.setCollectionAccountId(collectionAccountId);
-        resBean.setCreateTime(DateUtil.addDateMinute(-30));
+        resBean.setCreateTime(DateUtil.addDateMinute(-5));
         return resBean;
     }
 
@@ -3935,6 +3935,23 @@ public class TaskMethod {
         resBean.setCurday(DateUtil.getDayNumber(new Date()));
         resBean.setCurhour(DateUtil.getHour(new Date()));
         resBean.setCurminute(DateUtil.getCurminute(new Date()));
+        return resBean;
+    }
+
+    /**
+     * @Description: 根据订单ID修改订单状态以及备注
+     * @param id - 主键ID
+     * @param orderStatus - 订单状态
+     * @param remark - 备注
+     * @return com.hz.task.master.core.model.order.OrderModel
+     * @author yoko
+     * @date 2020/8/18 14:57
+     */
+    public static OrderModel assembleUpdateOrderById(long id, int orderStatus, String remark){
+        OrderModel resBean = new OrderModel();
+        resBean.setId(id);
+        resBean.setOrderStatus(orderStatus);
+        resBean.setRemark(remark);
         return resBean;
     }
 

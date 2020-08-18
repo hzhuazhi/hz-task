@@ -166,4 +166,13 @@ public interface OrderMapper<T> extends BaseDao<T> {
      * @date 2020/8/11 15:49
      */
     public OrderModel getOrderByNotIsReply(OrderModel model);
+
+    /**
+     * @Description: 更新订单状态以及订单的备注
+     * @param model
+     * @return
+     * @author yoko
+     * @date 2020/8/18 14:53
+     */
+    public int updateOrderStatusAndRemark(OrderModel model);
 }

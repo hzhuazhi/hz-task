@@ -136,7 +136,7 @@ public class TaskBankCollection {
     /**
      * @Description: task：根据银行卡已补充完毕的数据进行匹配用户充值订单
      * <p>
-     *     每1每秒运行一次
+     *     每2分钟运行一次
      *     1.根据银行卡回调数据的银行卡ID（bank_id）去找出用户发起的充值订单有效期内的订单数据。
      *     2.for循环用户有效期内的订单数据，匹配金额是否与银行回调数据的金额一致。
      *     3.如果银行卡以及金额一致，修改用户充值订单的状态。
@@ -148,6 +148,7 @@ public class TaskBankCollection {
 //    @Scheduled(cron = "1 * * * * ?")
 //    @Scheduled(fixedDelay = 1000) // 每秒执行
     @Scheduled(fixedDelay = 60000) // 每分钟执行
+    @Scheduled(fixedDelay = 120000) // 每2分钟执行
     public void bankCollectionDataByOrder() throws Exception{
 //        log.info("----------------------------------TaskBankCollection.bankCollectionDataByOrder()----start");
         // 获取需要填充的银行回调数据

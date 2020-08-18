@@ -201,7 +201,18 @@ public class TaskCatDataAnalysis {
                             // 剔除成员
                             int workType = 0;
                             String workRemark = "";
-
+                            if (data.getDataFrom() == 2){
+                                // 表示删除了我方小微：需要检查此时此时到之前5分钟是否有订单
+                                OrderModel orderQuery = TaskMethod.assembleOrderByCreateTime(data.getDid(), data.getCollectionAccountId());
+                                OrderModel orderModel = ComponentUtil.orderService.getOrderByDidAndTime(orderQuery);
+                                if (orderModel != null && orderModel.getId() != null && orderModel.getId() > 0){
+                                    if (orderModel.getOrderStatus() == 1){
+                                        // 需要修改此订单状态，修改成质疑状态
+                                        OrderModel upOrderModel = TaskMethod.assembleUpdateOrderById(orderModel.getId(), 3, "检测：处于挂单情况下剔除我方小微");
+                                        ComponentUtil.orderService.updateOrderStatusAndRemark(upOrderModel);
+                                    }
+                                }
+                            }
                             // 更新此次task的状态：更新成成功状态
                             workType = ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE;
                             StatusModel statusModel = TaskMethod.assembleUpdateStatusByWorkType(data.getId(), workType, workRemark);
