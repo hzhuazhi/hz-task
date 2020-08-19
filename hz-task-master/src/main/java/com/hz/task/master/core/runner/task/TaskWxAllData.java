@@ -156,7 +156,7 @@ public class TaskWxAllData {
 
                                         if (wxClient.type.equals("1")){
                                             // 普通消息：包含2,3,7,8,9的类型
-                                            // 具体类型说明：1初始化，《2其它》，《3发送固定指令3表示审核使用》，4加群信息，5发红包，6剔除成员，《7成功收款》，《8收款失败》，《9发送固定指令4表示暂停使用微信群》，10小微登入，11小微登出
+                                            // 具体类型说明：1初始化，《2其它》，《3发送固定指令3表示审核使用》，4加群信息，5发红包，6剔除成员，《7成功收款》，《8收款失败》，《9发送固定指令4表示暂停使用微信群》，10小微登入，11小微登出，12群图片
                                             int dataType = TaskMethod.getWxDataTypeByOne(wxClient.content);
 
                                             if (collectionAccountType != 2){
@@ -181,9 +181,19 @@ public class TaskWxAllData {
                                             // 更新此次task的状态：更新成成功
                                             StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE, "");
                                             ComponentUtil.taskWxAllDataService.updateWxAllDataStatus(statusModel);
+                                        }else if(wxClient.type.equals("3")){
+                                            // 群图片
+                                            int dataType = 12;
+                                            CatDataAnalysisModel catDataAnalysisModel = TaskMethod.assembleCatDataAnalysisByWxData(wxClient, dataType, data.getId(), wxModel.getId(), did, collectionAccountId, collectionAccountType, 2);
+                                            ComponentUtil.catDataAnalysisService.add(catDataAnalysisModel);
+
+                                            // 更新此次task的状态：更新成成功
+                                            StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE, "");
+                                            ComponentUtil.taskWxAllDataService.updateWxAllDataStatus(statusModel);
+
                                         }else if (wxClient.type.equals("10000")){
                                             // 系统消息：包含2,4,5,6的类型
-                                            // 具体类型说明：1初始化，《2其它》，3发送固定指令3表示审核使用，《4加群信息》，《5发红包》，《6剔除成员》，7成功收款，8收款失败，9发送固定指令4表示暂停使用微信群，10小微登入，11小微登出
+                                            // 具体类型说明：1初始化，《2其它》，3发送固定指令3表示审核使用，《4加群信息》，《5发红包》，《6剔除成员》，7成功收款，8收款失败，9发送固定指令4表示暂停使用微信群，10小微登入，11小微登出，12群图片
                                             int dataType = TaskMethod.getWxDataTypeByTenThousand(wxClient.content);
 
                                             // 判断是否是发红包的数据类型

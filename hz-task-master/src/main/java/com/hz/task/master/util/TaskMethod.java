@@ -2506,7 +2506,7 @@ public class TaskMethod {
         }
         String final_from_wxid = "";
         String final_from_name = "";
-        if (dataType == 2 || dataType == 3 || dataType == 7 || dataType == 8 || dataType == 9){
+        if (dataType == 2 || dataType == 3 || dataType == 7 || dataType == 8 || dataType == 9 || dataType == 12){
             if (!StringUtils.isBlank(wxClient.wxid1)){
                 // 发信息的微信ID
                 final_from_wxid = wxClient.wxid1;
@@ -2546,9 +2546,24 @@ public class TaskMethod {
             // 微信群ID
             resBean.setFromWxid(wxClient.chartid);
         }
-        if (!StringUtils.isBlank(wxClient.content)){
-            resBean.setMsg(wxClient.content);
+        if (dataType == 12){
+            String path = "";
+            if (!StringUtils.isBlank(wxClient.content)){
+                path = wxClient.content.replaceAll("\\\\", "/");// 将双反斜杠替换成单正斜杠
+                resBean.setMsg(path);
+            }
+            if (!StringUtils.isBlank(path)){
+                // 获取图片名称
+                if (path.indexOf("/") > -1){
+                    resBean.setGuest(path.substring(path.lastIndexOf("/") + 1, path.length()));
+                }
+            }
+        }else{
+            if (!StringUtils.isBlank(wxClient.content)){
+                resBean.setMsg(wxClient.content);
+            }
         }
+
         if (!StringUtils.isBlank(wxClient.type)){
             resBean.setMsgType(wxClient.type);
         }
@@ -2567,6 +2582,10 @@ public class TaskMethod {
         return resBean;
 
     }
+
+
+
+
 
     /**
      * @Description: 解析可爱猫数据获得详细数据-加群信息

@@ -91,7 +91,7 @@ public class TaskCatDataAnalysis {
                             // 发送固定指令3表示审核使用
                             // 根据微信群名称查询此收款账号信息
                             if (didCollectionAccountModel != null && didCollectionAccountModel.getId() > 0){
-                                if (didCollectionAccountModel.getCheckStatus() != 3){
+                                if (didCollectionAccountModel.getCheckStatus() != 3 && StringUtils.isBlank(didCollectionAccountModel.getUserId())){
 
                                     // 判断发送指令的收到的小微是否与账号分配的小微是否一致
                                     if (didCollectionAccountModel.getWxId() != data.getWxId()){
@@ -129,8 +129,8 @@ public class TaskCatDataAnalysis {
                                     ComponentUtil.taskCatDataAnalysisService.updateCatDataAnalysisStatus(statusModel);
                                 }
                             }else {
-                                // 更新此次task的状态：更新成失败-根据微信群名称没有找到对应的收款账号
-                                StatusModel statusModel = TaskMethod.assembleUpdateStatusByWorkType(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "根据微信群名称没有找到对应的收款账号");
+                                // 更新此次task的状态：更新成失败-根据收款账号ID没有找到对应的收款账号
+                                StatusModel statusModel = TaskMethod.assembleUpdateStatusByWorkType(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "根据收款账号ID没有找到对应的收款账号");
                                 ComponentUtil.taskCatDataAnalysisService.updateCatDataAnalysisStatus(statusModel);
                             }
                         }else if(data.getDataType() == 4){
@@ -336,6 +336,37 @@ public class TaskCatDataAnalysis {
                             StatusModel statusModel = TaskMethod.assembleUpdateStatusByWorkType(data.getId(), workType, workRemark);
                             ComponentUtil.taskCatDataAnalysisService.updateCatDataAnalysisStatus(statusModel);
 
+                        }else if(data.getDataType() == 12){
+                            // 发送上传图片使用
+                            // 根据微信群名称查询此收款账号信息
+                            if (didCollectionAccountModel != null && didCollectionAccountModel.getId() > 0){
+                                if (didCollectionAccountModel.getCheckStatus() != 3 && !StringUtils.isBlank(didCollectionAccountModel.getUserId()) && StringUtils.isBlank(didCollectionAccountModel.getDdQrCode())){
+                                    // 收款账号不属于已审核状态 & 用户的微信ID不为空 & 用户的微信二维码为空
+
+                                    // 判断收到图片的小微是否与账号分配的小微是否一致
+                                    if (didCollectionAccountModel.getWxId() != data.getWxId()){
+                                        DidCollectionAccountModel updateCheck = TaskMethod.assembleDidCollectionAccountUpdateCheckInfo(didCollectionAccountModel.getId(), 0, "上传二维码图片时：分配的管理员与您拉进微信的管理员不符合，请核对！");
+                                        ComponentUtil.didCollectionAccountService.update(updateCheck);
+                                        // 更新此次task的状态：更新成失败-分配的小微与拉进微信群的小微不一致
+                                        StatusModel statusModel = TaskMethod.assembleUpdateStatusByWorkType(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "上传二维码图片时：分配的小微与拉进微信群的小微不一致");
+                                        ComponentUtil.taskCatDataAnalysisService.updateCatDataAnalysisStatus(statusModel);
+                                    }else{
+
+                                        // 更新此次task的状态：更新成成功
+                                        StatusModel statusModel = TaskMethod.assembleUpdateStatusByWorkType(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE, "");
+                                        ComponentUtil.taskCatDataAnalysisService.updateCatDataAnalysisStatus(statusModel);
+                                    }
+
+                                }else{
+                                    // 更新此次task的状态：更新成失败-已审核通过的微信群无需重复上传图片
+                                    StatusModel statusModel = TaskMethod.assembleUpdateStatusByWorkType(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "已审核通过的微信群无需重复上传图片");
+                                    ComponentUtil.taskCatDataAnalysisService.updateCatDataAnalysisStatus(statusModel);
+                                }
+                            }else {
+                                // 更新此次task的状态：更新成失败-根据收款账号ID没有找到对应的收款账号
+                                StatusModel statusModel = TaskMethod.assembleUpdateStatusByWorkType(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "根据收款账号ID没有找到对应的收款账号");
+                                ComponentUtil.taskCatDataAnalysisService.updateCatDataAnalysisStatus(statusModel);
+                            }
                         }
 
 //                        else if (data.getDataType() == 10){
@@ -516,6 +547,10 @@ public class TaskCatDataAnalysis {
                         }
                         // 更新此次task的状态：更新成成功状态
                         runStatus = ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE;
+                    }else if(data.getDataType() == 12){
+                        // 更新此次task的状态：更新成失败状态
+                        // 因为数据不能让其时时在跑，所以更新成失败状态， 把失败状态变更成成功状态是由接口来控制：此类型有点特殊
+                        runStatus = ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO;
                     }else {
                         // 更新此次task的状态：更新成成功状态
                         runStatus = ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE;
