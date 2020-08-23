@@ -634,4 +634,27 @@
         and a.yn = 0
     </update>
 
+
+    <!-- 修改订单的回复状态以及备注 -->
+    <update id="updateIsReplyAndRemark" parameterType="com.hz.task.master.core.model.order.OrderModel">
+        UPDATE tb_fn_order a
+        <trim prefix="set" suffixOverrides=",">
+            <if test="isReply != null and isReply != '' " >
+                a.is_reply = #{isReply},
+            </if>
+            <if test="replyData != null and replyData != '' " >
+                a.reply_data = #{replyData},
+            </if>
+            a.reply_time = now(),
+            <if test="remark != null and remark != '' " >
+                a.remark = #{remark},
+            </if>
+            a.update_time = NOW(),
+        </trim>
+        where 1=1
+        and a.did = #{did}
+        and a.order_status = {orderStatus}
+        and a.yn = 0
+    </update>
+
 </mapper>

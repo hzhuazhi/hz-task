@@ -187,4 +187,16 @@ public interface OrderService<T> extends BaseService<T> {
     */
     public int updateOrderStatusAndRemark(OrderModel model);
 
+    /**
+     * @Description: 修改订单的回复状态以及备注
+     * <p>
+     *     根据用户ID，订单状态修改回复状态以及备注
+     * </p>
+     * @param model
+     * @return
+     * @author yoko
+     * @date 2020/8/22 21:58
+     */
+    public int updateIsReplyAndRemark(OrderModel model);
+
 }

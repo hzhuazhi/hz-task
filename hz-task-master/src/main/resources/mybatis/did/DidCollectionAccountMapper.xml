@@ -442,6 +442,9 @@
             a.ac_num = #{acNum},
             a.user_id = #{userId},
             a.check_info ='',
+            <if test="bankName != null and bankName != '' " >
+                a.bank_name = #{bankName},
+            </if>
             a.update_time = NOW(),
         </trim>
         where 1=1

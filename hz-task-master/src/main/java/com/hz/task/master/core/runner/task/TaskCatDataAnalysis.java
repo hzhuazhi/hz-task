@@ -325,6 +325,10 @@ public class TaskCatDataAnalysis {
                             if (!StringUtils.isBlank(data.getFinalFromWxid())){
                                 DidCollectionAccountModel didCollectionAccountUpdate = TaskMethod.assembleDidCollectionAccountUpdateCheckDataInfoByAcNum(data.getFinalFromWxid(), 3, "检测：微信收款异常");
                                 ComponentUtil.didCollectionAccountService.updateCheckByAcNum(didCollectionAccountUpdate);
+
+                                // 根据用户ID修改订单的回复状态：修改回复失败的状态，并且说明备注
+                                OrderModel upOrderIsReplyModel = TaskMethod.assembleUpdateIsReplyByDid(didCollectionAccountModel.getDid(), 1, 3, "2", "系统回复失败");
+                                ComponentUtil.orderService.updateIsReplyAndRemark(upOrderIsReplyModel);
                                 workType = ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE;
                             }else {
                                 // 更新此次task的状态：更新成失败

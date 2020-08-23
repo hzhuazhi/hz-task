@@ -2682,6 +2682,9 @@ public class TaskMethod {
             resBean.setAcNum(catDataAnalysisModel.getFinalFromWxid());
             resBean.setUserId(catDataAnalysisModel.getFinalFromWxid());
         }
+        if (!StringUtils.isBlank(catDataAnalysisModel.getFinalFromName())){
+            resBean.setBankName(catDataAnalysisModel.getFinalFromName());
+        }
         return resBean;
 
     }
@@ -3974,6 +3977,26 @@ public class TaskMethod {
         return resBean;
     }
 
+    /**
+     * @Description: 组装修改订单回复类容的方法
+     * @param did - 用户ID
+     * @param orderStatus - 订单状态
+     * @param isReply - 是否回复：1初始化未回复，2系统默认回复，3已回复失败，4已回复成功
+     * @param replyData - 回复类容
+     * @param remark - 备注
+     * @return com.hz.task.master.core.model.order.OrderModel
+     * @author yoko
+     * @date 2020/8/22 22:05
+     */
+    public static OrderModel assembleUpdateIsReplyByDid(long did, int orderStatus, int isReply, String replyData, String remark){
+        OrderModel resBean = new OrderModel();
+        resBean.setDid(did);
+        resBean.setOrderStatus(orderStatus);
+        resBean.setIsReply(isReply);
+        resBean.setReplyData(replyData);
+        resBean.setRemark(remark);
+        return resBean;
+    }
 
 
 
@@ -3984,7 +4007,8 @@ public class TaskMethod {
 
 
 
-    public static void main(String [] args) {
+
+    public static void main(String [] args) throws Exception{
         String reg = "^.*\\d{4}.*$";
         String s = "您尾号8902的储蓄卡账户2020年4月24日14时39分永久挂失成功。详情请询95533。[建设银行]";
         if (s.matches(reg)) {
@@ -4063,6 +4087,14 @@ public class TaskMethod {
         String sb5_end = sb5.substring(sb5.length()-4,sb5.length());
         System.out.println("sb5_start:"+ sb5_start);
         System.out.println("sb5_end:"+ sb5_end);
+
+        String replyTime = "2020-08-22 21:41:55";
+        String redPackTime = "2020-08-22 21:43:25";
+        int differSecond = DateUtil.differSecond(replyTime, redPackTime);
+        System.out.println("differSecond:" + differSecond);
+        if (differSecond >= 90){
+            System.out.println("时间进来了");
+        }
 
     }
 
