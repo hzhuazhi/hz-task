@@ -10,7 +10,7 @@
         a.id,a.did,a.order_no,a.order_money,a.collection_account_id,a.collection_type,a.qr_code_id,
         a.qr_code,a.wx_nickname,a.wx_id,a.out_trade_no,a.notify_url,a.order_status,a.invalid_time,
         a.program_time,a.did_status,a.profit,a.is_red_pack,a.red_pack_time,
-        a.is_reply,a.reply_data,a.reply_time,a.actual_money,a.money_fit_type,a.replenish_type,
+        a.is_reply,a.reply_data,a.reply_time,a.actual_money,a.money_fit_type,a.replenish_type,a.work_type,
         a.curday,a.curhour,a.curminute,a.run_num,a.run_status,a.send_num,a.send_status,
         a.create_time,a.update_time,a.yn,
         b.ac_name,b.ac_num
@@ -49,6 +49,9 @@
             </if>
             <if test="invalidTime != null and invalidTime != '' " >
                 and a.invalid_time &lt;= now()
+            </if>
+            <if test="workType != null and workType != '' " >
+                and a.work_type = #{workType}
             </if>
             and a.yn = 0
         </trim>
@@ -116,7 +119,7 @@
         a.id,a.did,a.order_no,a.order_money,a.collection_account_id,a.collection_type,
         a.qr_code,a.wx_nickname,a.wx_id,a.out_trade_no,a.notify_url,a.order_status,a.invalid_time,
         a.program_time,a.did_status,a.profit,a.is_red_pack,a.red_pack_time,
-        a.is_reply,a.reply_data,a.reply_time,a.actual_money,a.money_fit_type,a.replenish_type,
+        a.is_reply,a.reply_data,a.reply_time,a.actual_money,a.money_fit_type,a.replenish_type,a.work_type,
         a.curday,a.curhour,a.curminute,a.run_num,a.run_status,a.send_num,a.send_status,
         a.create_time,a.update_time,a.yn
         from tb_fn_order a
@@ -139,7 +142,7 @@
         a.id,a.did,a.order_no,a.order_money,a.collection_account_id,a.collection_type,
         a.qr_code,a.wx_nickname,a.wx_id,a.out_trade_no,a.notify_url,a.order_status,a.invalid_time,
         a.program_time,a.did_status,a.profit,a.is_red_pack,a.red_pack_time,
-        a.is_reply,a.reply_data,a.reply_time,a.actual_money,a.money_fit_type,a.replenish_type,
+        a.is_reply,a.reply_data,a.reply_time,a.actual_money,a.money_fit_type,a.replenish_type,a.work_type,
         a.curday,a.curhour,a.curminute,a.run_num,a.run_status,a.send_num,a.send_status,
         a.create_time,a.update_time,a.yn
         from tb_fn_order a
@@ -182,6 +185,22 @@
     </update>
 
 
+    <!-- 更新订单的补充数据类型 -->
+    <update id="updateWorkType" parameterType="com.hz.task.master.core.model.order.OrderModel">
+        UPDATE tb_fn_order a
+        <trim prefix="set" suffixOverrides=",">
+            <if test="workType != null and workType != '' " >
+                a.work_type = #{workType},
+            </if>
+            <if test="info != null and info != '' " >
+                a.remark = #{info},
+            </if>
+            a.update_time = NOW(),
+        </trim>
+        where 1=1
+        and a.id = #{id}
+        and a.yn =0
+    </update>
 
 
 </mapper>

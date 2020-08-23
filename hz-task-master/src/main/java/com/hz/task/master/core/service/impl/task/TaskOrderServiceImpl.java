@@ -56,4 +56,9 @@ public class TaskOrderServiceImpl<T> extends BaseServiceImpl<T> implements TaskO
     public int updateOrderStatusById(Object obj) {
         return taskOrderMapper.updateOrderStatusById(obj);
     }
+
+    @Override
+    public int updateWorkType(Object obj) {
+        return taskOrderMapper.updateWorkType(obj);
+    }
 }

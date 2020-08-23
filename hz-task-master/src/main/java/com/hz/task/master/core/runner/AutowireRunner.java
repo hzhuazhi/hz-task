@@ -158,6 +158,15 @@ public class AutowireRunner implements ApplicationRunner {
     @Autowired
     private PoolOriginService poolOriginService;
 
+    @Autowired
+    private DidWxMonitorService didWxMonitorService;
+
+
+
+
+
+
+
 
     @Autowired
     private TaskMobileCardService taskMobileCardService;
@@ -282,6 +291,8 @@ public class AutowireRunner implements ApplicationRunner {
         ComponentUtil.poolOpenService = poolOpenService;
         ComponentUtil.poolWaitService = poolWaitService;
         ComponentUtil.poolOriginService = poolOriginService;
+        ComponentUtil.didWxMonitorService = didWxMonitorService;
+
 
 
         ComponentUtil.taskMobileCardService = taskMobileCardService;

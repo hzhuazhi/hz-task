@@ -68,4 +68,16 @@ public interface TaskOrderMapper<T> extends BaseDao<T> {
      */
     public int updateOrderStatusById(Object obj);
 
+    /**
+     * @Description: 更新订单的补充数据类型
+     * <p>
+     *     补充数据的类型：1初始化，2补充数据失败（其它原因等..），3补充数据成功
+     * </p>
+     * @param obj
+     * @return
+     * @author yoko
+     * @date 2020/8/23 20:06
+    */
+    public int updateWorkType(Object obj);
+
 }

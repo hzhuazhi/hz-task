@@ -208,6 +208,11 @@ public class OrderModel extends BasePage implements Serializable {
      */
     private Integer replenishType;
 
+    /**
+     * 补充数据的类型：1初始化，2补充数据失败（其它原因等..），3补充数据成功
+     */
+    private Integer workType;
+
 
     private String startTime;
     private String endTime;
@@ -600,5 +605,13 @@ public class OrderModel extends BasePage implements Serializable {
 
     public void setOrderStatusStr(String orderStatusStr) {
         this.orderStatusStr = orderStatusStr;
+    }
+
+    public Integer getWorkType() {
+        return workType;
+    }
+
+    public void setWorkType(Integer workType) {
+        this.workType = workType;
     }
 }
