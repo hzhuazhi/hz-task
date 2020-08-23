@@ -456,6 +456,11 @@ public class TaskCatDataAnalysis {
                             // 更新此次task的状态
                             StatusModel statusModel = TaskMethod.assembleUpdateStatusByWorkType(data.getId(), workType, workRemark);
                             ComponentUtil.taskCatDataAnalysisService.updateCatDataAnalysisStatus(statusModel);
+                        }else{
+                            // 剩余的所属：work_type =1 并且 dataType =2 的数据
+                            // 更新此次task的状态：更新成成功
+                            StatusModel statusModel = TaskMethod.assembleUpdateStatusByWorkType(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE, "");
+                            ComponentUtil.taskCatDataAnalysisService.updateCatDataAnalysisStatus(statusModel);
                         }
                     }
 
