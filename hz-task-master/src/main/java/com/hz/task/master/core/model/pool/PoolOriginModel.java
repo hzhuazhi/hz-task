@@ -26,7 +26,7 @@ public class PoolOriginModel extends BasePage implements Serializable {
     private Long did;
 
     /**
-     * 数据类型:1初始化，2其它，3余额不足，4有效群不足，5有订单未回复，6有违规操作
+     * 数据类型:1初始化，2其它，3余额不足，4有效群不足，5有订单未回复，6有违规操作，7抛开被限制的微信有效群不足
      */
     private Integer dataType;
 

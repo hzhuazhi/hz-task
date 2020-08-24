@@ -183,6 +183,11 @@ public class DidCollectionAccountModel extends BasePage implements Serializable 
      */
     private List<Long> idList;
 
+    /**
+     * 数据集合-SQL
+     */
+    private List<String> strList;
+
     public Long getId() {
         return id;
     }
@@ -445,5 +450,13 @@ public class DidCollectionAccountModel extends BasePage implements Serializable 
 
     public void setIdList(List<Long> idList) {
         this.idList = idList;
+    }
+
+    public List<String> getStrList() {
+        return strList;
+    }
+
+    public void setStrList(List<String> strList) {
+        this.strList = strList;
     }
 }

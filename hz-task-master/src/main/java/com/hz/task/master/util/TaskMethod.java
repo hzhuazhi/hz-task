@@ -3769,11 +3769,13 @@ public class TaskMethod {
      * @param useStatus - 使用状态:1初始化有效正常使用，2无效暂停使用
      * @param loginType - 归属小微登录状态：1登出/未登录，2登入/已登录
      * @param countGroupNum - 有效微信群个数
+     * @param toWxidList - 原始微信ID集合
      * @return com.hz.fine.master.core.model.did.DidCollectionAccountModel
      * @author yoko
      * @date 2020/5/15 17:17
      */
-    public static DidCollectionAccountModel assembleDidCollectionAccountListEffective(long did, int acType, int isInvalid, int checkStatus,int useStatus, int loginType, int countGroupNum){
+    public static DidCollectionAccountModel assembleDidCollectionAccountListEffective(long did, int acType, int isInvalid, int checkStatus,int useStatus, int loginType, int countGroupNum,
+                                                                                      List<String> toWxidList){
         DidCollectionAccountModel resBean = new DidCollectionAccountModel();
         resBean.setDid(did);
         if(acType > 0){
@@ -3793,6 +3795,9 @@ public class TaskMethod {
         }
         if (countGroupNum > 0){
             resBean.setCountGroupNum(countGroupNum);
+        }
+        if (toWxidList != null && toWxidList.size() > 0){
+            resBean.setStrList(toWxidList);
         }
         return resBean;
     }
@@ -4141,6 +4146,23 @@ public class TaskMethod {
         resBean.setCurday(DateUtil.getDayNumber(new Date()));
         resBean.setCurhour(DateUtil.getHour(new Date()));
         resBean.setCurminute(DateUtil.getCurminute(new Date()));
+        return resBean;
+    }
+
+    /**
+     * @Description: 组装查询用户的微信收款账号金额监控的方法
+     * @param did - 用户ID
+     * @param invalidTime - 失效时间
+     * @return com.hz.task.master.core.model.did.DidWxMonitorModel
+     * @author yoko
+     * @date 2020/8/24 11:57
+     */
+    public static DidWxMonitorModel assembleDidWxMonitorByDidQuery(long did, String invalidTime){
+        DidWxMonitorModel resBean = new DidWxMonitorModel();
+        resBean.setDid(did);
+        if (!StringUtils.isBlank(invalidTime)){
+            resBean.setInvalidTimeStr(invalidTime);
+        }
         return resBean;
     }
 

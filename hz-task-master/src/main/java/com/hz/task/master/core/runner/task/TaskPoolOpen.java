@@ -6,6 +6,7 @@ import com.hz.task.master.core.common.utils.constant.ServerConstant;
 import com.hz.task.master.core.common.utils.constant.TkCacheKey;
 import com.hz.task.master.core.model.did.DidCollectionAccountModel;
 import com.hz.task.master.core.model.did.DidModel;
+import com.hz.task.master.core.model.did.DidWxMonitorModel;
 import com.hz.task.master.core.model.order.OrderModel;
 import com.hz.task.master.core.model.pool.PoolOpenModel;
 import com.hz.task.master.core.model.pool.PoolOriginModel;
@@ -88,6 +89,7 @@ public class TaskPoolOpen {
                     boolean flag_money = false;
                     boolean flag_group = false;
                     boolean flag_order = false;
+                    boolean flag_toWxId = false;
                     // 查询用户基本信息
                     DidModel didQuery = TaskMethod.assembleDidQueryByDid(data);
                     DidModel didModel = (DidModel) ComponentUtil.didService.findByObject(didQuery);
@@ -98,7 +100,7 @@ public class TaskPoolOpen {
                         origin = "接单池子中检测到余额低于保底金额!";
                     }else {
                         // 校验用户是否拥有有效群
-                        DidCollectionAccountModel didCollectionAccountQuery = TaskMethod.assembleDidCollectionAccountListEffective(didModel.getId(), 3, 1, 3,1,2, 0);
+                        DidCollectionAccountModel didCollectionAccountQuery = TaskMethod.assembleDidCollectionAccountListEffective(didModel.getId(), 3, 1, 3,1,2, 0, null);
                         List<DidCollectionAccountModel> didCollectionAccountList = ComponentUtil.didCollectionAccountService.getEffectiveDidCollectionAccountByWxGroup(didCollectionAccountQuery);
                         flag_group = TaskMethod.checkDidCollectionAccountListEffective(didCollectionAccountList);
                         if (!flag_group){
@@ -112,11 +114,30 @@ public class TaskPoolOpen {
                             if (!flag_order){
                                 dataType = 5;
                                 origin = "接单池子中检测到有订单未回复,微信群名称：《" + orderModel.getWxNickname() + "》";
+                            }else{
+                                // 校验排除超过金额的微信归属群，查询有效群是否不足
+
+                                // 获取用户的微信收款账号金额监控超过范围的微信ID集合
+                                DidWxMonitorModel didWxMonitorQuery = TaskMethod.assembleDidWxMonitorByDidQuery(data, "1");
+                                List<String> toWxidList = ComponentUtil.didWxMonitorService.getToWxidList(didWxMonitorQuery);
+                                if (toWxidList != null && toWxidList.size() > 0){
+                                    // 校验排除微信集合的其它微信用户是否拥有有效群
+                                    DidCollectionAccountModel didCollectionAccountToWxQuery = TaskMethod.assembleDidCollectionAccountListEffective(didModel.getId(), 3, 1, 3,1,2, 0, toWxidList);
+                                    List<DidCollectionAccountModel> didCollectionAccountToWxList = ComponentUtil.didCollectionAccountService.getEffectiveDidCollectionAccountByWxGroup(didCollectionAccountToWxQuery);
+                                    flag_toWxId = TaskMethod.checkDidCollectionAccountListEffective(didCollectionAccountToWxList);
+                                    if (!flag_toWxId){
+                                        dataType = 7;
+                                        origin = "接单池子中抛开被限制的微信后，有效群不足";
+                                    }
+                                }else {
+                                    flag_toWxId = true;
+                                }
+
                             }
                         }
                     }
 
-                    if (!flag_money || !flag_group || !flag_order){
+                    if (!flag_money || !flag_group || !flag_order || !flag_toWxId){
                         // 把用户移出接单池
                         PoolOpenModel poolOpenUpdate = TaskMethod.assemblePoolOpenUpdate(0, data , 1);
                         ComponentUtil.taskPoolOpenService.updatePoolOpenYn(poolOpenUpdate);
