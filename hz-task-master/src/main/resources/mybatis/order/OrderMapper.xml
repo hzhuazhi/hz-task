@@ -657,4 +657,16 @@
         and a.yn = 0
     </update>
 
+
+    <!-- 根据创建时间、微信原始ID查询成功订单的金额-->
+    <select id="sucMoneyByTowxid" parameterType="com.hz.task.master.core.model.order.OrderModel" resultType="java.lang.String">
+        select ifnull(sum(convert(a.actual_money,decimal(19,2))), '0.00') as money from tb_fn_order a
+        where 1=1
+        and a.collection_type = #{collectionType}
+        and a.order_status >= #{orderStatus}
+        and a.user_id = #{userId}
+        and a.create_time >= #{startTime} and a.create_time &lt;= #{endTime}
+        and a.yn = 0
+    </select>
+
 </mapper>

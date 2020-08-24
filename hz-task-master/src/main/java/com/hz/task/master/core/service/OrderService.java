@@ -199,4 +199,13 @@ public interface OrderService<T> extends BaseService<T> {
      */
     public int updateIsReplyAndRemark(OrderModel model);
 
+    /**
+     * @Description: 根据创建时间、微信原始ID查询成功订单的金额
+     * @param model - 创建时间，微信原始ID，订单状态，订单类型
+     * @return
+     * @author yoko
+     * @date 2020/6/6 11:22
+     */
+    public String sucMoneyByTowxid(OrderModel model);
+
 }

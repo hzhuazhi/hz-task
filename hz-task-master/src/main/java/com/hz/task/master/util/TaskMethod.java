@@ -3999,6 +3999,152 @@ public class TaskMethod {
     }
 
 
+    /**
+     * @Description: 组装查询订单每条微信收款成功-填充的查询条件
+     * @param collectionType - 多少条数据
+     * @param didStatus - 订单成功状态
+     * @param workType - 补充数据的类型：1初始化，2补充失败，3补充数据成功
+     * @return
+     * @author yoko
+     * @date 2020/1/11 16:23
+     */
+    public static StatusModel assembleOrderByToWxidMoneyQuery(int collectionType, int didStatus, int workType, int limitNum){
+        StatusModel resBean = new StatusModel();
+        resBean.setCollectionType(collectionType);
+        resBean.setDidStatus(didStatus);
+        resBean.setWorkType(workType);
+        resBean.setLimitNum(limitNum);
+        return resBean;
+    }
+
+
+
+
+    /**
+     * @Description: check校验订单的创建时间与系统当前时间是否超过策略规定的范围时间
+     * @param toWxidTime - 微信原始ID收款金额时间范围值
+     * @param time - 订单的创建时间
+     * @return boolean
+     * @author yoko
+     * @date 2020/8/23 21:40
+     */
+    public static boolean checkToWxidTimeExceed(int toWxidTime, String time){
+        int subtract = DateUtil.dateSubtractBySystemTime(time);
+        if (subtract == 0){
+            return true;
+        }else if(subtract < 0){
+            return true;
+        }else{
+            if (toWxidTime > subtract){
+                return true;
+            }else {
+                return false;
+            }
+        }
+    }
+
+
+    /**
+     * @Description: 组装根据原始微信ID查询成功收款金额
+     * @param collectionType - 支付类型
+     * @param orderStatus - 订单状态
+     * @param userId - 微信原始ID
+     * @param createTime - 订单的创建时间
+     * @param toWxidTime - 策略里面的微信原始ID收款金额时间范围值
+     * @return com.hz.task.master.core.model.order.OrderModel
+     * @author yoko
+     * @date 2020/8/24 9:41
+     */
+    public static OrderModel assembleOrderSumMoneyByToWxid(int collectionType, int orderStatus, String userId, String createTime, int toWxidTime){
+        OrderModel resBean = new OrderModel();
+        resBean.setCollectionType(collectionType);
+        resBean.setOrderStatus(orderStatus);
+        resBean.setUserId(userId);
+        String startTime = DateUtil.addDateByTime(createTime, -toWxidTime);
+        resBean.setStartTime(startTime);
+        resBean.setEndTime(createTime);
+        return resBean;
+    }
+
+
+    /**
+     * @Description: 计算监控微信收款账号的类型
+     * @param money - 微信账号成功收款金额
+     * @param toWxidRangeMoney - 策略里面的微信每次只出一个群码的金额范围
+     * @param toWxidMaxMoney - 策略里面的微信在时间范围内最大收款金额
+     * @return int - 类型1表示没有符合金额限定的范围，2符合金额范围，3符合最大收款金额
+     * @author yoko
+     * @date 2020/8/24 9:54
+     */
+    public static int getMonitorType(String money, String toWxidRangeMoney, String toWxidMaxMoney){
+        int num = 1;
+        if (StringUtils.isBlank(money)){
+            return 1;
+        }
+        if (money.equals("0.00")){
+            return 1;
+        }
+        String resStr = StringUtil.getBigDecimalSubtractByStr(money, toWxidMaxMoney);
+        if (resStr.equals("0") || resStr.equals("0.00")){
+            return 3;
+        }
+        boolean flag = StringUtil.getBigDecimalSubtract(money, toWxidMaxMoney);
+        if (flag){
+            return 3;
+        }
+
+        String [] strArr = toWxidRangeMoney.split("-");
+        double start = Double.parseDouble(strArr[0]);
+        double end = Double.parseDouble(strArr[1]);
+        if (Double.parseDouble(money) >= start && Double.parseDouble(money) <= end){
+            return 2;
+        }
+
+        return num;
+    }
+
+    /**
+     * @Description: 组装根据微信原始ID查询收款账号
+     * @param userId - 微信原始ID
+     * @param acType - 收款账号类型
+     * @return com.hz.task.master.core.model.did.DidCollectionAccountModel
+     * @author yoko
+     * @date 2020/8/24 10:32
+     */
+    public static DidCollectionAccountModel assembleDidCollectionAccountByUserId(String userId, int acType){
+        DidCollectionAccountModel resBean = new DidCollectionAccountModel();
+        resBean.setUserId(userId);
+        resBean.setAcType(acType);
+        return resBean;
+    }
+
+
+    /**
+     * @Description: 组装添加微信金额监控数据
+     * @param did - 用户ID
+     * @param wxNickname - 微信昵称
+     * @param toWxid - 微信原始ID
+     * @param toWxidTime - 要累加的失效时间
+     * @return com.hz.task.master.core.model.did.DidWxMonitorModel
+     * @author yoko
+     * @date 2020/8/24 10:58
+     */
+    public static DidWxMonitorModel assembleDidWxMonitorAdd(long did, String wxNickname, String toWxid, int toWxidTime){
+        DidWxMonitorModel resBean = new DidWxMonitorModel();
+        resBean.setDid(did);
+        if (!StringUtils.isBlank(wxNickname)){
+            resBean.setWxNickname(wxNickname);
+        }
+        resBean.setToWxid(toWxid);
+        String invalidTime = DateUtil.addDateMinute(toWxidTime);
+        resBean.setInvalidTime(invalidTime);
+        resBean.setCurday(DateUtil.getDayNumber(new Date()));
+        resBean.setCurhour(DateUtil.getHour(new Date()));
+        resBean.setCurminute(DateUtil.getCurminute(new Date()));
+        return resBean;
+    }
+
+
 
 
 
@@ -4095,6 +4241,18 @@ public class TaskMethod {
         if (differSecond >= 90){
             System.out.println("时间进来了");
         }
+        String sb3 = "2020-08-23 21:50:11";
+        int sb6 = DateUtil.dateSubtractBySystemTime(sb3);
+        System.out.println("sb6:" + sb6);
+        String sb7 = "2020-08-24 09:46:57";
+        String sb8 = DateUtil.addDateByTime(sb7, -30);
+        System.out.println("sb8:" + sb8);
+        String sb9 = "2500.00";
+        String sb10 = "2500.00";
+        boolean flag_1 = StringUtil.getBigDecimalSubtract(sb9, sb10);
+        System.out.println("flag_1:" + flag_1);
+        String sb11 = StringUtil.getBigDecimalSubtractByStr(sb9, sb10);
+        System.out.println("sb11:" + sb11);
 
     }
 

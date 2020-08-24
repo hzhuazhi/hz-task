@@ -9,6 +9,7 @@
     <sql id="Base_Column_List">
         a.id,a.did,a.order_no,a.order_money,a.collection_account_id,a.collection_type,a.qr_code_id,
         a.qr_code,a.wx_nickname,a.wx_id,a.out_trade_no,a.notify_url,a.order_status,a.invalid_time,
+        a.user_id,a.zfb_ac_num,
         a.program_time,a.did_status,a.profit,a.is_red_pack,a.red_pack_time,
         a.is_reply,a.reply_data,a.reply_time,a.actual_money,a.money_fit_type,a.replenish_type,a.work_type,
         a.curday,a.curhour,a.curminute,a.run_num,a.run_status,a.send_num,a.send_status,
@@ -22,6 +23,9 @@
         <trim  suffixOverrides="," >
             <if test="id != null and id != '' " >
                 and a.id = #{id}
+            </if>
+            <if test="collectionType != null and collectionType != '' " >
+                and a.collection_type = #{collectionType}
             </if>
             <if test="orderStatus != null and orderStatus != '' " >
                 and a.order_status = #{orderStatus}

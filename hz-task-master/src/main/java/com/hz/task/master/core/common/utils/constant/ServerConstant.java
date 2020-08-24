@@ -121,6 +121,9 @@ public class ServerConstant {
         POOL_MIN_MONEY(41,""),
         POOL_MIN_NUM(42,""),
         POOL_MIN_GROUP_NUM(43,""),
+        TO_WXID_TIME(44,""),
+        TO_WXID_RANGE_MONEY(45,""),
+        TO_WXID_MAX_MONEY(46,""),
         ;
         private int stgType;
         private String stgKey;

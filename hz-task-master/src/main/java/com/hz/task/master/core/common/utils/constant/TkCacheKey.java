@@ -221,4 +221,10 @@ public interface TkCacheKey {
      * 锁住
      */
     String LOCK_POOL_OPEN_DID = "-36";
+
+    /**
+     * 锁：订单成功数据填充的流水- 派单数据
+     * 锁住
+     */
+    String LOCK_ORDER_WORK_TYPE = "-37";
 }

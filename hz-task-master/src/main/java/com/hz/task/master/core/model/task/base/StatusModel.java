@@ -105,6 +105,11 @@ public class StatusModel implements Serializable {
      */
     private Integer isMatching;
 
+    /**
+     * 收款账号类型：1微信，2支付宝，3微信群
+     */
+    private Integer collectionType;
+
     public Long getId() {
         return id;
     }
@@ -265,5 +270,13 @@ public class StatusModel implements Serializable {
 
     public void setIsMatching(Integer isMatching) {
         this.isMatching = isMatching;
+    }
+
+    public Integer getCollectionType() {
+        return collectionType;
+    }
+
+    public void setCollectionType(Integer collectionType) {
+        this.collectionType = collectionType;
     }
 }

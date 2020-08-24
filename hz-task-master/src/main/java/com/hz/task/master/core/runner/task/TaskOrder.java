@@ -28,6 +28,7 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Description task:任务订单（平台派发订单）
@@ -617,6 +618,97 @@ public class TaskOrder {
             }
         }
     }
+
+
+
+    /**
+     * @Description: task：执行每条成功订单的微信在当时成功金额是否超过策略中的上限
+     * <p>
+     *     每1每秒运行一次
+     *     1.检测收款类型collection_type=3的微信ID在当前时间与策略部署的前1个小时的金额总和是否超过部署上限或者在部署范围。
+     *     2.如果超过部署上限测添加数据到表tb_fn_did_wx_monitor中。
+     *     3.如果在部署范围：则存缓存（金额在2000-2500之间的，存缓存；以便此微信ID的收款账号每次给码只能给出一个）
+     * </p>
+     * @author yoko
+     * @date 2019/12/6 20:25
+     */
+//    @Scheduled(cron = "1 * * * * ?")
+    @Scheduled(fixedDelay = 1000) // 每秒执行
+    public void orderByToWxidMoney() throws Exception{
+//        log.info("----------------------------------TaskOrder.orderByToWxidMoney()----start");
+        // 查询策略里面的微信原始ID收款金额时间范围值
+        int toWxidTime = 0;
+        StrategyModel strategyToWxidTimeQuery = HodgepodgeMethod.assembleStrategyQuery(ServerConstant.StrategyEnum.TO_WXID_TIME.getStgType());
+        StrategyModel strategyToWxidTimeModel = ComponentUtil.strategyService.getStrategyModel(strategyToWxidTimeQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
+        toWxidTime = strategyToWxidTimeModel.getStgNumValue();
+
+        // 查询策略里面的微信每次只出一个群码的金额范围
+        String toWxidRangeMoney = "";
+        StrategyModel strategyToWxidRangeMoneyQuery = HodgepodgeMethod.assembleStrategyQuery(ServerConstant.StrategyEnum.TO_WXID_RANGE_MONEY.getStgType());
+        StrategyModel strategyToWxidRangeMoneyModel = ComponentUtil.strategyService.getStrategyModel(strategyToWxidRangeMoneyQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
+        toWxidRangeMoney = strategyToWxidRangeMoneyModel.getStgValue();
+
+        // 查询策略里面的微信在时间范围内最大收款金额
+        String toWxidMaxMoney = "";
+        StrategyModel strategyToWxidMaxMoneyQuery = HodgepodgeMethod.assembleStrategyQuery(ServerConstant.StrategyEnum.TO_WXID_MAX_MONEY.getStgType());
+        StrategyModel strategyToWxidMaxMoneyModel = ComponentUtil.strategyService.getStrategyModel(strategyToWxidMaxMoneyQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
+        toWxidMaxMoney = strategyToWxidMaxMoneyModel.getStgValue();
+
+        // 获取支付类型为3，订单成功，并且没有进行数据填充的订单数据
+        StatusModel statusQuery = TaskMethod.assembleOrderByToWxidMoneyQuery(3, 3, 1, limitNum);
+        List<OrderModel> synchroList = ComponentUtil.taskOrderService.getOrderList(statusQuery);
+        for (OrderModel data : synchroList){
+            try{
+                String lockKey = CachedKeyUtils.getCacheKeyTask(TkCacheKey.LOCK_ORDER_WORK_TYPE, data.getId());
+                boolean flagLock = ComponentUtil.redisIdService.lock(lockKey);
+                if (flagLock){
+                    // 判断当前时间与订单时间的间隔是否已经超过策略的时间范围
+                    boolean flag_time = TaskMethod.checkToWxidTimeExceed(toWxidTime, data.getCreateTime());
+                    if (flag_time){
+                        OrderModel orderQuery = TaskMethod.assembleOrderSumMoneyByToWxid(3, 3, data.getUserId(), data.getCreateTime(), toWxidTime);
+                        String money = ComponentUtil.orderService.sucMoneyByTowxid(orderQuery);
+                        // 获取监控类型
+                        int monitorType = TaskMethod.getMonitorType(money, toWxidRangeMoney, toWxidMaxMoney);// 类型1表示没有符合金额限定的范围，2符合金额范围，3符合最大收款金额
+                        if (monitorType == 2){
+                            // 存储到redis中
+                            String strKeyCache = CachedKeyUtils.getCacheKey(CacheKey.TO_WXID_RANGE_MONEY_TIME, data.getId(), data.getUserId());
+                            ComponentUtil.redisService.set(strKeyCache, data.getUserId() + "," + money, toWxidTime, TimeUnit.MINUTES);
+                        }else if (monitorType == 3){
+                            // 存储到数据表中
+
+                            // 获取此微信的微信昵称
+                            String wxNickname = "";
+                            DidCollectionAccountModel didCollectionAccountQuery = TaskMethod.assembleDidCollectionAccountByUserId(data.getUserId(), 3);
+                            DidCollectionAccountModel didCollectionAccountData = (DidCollectionAccountModel) ComponentUtil.didCollectionAccountService.findByObject(didCollectionAccountQuery);
+                            if (didCollectionAccountData != null && didCollectionAccountData.getId() != null && didCollectionAccountData.getId() > 0){
+                                if (!StringUtils.isBlank(didCollectionAccountData.getBankName())){
+                                    wxNickname = didCollectionAccountData.getBankName();
+                                }
+                            }
+                            // 添加用户的微信收款账号金额监控数据
+                            DidWxMonitorModel didWxMonitorModel = TaskMethod.assembleDidWxMonitorAdd(data.getDid(), wxNickname, data.getUserId(), toWxidTime);
+                            ComponentUtil.didWxMonitorService.add(didWxMonitorModel);
+                        }
+                    }
+                    // 更新订单补充数据的状态
+                    // 更新此次task的状态
+                    StatusModel statusModel = TaskMethod.assembleUpdateStatusByWorkType(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE, "");
+                    ComponentUtil.taskOrderService.updateWorkType(statusModel);
+                    // 解锁
+                    ComponentUtil.redisIdService.delLock(lockKey);
+                }
+
+//                log.info("----------------------------------TaskOrder.orderByToWxidMoney()----end");
+            }catch (Exception e){
+                log.error(String.format("this TaskOrder.orderByToWxidMoney() is error , the dataId=%s !", data.getId()));
+                e.printStackTrace();
+                // 更新此次task的状态
+                StatusModel statusModel = TaskMethod.assembleUpdateStatusByWorkType(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "异常失败try!");
+                ComponentUtil.taskOrderService.updateWorkType(statusModel);
+            }
+        }
+    }
+
 
 
     /**
