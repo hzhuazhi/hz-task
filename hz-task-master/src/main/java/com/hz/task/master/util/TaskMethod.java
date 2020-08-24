@@ -3985,19 +3985,23 @@ public class TaskMethod {
     /**
      * @Description: 组装修改订单回复类容的方法
      * @param did - 用户ID
+     * @param userId - 微信ID
      * @param orderStatus - 订单状态
      * @param isReply - 是否回复：1初始化未回复，2系统默认回复，3已回复失败，4已回复成功
+     * @param collectionType - 支付类型
      * @param replyData - 回复类容
      * @param remark - 备注
      * @return com.hz.task.master.core.model.order.OrderModel
      * @author yoko
      * @date 2020/8/22 22:05
      */
-    public static OrderModel assembleUpdateIsReplyByDid(long did, int orderStatus, int isReply, String replyData, String remark){
+    public static OrderModel assembleUpdateIsReplyByDid(long did, String userId, int orderStatus, int isReply, int collectionType, String replyData, String remark){
         OrderModel resBean = new OrderModel();
         resBean.setDid(did);
+        resBean.setUserId(userId);
         resBean.setOrderStatus(orderStatus);
         resBean.setIsReply(isReply);
+        resBean.setCollectionType(collectionType);
         resBean.setReplyData(replyData);
         resBean.setRemark(remark);
         return resBean;

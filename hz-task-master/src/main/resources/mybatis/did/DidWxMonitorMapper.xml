@@ -199,7 +199,7 @@
         <include refid="Example_Where_Clause_id"/>
     </update>
 
-    <!-- 查询等待池中的用户集合 -->
+    <!-- 根据条件获取去重复的微信原始ID集合 -->
     <select id="getToWxidList" parameterType="com.hz.task.master.core.model.did.DidWxMonitorModel" resultType="java.lang.String">
         select
         DISTINCT(a.to_wxid) as to_wxid
