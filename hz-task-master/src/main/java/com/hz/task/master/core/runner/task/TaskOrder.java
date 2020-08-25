@@ -689,7 +689,7 @@ public class TaskOrder {
                         int monitorType = TaskMethod.getMonitorType(money, toWxidRangeMoney, toWxidMaxMoney);// 类型1表示没有符合金额限定的范围，2符合金额范围，3符合最大收款金额
                         if (monitorType == 2){
                             // 存储到redis中
-                            String strKeyCache = CachedKeyUtils.getCacheKey(CacheKey.TO_WXID_RANGE_MONEY_TIME, data.getId(), data.getUserId());
+                            String strKeyCache = CachedKeyUtils.getCacheKey(CacheKey.TO_WXID_RANGE_MONEY_TIME, data.getDid(), data.getUserId());
                             ComponentUtil.redisService.set(strKeyCache, data.getUserId() + "," + money, toWxidTime, TimeUnit.MINUTES);
                         }else if (monitorType == 3){
                             // 存储到数据表中
