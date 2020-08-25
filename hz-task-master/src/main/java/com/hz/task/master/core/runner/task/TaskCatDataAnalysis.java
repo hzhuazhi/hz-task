@@ -251,7 +251,7 @@ public class TaskCatDataAnalysis {
                                         }
                                     }
                                     String profit = "";
-                                    if (moneyFitType == 3){
+                                    if (moneyFitType == 3 || moneyFitType == 2){
                                         // 查询策略里面的消耗金额范围内的奖励规则列表
                                         StrategyModel strategyQuery = TaskMethod.assembleStrategyQuery(ServerConstant.StrategyEnum.WX_GROUP_CONSUME_MONEY_LIST.getStgType());
                                         StrategyModel strategyModel = ComponentUtil.strategyService.getStrategyModel(strategyQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
@@ -371,6 +371,14 @@ public class TaskCatDataAnalysis {
                                 StatusModel statusModel = TaskMethod.assembleUpdateStatusByWorkType(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO, "根据收款账号ID没有找到对应的收款账号");
                                 ComponentUtil.taskCatDataAnalysisService.updateCatDataAnalysisStatus(statusModel);
                             }
+                        }else if(data.getDataType() == 13){
+                            // 群内容包含限制的词语
+                            int workType = 0;
+                            String workRemark = "";
+                            // 更新此次task的状态：更新成成功状态
+                            workType = ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE;
+                            StatusModel statusModel = TaskMethod.assembleUpdateStatusByWorkType(data.getId(), workType, workRemark);
+                            ComponentUtil.taskCatDataAnalysisService.updateCatDataAnalysisStatus(statusModel);
                         }
 
 //                        else if (data.getDataType() == 10){
@@ -560,6 +568,17 @@ public class TaskCatDataAnalysis {
                         // 更新此次task的状态：更新成失败状态
                         // 因为数据不能让其时时在跑，所以更新成失败状态， 把失败状态变更成成功状态是由接口来控制：此类型有点特殊
                         runStatus = ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_TWO;
+                    }else if(data.getDataType() == 13){
+                        // 删除小微旗下店员的关联关系
+                        WxClerkModel wxClerkUpdate = TaskMethod.assembleWxClerkUpdate(data.getWxId(), data.getCollectionAccountId());
+                        ComponentUtil.wxClerkService.updateWxClerkIsYn(wxClerkUpdate);
+
+                        // 根据找到的微信群收款账号，更新此收款账号的审核状态，更新成审核初始化
+                        DidCollectionAccountModel didCollectionAccountUpdate = TaskMethod.assembleDidCollectionAccountUpdateCheckDataInfo(data.getCollectionAccountId(), "检测：群信息包含限制词汇");
+                        ComponentUtil.didCollectionAccountService.updateDidCollectionAccountCheckData(didCollectionAccountUpdate);
+
+                        // 更新此次task的状态：更新成成功状态
+                        runStatus = ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE;
                     }else {
                         // 更新此次task的状态：更新成成功状态
                         runStatus = ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE;

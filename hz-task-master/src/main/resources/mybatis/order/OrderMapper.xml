@@ -239,6 +239,9 @@
             <if test="replenishType != null and replenishType != '' " >
                 replenish_type,
             </if>
+            <if test="profit != null and profit != '' " >
+                profit,
+            </if>
             <if test="remark != null and remark != '' " >
                 remark,
             </if>
@@ -293,6 +296,9 @@
             </if>
             <if test="replenishType != null and replenishType != '' " >
                 <![CDATA[  #{replenishType}, ]]>
+            </if>
+            <if test="profit != null and profit != '' " >
+                <![CDATA[  #{profit}, ]]>
             </if>
             <if test="remark != null and remark != '' " >
                 <![CDATA[  #{remark}, ]]>
@@ -408,6 +414,9 @@
         <trim prefix="set" suffixOverrides=",">
             <if test="orderStatus != null and orderStatus != '' " >
                 a.order_status = #{orderStatus},
+            </if>
+            <if test="runStatus != null and runStatus != '' " >
+                a.run_status = #{runStatus},
             </if>
             a.update_time = NOW(),
         </trim>
@@ -654,7 +663,7 @@
         where 1=1
         and a.did = #{did}
         and a.user_id = #{userId}
-        and a.order_status = {orderStatus}
+        and a.order_status = #{orderStatus}
         and a.collection_type = #{collectionType}
         and a.yn = 0
     </update>

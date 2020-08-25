@@ -111,11 +111,12 @@ public class TaskWxAllData {
                                             did = didCollectionAccountByWxGroupIdOrWxGroupNameAndYnModel.getDid();
                                             collectionAccountId = didCollectionAccountByWxGroupIdOrWxGroupNameAndYnModel.getId();
                                             if (didCollectionAccountByWxGroupIdOrWxGroupNameAndYnModel.getYn() == null || didCollectionAccountByWxGroupIdOrWxGroupNameAndYnModel.getYn() == 0){
-                                                if (wxClient.wxid3.equals(didCollectionAccountByWxGroupIdOrWxGroupNameAndYnModel.getPayee())){
-                                                    collectionAccountType = 5;
-                                                }else{
-                                                    collectionAccountType = 4;
-                                                }
+                                                collectionAccountType = 5;
+//                                                if (wxClient.wxid3.equals(didCollectionAccountByWxGroupIdOrWxGroupNameAndYnModel.getPayee())){
+//                                                    collectionAccountType = 5;
+//                                                }else{
+//                                                    collectionAccountType = 4;
+//                                                }
                                             }else{
                                                 collectionAccountType = 3;
                                             }
@@ -155,9 +156,12 @@ public class TaskWxAllData {
                                         }
 
                                         if (wxClient.type.equals("1")){
-                                            // 普通消息：包含2,3,7,8,9的类型
-                                            // 具体类型说明：1初始化，《2其它》，《3发送固定指令3表示审核使用》，4加群信息，5发红包，6剔除成员，《7成功收款》，《8收款失败》，《9发送固定指令4表示暂停使用微信群》，10小微登入，11小微登出，12群图片
+                                            // 普通消息：包含2,3,7,8,9,13的类型
+                                            // 具体类型说明：1初始化，《2其它》，《3发送固定指令3表示审核使用》，4加群信息，5发红包，6剔除成员，《7成功收款》，《8收款失败》，《9发送固定指令4表示暂停使用微信群》，10小微登入，11小微登出，12群图片，《13内容包含限制》
                                             int dataType = TaskMethod.getWxDataTypeByOne(wxClient.content);
+
+                                            // 去掉所有空格
+                                            wxClient.content = wxClient.content.replaceAll(" ", "");
 
                                             if (collectionAccountType != 2){
 
@@ -193,7 +197,7 @@ public class TaskWxAllData {
 
                                         }else if (wxClient.type.equals("10000")){
                                             // 系统消息：包含2,4,5,6的类型
-                                            // 具体类型说明：1初始化，《2其它》，3发送固定指令3表示审核使用，《4加群信息》，《5发红包》，《6剔除成员》，7成功收款，8收款失败，9发送固定指令4表示暂停使用微信群，10小微登入，11小微登出，12群图片
+                                            // 具体类型说明：1初始化，《2其它》，3发送固定指令3表示审核使用，《4加群信息》，《5发红包》，《6剔除成员》，7成功收款，8收款失败，9发送固定指令4表示暂停使用微信群，10小微登入，11小微登出，12群图片，13内容包含限制
                                             int dataType = TaskMethod.getWxDataTypeByTenThousand(wxClient.content);
 
                                             // 判断是否是发红包的数据类型

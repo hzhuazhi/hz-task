@@ -11,6 +11,7 @@ import com.hz.task.master.core.common.utils.constant.TkCacheKey;
 import com.hz.task.master.core.model.did.*;
 import com.hz.task.master.core.model.operate.OperateModel;
 import com.hz.task.master.core.model.order.OrderModel;
+import com.hz.task.master.core.model.strategy.StrategyData;
 import com.hz.task.master.core.model.strategy.StrategyModel;
 import com.hz.task.master.core.model.task.base.StatusModel;
 import com.hz.task.master.util.ComponentUtil;
@@ -156,11 +157,20 @@ public class TaskOrder {
                                             // 订单金额不一致
                                             if (data.getMoneyFitType() == 2){
                                                 // 订单金额少了
+
+                                                // 查询策略里面的消耗金额范围内的奖励规则列表
+                                                String profit = "";
+                                                StrategyModel strategyProfitQuery = TaskMethod.assembleStrategyQuery(ServerConstant.StrategyEnum.WX_GROUP_CONSUME_MONEY_LIST.getStgType());
+                                                StrategyModel strategyProfitModel = ComponentUtil.strategyService.getStrategyModel(strategyProfitQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
+                                                // 解析奖励规则的值
+                                                List<StrategyData> wxGroupConsumeMoneyList = JSON.parseArray(strategyProfitModel.getStgBigValue(), StrategyData.class);
+                                                profit = TaskMethod.getConsumeProfit(wxGroupConsumeMoneyList, data.getActualMoney());
+
                                                 // 1.补一个新的派单，金额等于实际上报金额
                                                 String sgid = ComponentUtil.redisIdService.getNewFineId();
                                                 // 组装派发订单的数据
                                                 OrderModel orderAdd = TaskMethod.assembleOrderByReplenish(data.getDid(), sgid, data.getActualMoney(), data.getCollectionAccountId(), 3,
-                                                        "系统补单：依据原订单号：" + data.getOrderNo() +"，上报金额少了", 2);
+                                                        "系统补单：依据原订单号：" + data.getOrderNo() +"，上报金额少了", 2, profit);
                                                 ComponentUtil.orderService.add(orderAdd);
                                                 // 组装用户扣除余额流水的数据
                                                 DidBalanceDeductModel didBalanceDeductModel = TaskMethod.assembleDidBalanceDeductAdd(data.getDid(), sgid, data.getActualMoney(), 30);
@@ -175,7 +185,7 @@ public class TaskOrder {
                                                     // 解锁
                                                     ComponentUtil.redisIdService.delLock(lockKey_did_money);
                                                 }
-                                                // 2.原订单修改成 orderStatus = 4，原订单的run_status =3（这里run_status=3是为了保证不去修改用户扣款流水里面的订单状态）
+                                                // 2.原订单修改成 orderStatus = 4，原订单的run_status =3（这里run_status=3是为了保证不去修改用户扣款流水里面的订单状态）；这里有一个弊端就是因为runStatus=3等于说跑分用户的这笔收益没有奖励
                                                 OrderModel orderUpdateStatus = TaskMethod.assembleOrderUpdateOrderStatusAndRunStatus(data.getId(), 4, 3);
                                                 ComponentUtil.orderService.updateOrderStatus(orderUpdateStatus);
                                                 // 3.用户余额流水流水 orderStatus = 5，也就是说用户的订单金额要锁8小时
@@ -565,33 +575,35 @@ public class TaskOrder {
                             StatusModel statusModel = TaskMethod.assembleUpdateStatusByInfo(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE, "");
                             ComponentUtil.taskOrderService.updateOrderStatus(statusModel);
 
-                            // 用户自己奖励
-                            if (!StringUtils.isBlank(data.getProfit()) && data.getOrderStatus() != 3){
-                                DidRewardModel didRewardMyModel = TaskMethod.assembleTeamDirectConsumeProfit(6, data.getDid(), data.getProfit(), data);
-                                ComponentUtil.didRewardService.add(didRewardMyModel);
+//                            // 用户自己奖励
+//                            if (!StringUtils.isBlank(data.getProfit()) && data.getOrderStatus() != 3){
+//
+//                            }
+
+                            DidRewardModel didRewardMyModel = TaskMethod.assembleTeamDirectConsumeProfit(6, data.getDid(), data.getProfit(), data);
+                            ComponentUtil.didRewardService.add(didRewardMyModel);
 
 
-                                // 添加团队长奖励数据-start
-                                // 获取此用户的上级用户ID
-                                DidLevelModel didLevelQuery = TaskMethod.assembleDidSuperiorQuery(data.getDid(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ONE);
-                                DidLevelModel didLevelModel = (DidLevelModel) ComponentUtil.didLevelService.findByObject(didLevelQuery);
-                                if (didLevelModel != null && didLevelModel.getId() > 0){
-                                    // 根据用户ID查询此用户是否属于团队长
-                                    DidModel didByIdQuery = TaskMethod.assembleDidQueryByDid(didLevelModel.getLevelDid());
-                                    DidModel didModel = (DidModel) ComponentUtil.didService.findByObject(didByIdQuery);
-                                    if (didModel.getIsTeam() == 2){
-                                        // 属于团队长属性:计算需要给与每单的奖励的金额 = 订单金额 * 奖励比例
-                                        String moneyReward = StringUtil.getMultiply(data.getOrderMoney(), ratio_Wx_Reward);
-                                        log.info("");
-                                        if (!StringUtils.isBlank(moneyReward) && !moneyReward.equals("0.00")){
-                                            DidRewardModel didRewardModel = TaskMethod.assembleTeamDirectConsumeProfit(10, didModel.getId(), moneyReward, data);
-                                            ComponentUtil.didRewardService.add(didRewardModel);
-                                        }
-
+                            // 添加团队长奖励数据-start
+                            // 获取此用户的上级用户ID
+                            DidLevelModel didLevelQuery = TaskMethod.assembleDidSuperiorQuery(data.getDid(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ONE);
+                            DidLevelModel didLevelModel = (DidLevelModel) ComponentUtil.didLevelService.findByObject(didLevelQuery);
+                            if (didLevelModel != null && didLevelModel.getId() > 0){
+                                // 根据用户ID查询此用户是否属于团队长
+                                DidModel didByIdQuery = TaskMethod.assembleDidQueryByDid(didLevelModel.getLevelDid());
+                                DidModel didModel = (DidModel) ComponentUtil.didService.findByObject(didByIdQuery);
+                                if (didModel.getIsTeam() == 2){
+                                    // 属于团队长属性:计算需要给与每单的奖励的金额 = 订单金额 * 奖励比例
+                                    String moneyReward = StringUtil.getMultiply(data.getOrderMoney(), ratio_Wx_Reward);
+                                    log.info("");
+                                    if (!StringUtils.isBlank(moneyReward) && !moneyReward.equals("0.00")){
+                                        DidRewardModel didRewardModel = TaskMethod.assembleTeamDirectConsumeProfit(10, didModel.getId(), moneyReward, data);
+                                        ComponentUtil.didRewardService.add(didRewardModel);
                                     }
+
                                 }
-                                // 添加团队长奖励数据-end
                             }
+                            // 添加团队长奖励数据-end
 
 
 
@@ -654,6 +666,12 @@ public class TaskOrder {
         StrategyModel strategyToWxidMaxMoneyModel = ComponentUtil.strategyService.getStrategyModel(strategyToWxidMaxMoneyQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
         toWxidMaxMoney = strategyToWxidMaxMoneyModel.getStgValue();
 
+        // 查询策略里面的微信收款金额超上限的解控时间
+        int toWxidRelieveTime = 0;
+        StrategyModel strategyToWxidRelieveTimeQuery = HodgepodgeMethod.assembleStrategyQuery(ServerConstant.StrategyEnum.TO_WXID_RELIEVE_TIME.getStgType());
+        StrategyModel strategyToWxidRelieveTimeModel = ComponentUtil.strategyService.getStrategyModel(strategyToWxidRelieveTimeQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
+        toWxidRelieveTime = strategyToWxidRelieveTimeModel.getStgNumValue();
+
         // 获取支付类型为3，订单成功，并且没有进行数据填充的订单数据
         StatusModel statusQuery = TaskMethod.assembleOrderByToWxidMoneyQuery(3, 3, 1, limitNum);
         List<OrderModel> synchroList = ComponentUtil.taskOrderService.getOrderList(statusQuery);
@@ -686,7 +704,7 @@ public class TaskOrder {
                                 }
                             }
                             // 添加用户的微信收款账号金额监控数据
-                            DidWxMonitorModel didWxMonitorModel = TaskMethod.assembleDidWxMonitorAdd(data.getDid(), wxNickname, data.getUserId(), toWxidTime);
+                            DidWxMonitorModel didWxMonitorModel = TaskMethod.assembleDidWxMonitorAdd(data.getDid(), wxNickname, data.getUserId(), toWxidRelieveTime);
                             ComponentUtil.didWxMonitorService.add(didWxMonitorModel);
                         }
                     }

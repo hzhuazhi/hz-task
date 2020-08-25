@@ -3124,7 +3124,7 @@ public class TaskMethod {
      * @date 2020/6/2 14:53
      */
     public static OrderModel assembleOrderByReplenish(long did, String orderNo, String orderMoney,
-                                                       long collectionAccountId, int collectionType, String remark, int replenishType) throws Exception{
+                                                       long collectionAccountId, int collectionType, String remark, int replenishType, String profit) throws Exception{
         OrderModel resBean = new OrderModel();
         resBean.setDid(did);
         resBean.setOrderNo(orderNo);
@@ -3134,6 +3134,9 @@ public class TaskMethod {
         resBean.setCollectionType(collectionType);
         // 订单失效时间
         resBean.setInvalidTime(DateUtil.getNowPlusTime());
+        if (!StringUtils.isBlank(profit)){
+            resBean.setProfit(profit);
+        }
         resBean.setRemark(remark);
         resBean.setReplenishType(replenishType);
         resBean.setCurday(DateUtil.getDayNumber(new Date()));
@@ -3592,6 +3595,7 @@ public class TaskMethod {
      * @date 2020/7/21 21:16
      */
     public static int getWxDataTypeByOne(String msg){
+        msg = msg.replaceAll(" ","");
         int num = 0;
         if (msg.equals("3")){
             num = 3;
@@ -3626,6 +3630,8 @@ public class TaskMethod {
             }else {
                 num = 2;
             }
+        }else if(msg.indexOf("限制") > -1){
+            num = 13;
         }else{
             num = 2;
         }
@@ -4133,19 +4139,19 @@ public class TaskMethod {
      * @param did - 用户ID
      * @param wxNickname - 微信昵称
      * @param toWxid - 微信原始ID
-     * @param toWxidTime - 要累加的失效时间
+     * @param toWxidRelieveTime - 要累加的失效时间
      * @return com.hz.task.master.core.model.did.DidWxMonitorModel
      * @author yoko
      * @date 2020/8/24 10:58
      */
-    public static DidWxMonitorModel assembleDidWxMonitorAdd(long did, String wxNickname, String toWxid, int toWxidTime){
+    public static DidWxMonitorModel assembleDidWxMonitorAdd(long did, String wxNickname, String toWxid, int toWxidRelieveTime){
         DidWxMonitorModel resBean = new DidWxMonitorModel();
         resBean.setDid(did);
         if (!StringUtils.isBlank(wxNickname)){
             resBean.setWxNickname(wxNickname);
         }
         resBean.setToWxid(toWxid);
-        String invalidTime = DateUtil.addDateMinute(toWxidTime);
+        String invalidTime = DateUtil.addDateMinute(toWxidRelieveTime);
         resBean.setInvalidTime(invalidTime);
         resBean.setCurday(DateUtil.getDayNumber(new Date()));
         resBean.setCurhour(DateUtil.getHour(new Date()));
@@ -4279,6 +4285,11 @@ public class TaskMethod {
         System.out.println("flag_1:" + flag_1);
         String sb11 = StringUtil.getBigDecimalSubtractByStr(sb9, sb10);
         System.out.println("sb11:" + sb11);
+
+//        String sb13 = " 1 # 200 ";
+        String sb13 = "1#200";
+        System.out.println("sb13:" + sb13.replaceAll(" ",""));
+
 
     }
 
