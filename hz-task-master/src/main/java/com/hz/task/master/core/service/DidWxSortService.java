@@ -41,4 +41,16 @@ public interface DidWxSortService<T> extends BaseService<T> {
      * @date 2020/8/31 17:05
      */
     public int updateInUse(DidWxSortModel model);
+
+    /**
+     * @Description: 添加用户的微信出码排序，根据是否已经存在数据
+     * <p>
+     *     如果已存在则不进行数据的添加
+     * </p>
+     * @param model
+     * @return
+     * @author yoko
+     * @date 2020/8/31 17:39
+    */
+    public int addByExist(DidWxSortModel model);
 }
