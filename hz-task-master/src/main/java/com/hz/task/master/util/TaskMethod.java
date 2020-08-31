@@ -4176,6 +4176,28 @@ public class TaskMethod {
         return resBean;
     }
 
+    /**
+     * @Description: 组装添加用户的微信出码排序数据的方法
+     * @param catDataAnalysisModel - 群指令3数据
+     * @param did - 用户ID
+     * @return com.hz.task.master.core.model.did.DidWxSortModel
+     * @author yoko
+     * @date 2020/8/31 17:49
+     */
+    public static DidWxSortModel assembleDidWxSort(CatDataAnalysisModel catDataAnalysisModel, long did){
+        DidWxSortModel resBean = new DidWxSortModel();
+        resBean.setDid(did);
+        if (!StringUtils.isBlank(catDataAnalysisModel.getFromWxid())){
+            resBean.setWxNickname(catDataAnalysisModel.getFromWxid());
+        }
+        if (!StringUtils.isBlank(catDataAnalysisModel.getFinalFromWxid())){
+            resBean.setToWxid(catDataAnalysisModel.getFinalFromWxid());
+        }else {
+            return null;
+        }
+        return resBean;
+
+    }
 
 
 

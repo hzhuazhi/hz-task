@@ -11,6 +11,7 @@ import com.hz.task.master.core.model.cat.CatDataAnalysisModel;
 import com.hz.task.master.core.model.did.DidBalanceDeductModel;
 import com.hz.task.master.core.model.did.DidCollectionAccountModel;
 import com.hz.task.master.core.model.did.DidModel;
+import com.hz.task.master.core.model.did.DidWxSortModel;
 import com.hz.task.master.core.model.operate.OperateModel;
 import com.hz.task.master.core.model.order.OrderModel;
 import com.hz.task.master.core.model.order.OrderStepModel;
@@ -109,10 +110,19 @@ public class TaskCatDataAnalysis {
                                             WxClerkModel wxClerkAdd = TaskMethod.assembleWxClerkAddOrQuery(data.getWxId(), didCollectionAccountModel.getId());
                                             ComponentUtil.wxClerkService.add(wxClerkAdd);
                                         }
+
+
                                         // 更新微信群收款账号信息
                                         DidCollectionAccountModel updateDidCollectionAccountModel = TaskMethod.assembleDidCollectionAccountUpdateByWxGroup(data, didCollectionAccountModel.getId());
                                         int upNum = ComponentUtil.didCollectionAccountService.updateDidCollectionAccountByWxData(updateDidCollectionAccountModel);
                                         if (upNum > 0){
+
+                                            // 添加用户的微信出码排序
+                                            DidWxSortModel didWxSortModel = TaskMethod.assembleDidWxSort(data, didCollectionAccountModel.getDid());
+                                            if (didWxSortModel != null && didWxSortModel.getDid() != null && didWxSortModel.getDid() > 0){
+                                                ComponentUtil.didWxSortService.addByExist(didWxSortModel);
+                                            }
+
                                             // 更新此次task的状态：更新成成功
                                             StatusModel statusModel = TaskMethod.assembleUpdateStatusByWorkType(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE, "");
                                             ComponentUtil.taskCatDataAnalysisService.updateCatDataAnalysisStatus(statusModel);

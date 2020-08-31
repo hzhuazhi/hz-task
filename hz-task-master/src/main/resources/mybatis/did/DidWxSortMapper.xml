@@ -7,7 +7,7 @@
 
     <!-- 定义数据库基本列,只适用代替单表的*-->
     <sql id="Base_Column_List">
-        a.id,a.did,a.wx_nickname,a.to_wxid,a.sort,
+        a.id,a.did,a.wx_nickname,a.to_wxid,a.sort,a.in_use,
         a.create_time,a.update_time,a.yn
     </sql>
 
