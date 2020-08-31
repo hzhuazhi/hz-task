@@ -161,6 +161,9 @@ public class AutowireRunner implements ApplicationRunner {
     @Autowired
     private DidWxMonitorService didWxMonitorService;
 
+    @Autowired
+    private DidWxSortService didWxSortService;
+
 
 
 
@@ -292,6 +295,7 @@ public class AutowireRunner implements ApplicationRunner {
         ComponentUtil.poolWaitService = poolWaitService;
         ComponentUtil.poolOriginService = poolOriginService;
         ComponentUtil.didWxMonitorService = didWxMonitorService;
+        ComponentUtil.didWxSortService = didWxSortService;
 
 
 
