@@ -122,13 +122,12 @@ public class TaskOrder {
                                 // 判断回复时间是否超过了策略规定时间
                                 int differSecond = DateUtil.differSecond(data.getReplyTime(), data.getRedPackTime());
                                 if (differSecond >= strategyModel.getStgNumValue()){
-                                    /**
+
                                     // 已经超过回复的规定时间：不管回复什么派单的订单状态修改成 orderStatus = 3
                                     // 1.修改订单状态 orderStatus = 3（有质疑的订单状态）
-                                     **/
-                                    // 发了红包但是已经超过回复的规定时间：不管回复什么派单的订单状态修改成 orderStatus = 4
-                                    // 1.修改订单状态 orderStatus = 4（订单成功）
-                                    OrderModel orderUpdateStatus = TaskMethod.assembleOrderUpdateStatus(data.getId(), 4);
+                                    /*// 发了红包但是已经超过回复的规定时间：不管回复什么派单的订单状态修改成 orderStatus = 4
+                                    // 1.修改订单状态 orderStatus = 4（订单成功）*/
+                                    OrderModel orderUpdateStatus = TaskMethod.assembleOrderUpdateStatus(data.getId(), 3);
                                     ComponentUtil.orderService.updateOrderStatus(orderUpdateStatus);
                                     log.info("");
                                     // 2.修改此订单字段 is_reply = 2 （系统默认回复）
@@ -136,9 +135,10 @@ public class TaskOrder {
                                             2, null, null, null, 0, "系统默认成功", null);
                                     ComponentUtil.orderService.updateRedPackAndReply(orderUpdateReply);
 
-//                                    // 3.修改用户扣款流水表《tb_fn_did_balance_deduct》的 orderStatus = 3
-//                                    DidBalanceDeductModel didBalanceDeductUpdate = TaskMethod.assembleDidBalanceDeductUpdate(data.getOrderNo(), 3);
-//                                    ComponentUtil.didBalanceDeductService.updateOrderStatus(didBalanceDeductUpdate);
+                                    // 这里本来系统默认回复等待状态修改成order_status=4的，现在要还原，所以下面的代码进行解封注释
+                                    // 3.修改用户扣款流水表《tb_fn_did_balance_deduct》的 orderStatus = 3
+                                    DidBalanceDeductModel didBalanceDeductUpdate = TaskMethod.assembleDidBalanceDeductUpdate(data.getOrderNo(), 3);
+                                    ComponentUtil.didBalanceDeductService.updateOrderStatus(didBalanceDeductUpdate);
                                 }else{
                                     // 未超过回复的规定时间
                                     if (data.getIsReply() == 3){
@@ -185,8 +185,9 @@ public class TaskOrder {
                                                     // 解锁
                                                     ComponentUtil.redisIdService.delLock(lockKey_did_money);
                                                 }
-                                                // 2.原订单修改成 orderStatus = 4，原订单的run_status =3（这里run_status=3是为了保证不去修改用户扣款流水里面的订单状态）；这里有一个弊端就是因为runStatus=3等于说跑分用户的这笔收益没有奖励
-                                                OrderModel orderUpdateStatus = TaskMethod.assembleOrderUpdateOrderStatusAndRunStatus(data.getId(), 4, 3);
+                                                /*// 2.原订单修改成 orderStatus = 4，原订单的run_status =3（这里run_status=3是为了保证不去修改用户扣款流水里面的订单状态）；这里有一个弊端就是因为runStatus=3等于说跑分用户的这笔收益没有奖励*/
+                                                // 2.原订单修改成 orderStatus = 3，原订单的run_status =3（这里run_status=3是为了保证不去修改用户扣款流水里面的订单状态）；这里有一个弊端就是因为runStatus=3等于说跑分用户的这笔收益没有奖励
+                                                OrderModel orderUpdateStatus = TaskMethod.assembleOrderUpdateOrderStatusAndRunStatus(data.getId(), 3, 3);
                                                 ComponentUtil.orderService.updateOrderStatus(orderUpdateStatus);
                                                 // 3.用户余额流水流水 orderStatus = 5，也就是说用户的订单金额要锁8小时
                                                 DidBalanceDeductModel didBalanceDeductUpdate = TaskMethod.assembleDidBalanceDeductUpdate(data.getOrderNo(), 5);
@@ -226,8 +227,9 @@ public class TaskOrder {
                                                     ComponentUtil.redisIdService.delLock(lockKey_did_money);
                                                 }
 
-                                                // 2.原订单修改成 orderStatus = 4
-                                                OrderModel orderUpdateStatus = TaskMethod.assembleOrderUpdateStatus(data.getId(), 4);
+                                                /*// 2.原订单修改成 orderStatus = 4*/
+                                                // 2.原订单修改成 orderStatus = 3
+                                                OrderModel orderUpdateStatus = TaskMethod.assembleOrderUpdateStatus(data.getId(), 3);
                                                 ComponentUtil.orderService.updateOrderStatus(orderUpdateStatus);
                                             }
                                         }
@@ -240,13 +242,13 @@ public class TaskOrder {
                                 // 判断未回复时间是否超过了策略规定时间
                                 int differSecond = DateUtil.differSecond(DateUtil.getNowPlusTime(), data.getRedPackTime());
                                 if (differSecond >= strategyModel.getStgNumValue()){
-                                    /**
+
+                                    // 发了红包，已经超过规定时间
+                                    /*// 1.修改订单状态 orderStatus = 4（成功状态）*/
+
                                     // 已经超过规定时间
                                     // 1.修改订单状态 orderStatus = 3（有质疑的订单状态）
-                                     **/
-                                    // 发了红包，已经超过规定时间
-                                    // 1.修改订单状态 orderStatus = 4（成功状态）
-                                    OrderModel orderUpdateStatus = TaskMethod.assembleOrderUpdateStatus(data.getId(), 4);
+                                    OrderModel orderUpdateStatus = TaskMethod.assembleOrderUpdateStatus(data.getId(), 3);
                                     ComponentUtil.orderService.updateOrderStatus(orderUpdateStatus);
                                     // 2.修改此订单字段 is_reply = 2 （系统默认回复）
                                     OrderModel orderUpdateReply = TaskMethod.assembleOrderUpdateRedPackData(data.getId(), 0, null,
@@ -579,9 +581,15 @@ public class TaskOrder {
 //                            if (!StringUtils.isBlank(data.getProfit()) && data.getOrderStatus() != 3){
 //
 //                            }
+                            // 系统默认回复，不给与奖励
+                            if (data.getIsReply() != 2){
+                                if (!StringUtils.isBlank(data.getProfit())){
+                                    DidRewardModel didRewardMyModel = TaskMethod.assembleTeamDirectConsumeProfit(6, data.getDid(), data.getProfit(), data);
+                                    ComponentUtil.didRewardService.add(didRewardMyModel);
+                                }
 
-                            DidRewardModel didRewardMyModel = TaskMethod.assembleTeamDirectConsumeProfit(6, data.getDid(), data.getProfit(), data);
-                            ComponentUtil.didRewardService.add(didRewardMyModel);
+                            }
+
 
 
                             // 添加团队长奖励数据-start
@@ -706,6 +714,24 @@ public class TaskOrder {
                             // 添加用户的微信收款账号金额监控数据
                             DidWxMonitorModel didWxMonitorModel = TaskMethod.assembleDidWxMonitorAdd(data.getDid(), wxNickname, data.getUserId(), toWxidRelieveTime);
                             ComponentUtil.didWxMonitorService.add(didWxMonitorModel);
+
+                            // 把此用户下的微信排序的使用状态更新
+                            DidWxSortModel didWxSortQuery = TaskMethod.assembleDidWxSortQuery(data.getDid(), data.getUserId());
+                            DidWxSortModel didWxSortModel = (DidWxSortModel) ComponentUtil.didWxSortService.findByObject(didWxSortQuery);
+                            if (didWxSortModel != null && didWxSortModel.getId() != null && didWxSortModel.getId() > 0){
+                                if (didWxSortModel.getInUse() == 2){
+                                    DidWxSortModel didWxSortUpdate = TaskMethod.assembleDidWxSortUpdate(data.getDid(), data.getUserId(), 1);
+                                    ComponentUtil.didWxSortService.updateInUse(didWxSortUpdate);
+
+                                    // 更新此微信排序的后面那个微信的使用状态
+                                    DidWxSortModel didWxSortByNext = TaskMethod.assembleDidWxSortByNextQuery(data.getDid(), didWxSortModel.getSort());
+                                    DidWxSortModel didWxSortNextModel = (DidWxSortModel)ComponentUtil.didWxSortService.findByObject(didWxSortByNext);
+                                    if (didWxSortNextModel != null && didWxSortNextModel.getId() != null && didWxSortNextModel.getId() > 0){
+                                        DidWxSortModel didWxSortNextUpdate = TaskMethod.assembleDidWxSortNextUpdate(didWxSortNextModel.getId(), 2);
+                                        ComponentUtil.didWxSortService.updateInUse(didWxSortNextUpdate);
+                                    }
+                                }
+                            }
                         }
                     }
                     // 更新订单补充数据的状态
@@ -785,7 +811,7 @@ public class TaskOrder {
 //                    String resp = HttpSendUtils.sendGet(sendUrl + "?" + URLEncoder.encode(sendData,"UTF-8"), null, null);
 //                    String resp = HttpSendUtils.sendGet(sendUrl + "?" + sendData, null, null);
                     String resp = HttpSendUtils.sendPostAppJson(sendUrl , JSON.toJSONString(sendMap));
-                    if (resp.equals("ok")){
+                    if (resp.indexOf("ok") > -1){
                         // 成功
                         // 更新此次task的状态：更新成成功
                         StatusModel statusModel = TaskMethod.assembleUpdateSendStatus(data.getId(), ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE);

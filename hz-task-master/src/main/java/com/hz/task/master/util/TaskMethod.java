@@ -4199,6 +4199,69 @@ public class TaskMethod {
 
     }
 
+    /**
+     * @Description: 组装查询微信排序的查询条件
+     * @param did - 用户DID
+     * @param toWxid - 微信原始ID
+     * @return com.hz.task.master.core.model.did.DidWxSortModel
+     * @author yoko
+     * @date 2020/8/31 23:03
+     */
+    public static DidWxSortModel assembleDidWxSortQuery(long did, String toWxid){
+        DidWxSortModel resBean = new DidWxSortModel();
+        resBean.setDid(did);
+        resBean.setToWxid(toWxid);
+        return resBean;
+    }
+
+    /**
+     * @Description: 组装更新用户微信排序的使用状态
+     * @param did - 用户ID
+     * @param inUse - 是否属于使用中：1没有使用，2正在使用中
+     * @return com.hz.task.master.core.model.did.DidWxSortModel
+     * @author yoko
+     * @date 2020/8/31 23:17
+     */
+    public static DidWxSortModel assembleDidWxSortUpdate(long did, String toWxid, int inUse){
+        DidWxSortModel resBean = new DidWxSortModel();
+        resBean.setDid(did);
+        resBean.setToWxid(toWxid);
+        resBean.setUpInUse(inUse);
+        return resBean;
+    }
+
+
+    /**
+     * @Description: 组装查询此位置的下一个位置的微信原始ID
+     * @param did - 用户ID
+     * @param startSort - 排序位置
+     * @return com.hz.task.master.core.model.did.DidWxSortModel
+     * @author yoko
+     * @date 2020/8/31 23:26
+     */
+    public static DidWxSortModel assembleDidWxSortByNextQuery(long did, int startSort){
+        DidWxSortModel resBean = new DidWxSortModel();
+        resBean.setDid(did);
+        resBean.setStartSort(startSort);
+        return resBean;
+    }
+
+
+    /**
+     * @Description: 组装更新用户正在使用的状态
+     * @param id - 主键ID
+     * @param upInUse - 正在使用的状态
+     * @return com.hz.task.master.core.model.did.DidWxSortModel
+     * @author yoko
+     * @date 2020/8/31 23:31
+     */
+    public static DidWxSortModel assembleDidWxSortNextUpdate(long id, int upInUse){
+        DidWxSortModel resBean = new DidWxSortModel();
+        resBean.setId(id);
+        resBean.setUpInUse(upInUse);
+        return resBean;
+    }
+
 
 
 
