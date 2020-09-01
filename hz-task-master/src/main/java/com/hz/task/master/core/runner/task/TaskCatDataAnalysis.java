@@ -34,6 +34,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Description task:可爱猫数据解析
@@ -230,6 +231,39 @@ public class TaskCatDataAnalysis {
 
                         }else if(data.getDataType() == 7){
                             // 成功收款
+
+                            // 延迟10秒执行 - start
+                            int timeDifferSecond = 10;
+                            String strKeyCache = CachedKeyUtils.getCacheKeyTask(TkCacheKey.SUC_REPLY_VALUE, data.getCollectionAccountId());
+                            String strCache = (String) ComponentUtil.redisService.get(strKeyCache);
+                            if (!StringUtils.isBlank(strCache)){
+                                long taskId = Long.parseLong(strCache);
+                                if (taskId == data.getId()){
+                                    int differSecond = DateUtil.differSecond(DateUtil.getNowPlusTime(), data.getCreateTime());
+                                    if (differSecond < timeDifferSecond){
+                                        continue;
+                                    }
+                                }else{
+                                    if (data.getId() > taskId){
+                                        // 因为数据是按照一批一批的来抓取的，所以任务ID要大于redis的ID才能是内容覆盖
+                                        // 把之前的回复成功的任务修改成失败的
+                                        // 更新此次task的状态 - 更新成失败
+                                        StatusModel statusModel = TaskMethod.assembleUpdateStatusByWorkType(taskId, 2, "用户矫正回复");
+                                        ComponentUtil.taskCatDataAnalysisService.updateCatDataAnalysisStatus(statusModel);
+
+                                        // 删除已操作过的这个回复任务
+                                        ComponentUtil.redisService.remove(strKeyCache);
+                                    }
+
+                                }
+                            }else{
+                                int differSecond = DateUtil.differSecond(DateUtil.getNowPlusTime(), data.getCreateTime());
+                                if (differSecond < timeDifferSecond){
+                                    ComponentUtil.redisService.set(strKeyCache,String.valueOf(data.getId()) , Long.parseLong(String.valueOf(timeDifferSecond)));
+                                    continue;
+                                }
+                            }
+                            // 延迟10秒执行 - end
 
                             int workType = 0; // task的补充结果状态
                             String workRemark = "";// task的补充的备注

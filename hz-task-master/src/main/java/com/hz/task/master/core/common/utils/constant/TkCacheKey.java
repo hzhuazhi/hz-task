@@ -227,4 +227,10 @@ public interface TkCacheKey {
      * 锁住
      */
     String LOCK_ORDER_WORK_TYPE = "-37";
+
+
+    /**
+     * 限制回复成功的数据锁定
+     */
+    String SUC_REPLY_VALUE = "-38";
 }

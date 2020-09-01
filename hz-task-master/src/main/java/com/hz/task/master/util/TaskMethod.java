@@ -4351,13 +4351,7 @@ public class TaskMethod {
         System.out.println("sb5_start:"+ sb5_start);
         System.out.println("sb5_end:"+ sb5_end);
 
-        String replyTime = "2020-08-22 21:41:55";
-        String redPackTime = "2020-08-22 21:43:25";
-        int differSecond = DateUtil.differSecond(replyTime, redPackTime);
-        System.out.println("differSecond:" + differSecond);
-        if (differSecond >= 90){
-            System.out.println("时间进来了");
-        }
+
         String sb3 = "2020-08-23 21:50:11";
         int sb6 = DateUtil.dateSubtractBySystemTime(sb3);
         System.out.println("sb6:" + sb6);
@@ -4375,7 +4369,13 @@ public class TaskMethod {
         String sb13 = "1#200";
         System.out.println("sb13:" + sb13.replaceAll(" ",""));
 
-
+        String replyTime = "2020-08-22 21:41:55";
+        String redPackTime = "2020-08-22 21:41:51";
+        int differSecond = DateUtil.differSecond(replyTime, redPackTime);
+        System.out.println("differSecond:" + differSecond);
+        if (differSecond >= 90){
+            System.out.println("时间进来了");
+        }
     }
 
 
