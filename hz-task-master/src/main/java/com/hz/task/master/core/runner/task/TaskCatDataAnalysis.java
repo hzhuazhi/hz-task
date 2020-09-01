@@ -253,6 +253,8 @@ public class TaskCatDataAnalysis {
 
                                         // 删除已操作过的这个回复任务
                                         ComponentUtil.redisService.remove(strKeyCache);
+                                    }else {
+                                        continue;
                                     }
 
                                 }
