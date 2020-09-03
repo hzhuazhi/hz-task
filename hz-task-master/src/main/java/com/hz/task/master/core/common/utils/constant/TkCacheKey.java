@@ -233,4 +233,10 @@ public interface TkCacheKey {
      * 限制回复成功的数据锁定
      */
     String SUC_REPLY_VALUE = "-38";
+
+    /**
+     * 锁：用户微信排序规则使用
+     * 锁住
+     */
+    String LOCK_DID_WX_SORT = "-39";
 }

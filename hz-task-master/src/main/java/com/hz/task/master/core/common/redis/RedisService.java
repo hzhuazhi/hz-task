@@ -260,6 +260,21 @@ public class RedisService {
         return false;
     }
 
+    /**
+     * @Description: 查询key的集合
+     * <p>
+     *     前缀一致的所有key
+     * </p>
+     * @param key
+     * @return
+     * @author yoko
+     * @date 2020/9/3 15:52
+    */
+    public Set<String> prefixKeys(String key){
+        Set<String> keys = redisTemplate.keys(key);
+        return keys;
+    }
+
 
 
 }

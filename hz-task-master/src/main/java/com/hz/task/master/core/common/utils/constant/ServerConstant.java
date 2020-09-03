@@ -125,6 +125,8 @@ public class ServerConstant {
         TO_WXID_RANGE_MONEY(45,""),
         TO_WXID_MAX_MONEY(46,""),
         TO_WXID_RELIEVE_TIME(47,""),
+        WX_LIMIT_DAY_NUM(48,""),
+
         ;
         private int stgType;
         private String stgKey;
