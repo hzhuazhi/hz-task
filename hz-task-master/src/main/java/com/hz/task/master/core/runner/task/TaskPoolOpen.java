@@ -84,13 +84,14 @@ public class TaskPoolOpen {
                 String lockKey = CachedKeyUtils.getCacheKeyTask(TkCacheKey.LOCK_POOL_OPEN_DID, data);
                 boolean flagLock = ComponentUtil.redisIdService.lock(lockKey);
                 if (flagLock){
-                    int dataType = 0;// 数据类型:1初始化，2其它，3余额不足，4有效群不足，5有订单未回复，6有违规操作
+                    int dataType = 0;// 数据类型:1初始化，2其它，3余额不足，4有效群不足，5有订单未回复，6有违规操作，7抛开被限制的微信有效群不足，8没有可使用的微信
                     String origin = "";// 起因
                     PoolOriginModel poolOriginModel = null;
+                    boolean flag = false;
                     boolean flag_money = false;
                     boolean flag_group = false;
                     boolean flag_order = false;
-                    boolean flag_toWxId = false;
+                    boolean flag_toWxid = false;
                     boolean flag_toWxid_sort = false;
                     // 查询用户基本信息
                     DidModel didQuery = TaskMethod.assembleDidQueryByDid(data);
@@ -100,7 +101,9 @@ public class TaskPoolOpen {
                     if (!flag_money){
                         dataType = 3;
                         origin = "接单池子中检测到余额低于保底金额!";
-                    }else {
+                    }
+                    flag = flag_money;
+                    if (flag){
                         // 校验用户是否拥有有效群
                         DidCollectionAccountModel didCollectionAccountQuery = TaskMethod.assembleDidCollectionAccountListEffective(didModel.getId(), 3, 1, 3,1,2, 0, null);
                         List<DidCollectionAccountModel> didCollectionAccountList = ComponentUtil.didCollectionAccountService.getEffectiveDidCollectionAccountByWxGroup(didCollectionAccountQuery);
@@ -108,51 +111,56 @@ public class TaskPoolOpen {
                         if (!flag_group){
                             dataType = 4;
                             origin = "接单池子中检测到有效群不足!";
-                        }else{
-                            // 校验用户是否有已发红包的订单，但是未回复
-                            OrderModel orderQuery = TaskMethod.assembleOrderByIsReply(data, 3, 1, 2,2);
-                            OrderModel orderModel = ComponentUtil.orderService.getOrderByNotIsReply(orderQuery);
-                            flag_order = TaskMethod.checkOrderByIsReply(orderModel);
-                            if (!flag_order){
-                                dataType = 5;
-                                origin = "接单池子中检测到有订单未回复,微信群名称：《" + orderModel.getWxNickname() + "》";
-                            }else{
-                                // 校验排除超过金额的微信归属群，查询有效群是否不足
-
-                                // 获取用户的微信收款账号金额监控超过范围的微信ID集合
-                                DidWxMonitorModel didWxMonitorQuery = TaskMethod.assembleDidWxMonitorByDidQuery(data, "1");
-                                List<String> toWxidList = ComponentUtil.didWxMonitorService.getToWxidList(didWxMonitorQuery);
-                                if (toWxidList != null && toWxidList.size() > 0){
-                                    // 校验排除微信集合的其它微信用户是否拥有有效群
-                                    DidCollectionAccountModel didCollectionAccountToWxQuery = TaskMethod.assembleDidCollectionAccountListEffective(didModel.getId(), 3, 1, 3,1,2, 0, toWxidList);
-                                    List<DidCollectionAccountModel> didCollectionAccountToWxList = ComponentUtil.didCollectionAccountService.getEffectiveDidCollectionAccountByWxGroup(didCollectionAccountToWxQuery);
-                                    flag_toWxId = TaskMethod.checkDidCollectionAccountListEffective(didCollectionAccountToWxList);
-                                    if (!flag_toWxId){
-                                        dataType = 7;
-                                        origin = "接单池子中抛开被限制的微信后，有效群不足";
-                                    }
-                                }else {
-                                    flag_toWxId = true;
-                                }
-
-
-                                if (flag_toWxId){
-                                    // 校验微信排序中是否有正在使用的微信
-                                    DidWxSortModel didWxSortQuery = TaskMethod.assembleDidWxSortData(0, didModel.getId(), null,
-                                            0, 2, 0, 0, 0, null, null, null);
-                                    DidWxSortModel didWxSortModel = (DidWxSortModel)ComponentUtil.didWxSortService.findByObject(didWxSortQuery);
-                                    flag_toWxid_sort = TaskMethod.checkDidWxSortData(didWxSortModel);
-                                    if (!flag_toWxid_sort){
-                                        dataType = 8;
-                                        origin = "接单池子中用户在微信排序数据中没有可使用的微信";
-                                    }
-                                }
-
-                            }
                         }
                     }
+                    flag = flag_group;
+                    if (flag){
+                        // 校验用户是否有已发红包的订单，但是未回复
+                        OrderModel orderQuery = TaskMethod.assembleOrderByIsReply(data, 3, 1, 2,2);
+                        OrderModel orderModel = ComponentUtil.orderService.getOrderByNotIsReply(orderQuery);
+                        flag_order = TaskMethod.checkOrderByIsReply(orderModel);
+                        if (!flag_order){
+                            dataType = 5;
+                            origin = "接单池子中检测到有订单未回复,微信群名称：《" + orderModel.getWxNickname() + "》";
+                        }
+                    }
+                    flag = flag_order;
+                    if (flag){
+                        // 校验排除超过金额的微信归属群，查询有效群是否不足
 
-                    if (!flag_money || !flag_group || !flag_order || !flag_toWxId || !flag_toWxid_sort){
+                        // 获取用户的微信收款账号金额监控超过范围的微信ID集合
+                        DidWxMonitorModel didWxMonitorQuery = TaskMethod.assembleDidWxMonitorByDidQuery(data, "1");
+                        List<String> toWxidList = ComponentUtil.didWxMonitorService.getToWxidList(didWxMonitorQuery);
+                        if (toWxidList != null && toWxidList.size() > 0){
+                            // 校验排除微信集合的其它微信用户是否拥有有效群
+                            DidCollectionAccountModel didCollectionAccountToWxQuery = TaskMethod.assembleDidCollectionAccountListEffective(didModel.getId(), 3, 1, 3,1,2, 0, toWxidList);
+                            List<DidCollectionAccountModel> didCollectionAccountToWxList = ComponentUtil.didCollectionAccountService.getEffectiveDidCollectionAccountByWxGroup(didCollectionAccountToWxQuery);
+                            flag_toWxid = TaskMethod.checkDidCollectionAccountListEffective(didCollectionAccountToWxList);
+                            if (!flag_toWxid){
+                                dataType = 7;
+                                origin = "接单池子中抛开被限制的微信后，有效群不足";
+                            }
+                        }else {
+                            flag_toWxid = true;
+                        }
+                    }
+                    flag = flag_toWxid;
+                    if (flag){
+                        // 校验微信排序中是否有正在使用的微信
+                        DidWxSortModel didWxSortQuery = TaskMethod.assembleDidWxSortData(0, didModel.getId(), null,
+                                0, 2, 0, 0, 0, null, null, null);
+                        DidWxSortModel didWxSortModel = (DidWxSortModel)ComponentUtil.didWxSortService.findByObject(didWxSortQuery);
+                        flag_toWxid_sort = TaskMethod.checkDidWxSortData(didWxSortModel);
+                        if (!flag_toWxid_sort){
+                            dataType = 8;
+                            origin = "接单池子中用户在微信排序数据中没有可使用的微信";
+                        }
+                    }
+                    flag = flag_toWxid_sort;
+
+
+
+                    if (!flag){
                         // 把用户移出接单池
                         PoolOpenModel poolOpenUpdate = TaskMethod.assemblePoolOpenUpdate(0, data , 1);
                         ComponentUtil.taskPoolOpenService.updatePoolOpenYn(poolOpenUpdate);
