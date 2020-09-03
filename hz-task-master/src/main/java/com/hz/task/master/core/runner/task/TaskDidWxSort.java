@@ -78,7 +78,6 @@ public class TaskDidWxSort {
                             long did = redis_didWxSortModel.getDid();
                             String toWxid = redis_didWxSortModel.getToWxid();
                             String delayTime = redis_didWxSortModel.getDelayTime();
-                            log.info("strKeyCache:" + data + ",strCache:" + strCache);
                             // 根据条件查询此排序的信息
                             DidWxSortModel didWxSortQuery = TaskMethod.assembleDidWxSortData(0, did, toWxid,
                                     0, 0, 0, 0, 0, null, null, null);
