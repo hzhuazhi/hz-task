@@ -3863,6 +3863,21 @@ public class TaskMethod {
     }
 
     /**
+     * @Description: 校验微信排序数据中是否有正在使用的微信
+     * @param didWxSortModel
+     * @return
+     * @author yoko
+     * @date 2020/9/3 17:15
+    */
+    public static boolean checkDidWxSortData(DidWxSortModel didWxSortModel){
+        if (didWxSortModel == null || didWxSortModel.getId() == null || didWxSortModel.getId() <= 0){
+            return false;
+        }else {
+            return true;
+        }
+    }
+
+    /**
      * @Description: 组装查询订单信息的查询条件
      * @param did - 用户ID
      * @param collectionType - 收款账号类型：1微信，2支付宝，3微信群
@@ -4187,8 +4202,8 @@ public class TaskMethod {
     public static DidWxSortModel assembleDidWxSort(CatDataAnalysisModel catDataAnalysisModel, long did){
         DidWxSortModel resBean = new DidWxSortModel();
         resBean.setDid(did);
-        if (!StringUtils.isBlank(catDataAnalysisModel.getFromWxid())){
-            resBean.setWxNickname(catDataAnalysisModel.getFromWxid());
+        if (!StringUtils.isBlank(catDataAnalysisModel.getFinalFromName())){
+            resBean.setWxNickname(catDataAnalysisModel.getFinalFromName());
         }
         if (!StringUtils.isBlank(catDataAnalysisModel.getFinalFromWxid())){
             resBean.setToWxid(catDataAnalysisModel.getFinalFromWxid());
@@ -4317,6 +4332,24 @@ public class TaskMethod {
 
     }
 
+    /**
+     * @Description: 组装更新发送指令到redis的微信排序内容
+     * @param did - 用户ID
+     * @param toWxid - 用户微信ID
+     * @param limitType - 被限制的类型：1在金额范围内限制，2超过金额上限被限制，3被微信限制时间
+     * @param delayTime - 延迟要使用的时间
+     * @return com.hz.task.master.core.model.did.DidWxSortModel
+     * @author yoko
+     * @date 2020/9/3 16:28
+     */
+    public static DidWxSortModel assembleDidWxSortSend(long did, String toWxid, int limitType, String delayTime){
+        DidWxSortModel resBean = new DidWxSortModel();
+        resBean.setDid(did);
+        resBean.setToWxid(toWxid);
+        resBean.setLimitType(limitType);
+        resBean.setDelayTime(delayTime);
+        return resBean;
+    }
 
 
 

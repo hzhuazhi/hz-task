@@ -1,6 +1,7 @@
 package com.hz.task.master.core.runner.task;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.hz.task.master.core.common.utils.DateUtil;
 import com.hz.task.master.core.common.utils.StringUtil;
 import com.hz.task.master.core.common.utils.constant.CacheKey;
@@ -23,6 +24,7 @@ import com.hz.task.master.core.model.wx.WxFriendModel;
 import com.hz.task.master.core.model.wx.WxModel;
 import com.hz.task.master.core.model.wx.WxOrderModel;
 import com.hz.task.master.util.ComponentUtil;
+import com.hz.task.master.util.HodgepodgeMethod;
 import com.hz.task.master.util.TaskMethod;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -72,7 +74,6 @@ public class TaskCatDataAnalysis {
     @Scheduled(fixedDelay = 1000) // 每秒执行
     public void catDataAnalysisWorkType() throws Exception{
 //        log.info("----------------------------------TaskCatDataAnalysis.catDataAnalysisWorkType()----start");
-
         // 获取需要填充的可爱猫数据解析的数据
         StatusModel statusQuery = TaskMethod.assembleTaskByWorkTypeQuery(limitNum, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ONE);
         List<CatDataAnalysisModel> synchroList = ComponentUtil.taskCatDataAnalysisService.getCatDataAnalysisList(statusQuery);
@@ -367,6 +368,14 @@ public class TaskCatDataAnalysis {
                             int workType = 0; // task的补充结果状态
                             String workRemark = "";// task的补充的备注
 
+
+                            // 查询策略里面的微信收红包异常时间限制天数
+                            int wxLimitDayNum = 0;
+                            StrategyModel strategyQuery = HodgepodgeMethod.assembleStrategyQuery(ServerConstant.StrategyEnum.WX_LIMIT_DAY_NUM.getStgType());
+                            StrategyModel strategyModel = ComponentUtil.strategyService.getStrategyModel(strategyQuery, ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_ZERO);
+                            wxLimitDayNum = strategyModel.getStgNumValue();
+
+
                             // 根据发指令的微信ID更新用户群的审核状态
                             if (!StringUtils.isBlank(data.getFinalFromWxid())){
                                 DidCollectionAccountModel didCollectionAccountUpdate = TaskMethod.assembleDidCollectionAccountUpdateCheckDataInfoByAcNum(data.getFinalFromWxid(), 3, "检测：微信收款异常");
@@ -375,6 +384,14 @@ public class TaskCatDataAnalysis {
                                 // 根据用户ID修改订单的回复状态：修改回复失败的状态，并且说明备注
                                 OrderModel upOrderIsReplyModel = TaskMethod.assembleUpdateIsReplyByDid(didCollectionAccountModel.getDid(), data.getFinalFromWxid(),1, 3, 3,"2", "系统回复失败");
                                 ComponentUtil.orderService.updateIsReplyAndRemark(upOrderIsReplyModel);
+
+                                // 发送微信排序优先级调控
+                                String delayTime = DateUtil.nowTimeAddDay(wxLimitDayNum);
+                                DidWxSortModel didWxSortModel = TaskMethod.assembleDidWxSortSend(data.getDid(), data.getFinalFromWxid(), 3, delayTime);
+                                String strKeyCache_didWxSort = CachedKeyUtils.getCacheKey(CacheKey.DID_WX_SORT, data.getDid(), data.getFinalFromWxid());
+                                ComponentUtil.redisService.set(strKeyCache_didWxSort, JSON.toJSONString(didWxSortModel, SerializerFeature.WriteMapNullValue, SerializerFeature.WriteNullStringAsEmpty));
+
+
                                 workType = ServerConstant.PUBLIC_CONSTANT.SIZE_VALUE_THREE;
                             }else {
                                 // 更新此次task的状态：更新成失败

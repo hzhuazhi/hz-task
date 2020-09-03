@@ -1244,6 +1244,20 @@ public class DateUtil {
 	}
 
 	/**
+	 * @Description: 当前时间加多少天
+	 * @param day
+	 * @return
+	 * @author yoko
+	 * @date 2020/9/3 16:40
+	*/
+	public static String nowTimeAddDay(int day){
+		Calendar calo = Calendar.getInstance();
+		calo.setTime(new Date());
+		calo.add(Calendar.DATE, day);
+		return getFormattedDateUtil(calo.getTime(), "yyyy-MM-dd HH:mm:ss");
+	}
+
+	/**
 	 * 得到将date增加指定年数后的date
 	 *
 	 * @param date
@@ -3145,6 +3159,8 @@ public class DateUtil {
 		String endTime = "2020-07-27 23:56:57";
 		boolean sb1_flag = beforeData(startTime, endTime);
 		System.out.println("sb1_flag:" + sb1_flag);
+		String sb1 = nowTimeAddDay(30);
+		System.out.println("sb1:" + sb1);
 	}
 
 	/**

@@ -1,6 +1,7 @@
 package com.hz.task.master.core.runner.task;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.hz.task.master.core.common.utils.DateUtil;
 import com.hz.task.master.core.common.utils.HttpSendUtils;
 import com.hz.task.master.core.common.utils.StringUtil;
@@ -715,23 +716,11 @@ public class TaskOrder {
                             DidWxMonitorModel didWxMonitorModel = TaskMethod.assembleDidWxMonitorAdd(data.getDid(), wxNickname, data.getUserId(), toWxidRelieveTime);
                             ComponentUtil.didWxMonitorService.add(didWxMonitorModel);
 
-                            // 把此用户下的微信排序的使用状态更新
-                            DidWxSortModel didWxSortQuery = TaskMethod.assembleDidWxSortQuery(data.getDid(), data.getUserId());
-                            DidWxSortModel didWxSortModel = (DidWxSortModel) ComponentUtil.didWxSortService.findByObject(didWxSortQuery);
-                            if (didWxSortModel != null && didWxSortModel.getId() != null && didWxSortModel.getId() > 0){
-                                if (didWxSortModel.getInUse() == 2){
-                                    DidWxSortModel didWxSortUpdate = TaskMethod.assembleDidWxSortUpdate(data.getDid(), data.getUserId(), 1);
-                                    ComponentUtil.didWxSortService.updateInUse(didWxSortUpdate);
-
-                                    // 更新此微信排序的后面那个微信的使用状态
-                                    DidWxSortModel didWxSortByNext = TaskMethod.assembleDidWxSortByNextQuery(data.getDid(), didWxSortModel.getSort());
-                                    DidWxSortModel didWxSortNextModel = (DidWxSortModel)ComponentUtil.didWxSortService.findByObject(didWxSortByNext);
-                                    if (didWxSortNextModel != null && didWxSortNextModel.getId() != null && didWxSortNextModel.getId() > 0){
-                                        DidWxSortModel didWxSortNextUpdate = TaskMethod.assembleDidWxSortNextUpdate(didWxSortNextModel.getId(), 2);
-                                        ComponentUtil.didWxSortService.updateInUse(didWxSortNextUpdate);
-                                    }
-                                }
-                            }
+                            // 发送微信排序优先级调控
+                            String delayTime = DateUtil.addDateMinute(toWxidRelieveTime);
+                            DidWxSortModel didWxSortModel = TaskMethod.assembleDidWxSortSend(data.getDid(), data.getUserId(), 2, delayTime);
+                            String strKeyCache_didWxSort = CachedKeyUtils.getCacheKey(CacheKey.DID_WX_SORT, data.getDid(), data.getUserId());
+                            ComponentUtil.redisService.set(strKeyCache_didWxSort, JSON.toJSONString(didWxSortModel, SerializerFeature.WriteMapNullValue, SerializerFeature.WriteNullStringAsEmpty));
                         }
                     }
                     // 更新订单补充数据的状态

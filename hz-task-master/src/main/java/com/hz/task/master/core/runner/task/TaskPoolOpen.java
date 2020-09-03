@@ -7,6 +7,7 @@ import com.hz.task.master.core.common.utils.constant.TkCacheKey;
 import com.hz.task.master.core.model.did.DidCollectionAccountModel;
 import com.hz.task.master.core.model.did.DidModel;
 import com.hz.task.master.core.model.did.DidWxMonitorModel;
+import com.hz.task.master.core.model.did.DidWxSortModel;
 import com.hz.task.master.core.model.order.OrderModel;
 import com.hz.task.master.core.model.pool.PoolOpenModel;
 import com.hz.task.master.core.model.pool.PoolOriginModel;
@@ -90,6 +91,7 @@ public class TaskPoolOpen {
                     boolean flag_group = false;
                     boolean flag_order = false;
                     boolean flag_toWxId = false;
+                    boolean flag_toWxid_sort = false;
                     // 查询用户基本信息
                     DidModel didQuery = TaskMethod.assembleDidQueryByDid(data);
                     DidModel didModel = (DidModel) ComponentUtil.didService.findByObject(didQuery);
@@ -133,11 +135,24 @@ public class TaskPoolOpen {
                                     flag_toWxId = true;
                                 }
 
+
+                                if (flag_toWxId){
+                                    // 校验微信排序中是否有正在使用的微信
+                                    DidWxSortModel didWxSortQuery = TaskMethod.assembleDidWxSortData(0, didModel.getId(), null,
+                                            0, 2, 0, 0, 0, null, null, null);
+                                    DidWxSortModel didWxSortModel = (DidWxSortModel)ComponentUtil.didWxSortService.findByObject(didWxSortQuery);
+                                    flag_toWxid_sort = TaskMethod.checkDidWxSortData(didWxSortModel);
+                                    if (!flag_toWxid_sort){
+                                        dataType = 8;
+                                        origin = "接单池子中用户在微信排序数据中没有可使用的微信";
+                                    }
+                                }
+
                             }
                         }
                     }
 
-                    if (!flag_money || !flag_group || !flag_order || !flag_toWxId){
+                    if (!flag_money || !flag_group || !flag_order || !flag_toWxId || !flag_toWxid_sort){
                         // 把用户移出接单池
                         PoolOpenModel poolOpenUpdate = TaskMethod.assemblePoolOpenUpdate(0, data , 1);
                         ComponentUtil.taskPoolOpenService.updatePoolOpenYn(poolOpenUpdate);

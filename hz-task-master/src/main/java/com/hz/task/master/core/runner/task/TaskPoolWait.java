@@ -6,6 +6,7 @@ import com.hz.task.master.core.common.utils.constant.TkCacheKey;
 import com.hz.task.master.core.model.did.DidCollectionAccountModel;
 import com.hz.task.master.core.model.did.DidModel;
 import com.hz.task.master.core.model.did.DidWxMonitorModel;
+import com.hz.task.master.core.model.did.DidWxSortModel;
 import com.hz.task.master.core.model.order.OrderModel;
 import com.hz.task.master.core.model.pool.PoolOriginModel;
 import com.hz.task.master.core.model.pool.PoolWaitModel;
@@ -80,13 +81,14 @@ public class TaskPoolWait {
                 String lockKey = CachedKeyUtils.getCacheKeyTask(TkCacheKey.LOCK_POOL_WAIT_DID, data);
                 boolean flagLock = ComponentUtil.redisIdService.lock(lockKey);
                 if (flagLock){
-                    int dataType = 0;// 数据类型:1初始化，2其它，3余额不足，4有效群不足，5有订单未回复，6有违规操作，7抛开被限制的微信有效群不足
+                    int dataType = 0;// 数据类型:1初始化，2其它，3余额不足，4有效群不足，5有订单未回复，6有违规操作，7抛开被限制的微信有效群不足，8没有可使用的微信
                     String origin = "";// 起因
                     PoolOriginModel poolOriginModel = null;
                     boolean flag_money = false;
                     boolean flag_group = false;
                     boolean flag_order = false;
                     boolean flag_toWxId = false;
+                    boolean flag_toWxid_sort = false;
                     // 查询用户基本信息
                     DidModel didQuery = TaskMethod.assembleDidQueryByDid(data);
                     DidModel didModel = (DidModel) ComponentUtil.didService.findByObject(didQuery);
@@ -130,11 +132,24 @@ public class TaskPoolWait {
                                     flag_toWxId = true;
                                 }
 
+
+                                if (flag_toWxId){
+                                    // 校验微信排序中是否有正在使用的微信
+                                    DidWxSortModel didWxSortQuery = TaskMethod.assembleDidWxSortData(0, didModel.getId(), null,
+                                            0, 2, 0, 0, 0, null, null, null);
+                                    DidWxSortModel didWxSortModel = (DidWxSortModel)ComponentUtil.didWxSortService.findByObject(didWxSortQuery);
+                                    flag_toWxid_sort = TaskMethod.checkDidWxSortData(didWxSortModel);
+                                    if (!flag_toWxid_sort){
+                                        dataType = 8;
+                                        origin = "等待池子中用户在微信排序数据中没有可使用的微信";
+                                    }
+                                }
+
                             }
                         }
                     }
 
-                    if (!flag_money || !flag_group || !flag_order || !flag_toWxId){
+                    if (!flag_money || !flag_group || !flag_order || !flag_toWxId || !flag_toWxid_sort){
                         // 把用户移出等待池
                         PoolWaitModel poolWaitUpdate = TaskMethod.assemblePoolWaitUpdate(0, data, 1);
                         ComponentUtil.taskPoolWaitService.updatePoolWaitYn(poolWaitUpdate);

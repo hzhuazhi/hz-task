@@ -47,7 +47,10 @@ public class DidWxSortServiceImpl<T> extends BaseServiceImpl<T> implements DidWx
 
     @Override
     public int addByExist(DidWxSortModel model) {
-        DidWxSortModel didWxSortModel = (DidWxSortModel)didWxSortMapper.findByObject(model);
+        DidWxSortModel didWxSortQuery = new DidWxSortModel();
+        didWxSortQuery.setDid(model.getDid());
+        didWxSortQuery.setToWxid(model.getToWxid());
+        DidWxSortModel didWxSortModel = (DidWxSortModel)didWxSortMapper.findByObject(didWxSortQuery);
         if (didWxSortModel != null && didWxSortModel.getId() != null && didWxSortModel.getId() > 0){
             return 0;
         }else {
